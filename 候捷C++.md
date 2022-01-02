@@ -1,9 +1,9 @@
 [TOC]
 
-# C++面向对象程序设计
+# 一. C++面向对象程序设计
 ## 2. 头文件与类的声明
 
-</br>
+
 
 ## 3. 构造函数
 
@@ -44,7 +44,7 @@
 - **static data members:** 只有一份，不管创建了多少对象
 - **static member function:** 无 this 指针，只能处理 static data member
 
-``` C++
+```C++
 class Account {
 public:
     static double m_rate;  // 声明静态变量
@@ -187,8 +187,8 @@ queue::~queue(...)
 - **_List_node <font color='red'>is a</font> _List_node_base：** 子类是一种父类
 
 #### 内存关系
-![](\图片\inheritanceM.png)
-- **构造由内而外：** 先父类（默认构造函数），在子类
+![内存关系](\图片\inheritanceM.png)
+- **构造由内而外：** 先父类（默认构造函数），再子类
 - **析构由外而内：** 先子类，再父类
 - **父类的析构函数必须是 virtual**
 
@@ -203,7 +203,7 @@ queue::~queue(...)
 - **虚函数：** 希望子类重新定义，且有默认定义
 - **纯虚函数(pure)：** 希望子类一定重新定义，且无默认定义
 
-### Template Method: Inheritance(继承) with virtual(虚函数)
+### Template Method：Inheritance(继承) with virtual(虚函数)
 ![虚函数经典用法](\图片\TemplateMethod.png)
 - Serialize() 为父类的一个虚函数，执行到的时候跳转到子类重新定义的 Serialize
 ```C++
@@ -452,6 +452,198 @@ int main()
 &nbsp;
 
 
-# C++程序设计(II): 兼谈对象模型
+# 二. C++程序设计(II)：兼谈对象模型
+
+&nbsp;
+
+## 2. conversion function —— 转换函数
+### 将 Fraction 转换为其它类型
+```C++
+class Fraction {
+public:
+    Fraction(int num, int den = 1)
+        : m_numberator(num), m_denominator(den)
+    { }
+    /* 转换函数：Fraction 可被转换为 double */
+    operator double() const {  // 注意 const
+        return (double)(m_numberator / m_denominator);
+    }
+private:
+    int m_numberator;  // 分子
+    int m_denominator; // 分母
+};
+
+Fraction f(3, 5);
+double d = 4 + f;  // 调用 operator double() 将 f 转换为 double 类型
+```
+- 最后一行：
+    1. 编译器会先找对应的 + 函数
+    2. 再设法将 f 转换为 double，即 double + double
+
+&nbsp;
+
+## 3. non-explicit-one-argument constructor —— 非显式单参数构造函数
+### 将其它转换为 Fraction 类型
+```C++
+class Fraction {
+public:
+    // non-explicit：非显式
+    // one-argument：有默认参数，只要一个实参就够了
+    Fraction(int num, int den = 1)
+        : m_numberator(num), m_denominator(den)
+    { }
+    Fraction opertaor+(const Fraction& f) {
+        return Fraction(...);
+    }
+private:
+    int m_numberator;
+    int m_denominator;
+};
+
+Fraction f(3, 5);
+double d2 = f + 4;
+```
+- 最后一行：
+    1. 调用 non-explicit ctor 将 4 转为 Fraction(4, 1)，即 4/1，因为 operator+ 右值为 Fraction，而构造函数可以只传入1个参数
+    2. 然后调用 operator+
+
+### 两者并存
+```C++
+class Fraction {
+public:
+    Fraction(int num, int den = 1)
+        : m_numberator(num), m_denominator(den)
+    { }
+    operator double() const {
+        return (double)(m_numberator / m_denominator);
+    }
+    Fraction opertaor+(const Fraction& f) {
+        return Fraction(...);
+    }
+private:
+    int m_numberator;
+    int m_denominator;
+};
+
+Fraction f(3, 5);
+double d2 = f + 4;
+```
+- 最后一行：**<font color='red'>报错</font>** ambiguous
+    可行方案 > 1
+
+### explicit-one-argument ctor
+```C++
+class Fraction {
+public:
+    explicit Fraction(int num, int den = 1)
+        : m_numberator(num), m_denominator(den)
+    { }
+    Fraction opertaor+(const Fraction& f) {
+        return Fraction(...);
+    }
+private:
+    int m_numberator;
+    int m_denominator;
+};
+
+Fraction f(3, 5);
+double d2 = f + 4;
+```
+- 最后一行：**<font color='red'>报错</font>** conversion from 'double' to 'Fraction' requested
+    构造函数为 explicit，即 4 不会被隐形转换为 Fraction
+
+### 标准库内的 conversion function(转换函数)
+```C++
+template<class Alloc>
+class vector<bool, Alloc> {
+public:
+    typedef __bit_reference reference;
+protected:
+    reference operator[](size_type n) {
+        return *(begin() + difference_type(n));
+    }
+};
+
+struct __bit_reference {
+    unsigned int* p;
+    unsigned int mask;
+    ...
+public:
+    operator bool() const { return !(!(*p & mask)); }
+    ...
+}
+```
+- 解读：
+    1. [] 返回的是 __bit_reference，而 calss 是 bool 类型
+    2. 那么 __bit_reference 内就得有一个转换为 bool 的转换函数
+
+&nbsp;
+## 4. pointer-link classes —— 智能指针
+
+
+
+
+&nbsp;
+## 5. function-link classes
+
+&nbsp;
+## 6. namespace经验谈
+
+&nbsp;
+## 7. class template
+
+&nbsp;
+## 8. function template
+
+&nbsp;
+## 9. member template
+
+&nbsp;
+## 10. specialization
+
+&nbsp;
+## 11. 模版偏特化
+
+&nbsp;
+## 12. 模版模版参数
+
+&nbsp;
+## 13. 关于C++标准库
+
+&nbsp;
+## 14. 三个主题
+
+&nbsp;
+## 15. reference
+
+&nbsp;
+## 16. 复合&继承关系下的构造和析构
+
+&nbsp;
+## 17. 对象模型：关于vptr和vybl
+
+&nbsp;
+## 18. 对象模型：关于this
+
+&nbsp;
+## 19. 对象模型：关于Dynamic Binding
+
+&nbsp;
+## 20. 谈谈const
+
+&nbsp;
+## 21. 关于new、delete
+
+&nbsp;
+## 22. operator new、operator delete
+
+&nbsp;
+## 23. 示例
+
+&nbsp;
+## 24. 重载new()、delete()示例
+
+&nbsp;
+## 25. Basic_String使用new(extra)扩充申请量
 
 
