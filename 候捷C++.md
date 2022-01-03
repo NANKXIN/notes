@@ -86,7 +86,7 @@ int main()
 #### 类模版
 ![类模版](\图片\classTemplate.png)
 - 变量(typename) T 未定，调用的时候再确定
-- 使用时要明确指定使用的类型 <>
+- 使用时要明确指定使用的类型 <font color='red'><></font>
 
 &nbsp;
 
@@ -579,12 +579,102 @@ public:
 
 &nbsp;
 ## 4. pointer-link classes —— 智能指针
+![智能指针图](\图片\pointerlinkclasses.png)
+- 智能指针：一个像指针的 class
+- 圆圈为智能指针，里面一定会有一个真正的指针
+- 指针所允许的操作（* 和 ->），该 class 都得有
+```C++
+template<class T>
+class shared_ptr {
+public:
+    T& operator*() const { return *px; }
+    T* opertaor->() const { return px; }
+    shared_ptr(T* p) 
+        : px(p) 
+    { }
 
+private:
+    T* px;  // 真正的指针
+    long* pn;
+...
+};
 
-
+// 例：
+struct Foo {
+    ...
+    void method(void) {...}
+};
+shard_ptr<Foo> sp(new Foo);  // sp 即 圆圈
+// 使用：
+Foo f(*sp);     // 解引用
+sp->method();   // -> 返回的是 px，即上面 new 的 Foo，即 px->methon();
+                // 虽然返回 px 消耗掉 ->，但 -> 还会继续作用下去（-> 特殊之处）
+```
+### 另一种 pointer-link classes —— 迭代器
+- 容器一定会带有迭代器
+- 迭代器指向容器内的一个元素
+- 迭代器还需要处理：++、--
+```C++
+template<class T>
+struct __list_node {
+    void* prev;
+    void* next;
+    T data;
+};
+template<class T, class Ref, class Ptr>
+struct __list_iterator {
+    typedef __list_iterator<T, Ref, Ptr> self;
+    typedef Ptr pointer;
+    typedef Ref reference;
+    typedef __list_node<T>* link_type;
+    link_type node;  // 真正的指针
+    bool operator==(const self& x) const { return node == x.node; }
+    bool operator!=(const self& x) const { return node != x.node; } 
+    reference operator*() const { return (*node).data; } 
+    pointer operator->() const { return &(operator*()); } 
+    self& operator++() {node = (link_type)((*node).next); return *this; }
+    self operator++(int){ selftmp = *this; ++*this; return tmp; } 
+    self& operator--() { node = (link_type) ((*node).prev); return *this; }
+    self operator--(int){ self tmp =*this; --*this; return tmp; } 
+};
+```
+- 解析 * 和 ->
+```C++
+// *：直接返回 node 指向结点的 data
+reference operator*() const { return (*noed).data; }
+// ->：返回 node 即可
+pointer opertaor->() const { return &(operator*()); }
+```
+![链表迭代器](\图片\链表迭代器.png)
+- node 为迭代器内真正的指针
 
 &nbsp;
-## 5. function-link classes
+## 5. function-link classes —— 仿函数
+- 表现的像函数的 class 
+- 有 () 的重载
+
+```C++
+template<class T>
+struct identity {
+    const T& operator()(const T& x) const { return x; }
+};
+
+template<class Pair>
+struct select1st {
+    const typename Pair::first_type& 
+    operator()(const Pair& x) const { return x.first; }
+};
+
+template<class Pair>
+struct select2nd {
+    const typename Pair::second_type& 
+    operator()(const Pair& x) const { return x.second; }
+};
+
+// 使用：
+select1st<Pair>()();    // 第一个 ()：创建临时变量
+                        // 第二个 ()：调用 () 函数
+```
 
 &nbsp;
 ## 6. namespace经验谈
