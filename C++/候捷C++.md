@@ -578,7 +578,7 @@ public:
     2. 那么 __bit_reference 内就得有一个转换为 bool 的转换函数
 
 &nbsp;
-## 4. pointer-link classes —— 智能指针
+## 4. pointer-like classes —— 智能指针
 ![智能指针图](\图片\pointerlinkclasses.png)
 - 智能指针：一个像指针的 class
 - 圆圈为智能指针，里面一定会有一个真正的指针
@@ -610,7 +610,7 @@ Foo f(*sp);     // 解引用
 sp->method();   // -> 返回的是 px，即上面 new 的 Foo，即 px->methon();
                 // 虽然返回 px 消耗掉 ->，但 -> 还会继续作用下去（-> 特殊之处）
 ```
-### 另一种 pointer-link classes —— 迭代器
+### 另一种 pointer-like classes —— 迭代器
 - 容器一定会带有迭代器
 - 迭代器指向容器内的一个元素
 - 迭代器还需要处理：++、--
@@ -649,7 +649,7 @@ pointer opertaor->() const { return &(operator*()); }
 - node 为迭代器内真正的指针
 
 &nbsp;
-## 5. function-link classes —— 仿函数
+## 5. function-like classes —— 仿函数
 - 表现的像函数的 class 
 - 有 () 的重载
 
