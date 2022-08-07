@@ -1,6 +1,8 @@
 [TOC]
 
-# 一. Linux常用命令
+# 一. 必备Linux命令和C语言基础
+
+## 1. Linux常用命令
 * __ls：__ -R 查看对应文件及所在目录
 * __cat：__ 打印文件内容到终端；__-s__：空行合并；__-b__：显示行号
 * __nl：__ 相当于 cat -b
@@ -27,8 +29,8 @@
 
 <!--============================================================-->
 
-# 二. vi编辑器的使用
-## 1. 基础命令
+## 2. vi编辑器的使用
+### (1). 基础命令
 > <font face="华文细黑" color=#008B8B size=5>模式切换</font>
 >> * <font face="consolas" color=#DC143C size=5>a</font> &nbsp;&nbsp; **<font face="华文细黑" size=4>光标之后插入</font>**
 >> * <font face="consolas" color=#DC143C size=5>A</font> &nbsp;&nbsp; **<font face="华文细黑" size=4>行尾插入</font>**
@@ -84,7 +86,7 @@
     * __u__ &nbsp;&nbsp; 取消上次操作
 -->
 
-## 2. 高级命令
+### (2). 高级命令
 > <font face="华文细黑" color=#008B8B size=5>光标命令</font>
 >> * <font face="consolas" color=#DC143C size=5>hjkl</font> &nbsp;&nbsp; **<font face="华文细黑" size=4>左下上右</font>**
 >> * <font face="consolas" color=#DC143C size=5>1G</font> &nbsp;&nbsp; **<font face="华文细黑" size=4>到第一行</font>**
@@ -119,8 +121,8 @@
 >> * <font face="consolas" color=#DC143C size=5>: [范围] s /old/new</font> &nbsp;&nbsp; **<font face="华文细黑" size=4>将 old 替换为 new，范围不写则为当前行</font>**
 >> * <font face="consolas" color=#DC143C size=5>: 10,15 s /old/new/g</font> &nbsp;&nbsp; **<font face="华文细黑" size=4>从10到15行所有 old 替换为 new（g 代表全部）</font>**
 >> * <font face="consolas" color=#DC143C size=5>: .,$ s /old/new</font> &nbsp;&nbsp; **<font face="华文细黑" size=4>从当前行到最后一行</font>**
->> * <font face="consolas" color=#DC143C size=5>: 1,$ s /old/new</font> &nbsp;&nbsp; **<font face="华文细黑" size=4>从第1行到最后一行</font>**
->> * <font face="consolas" color=#DC143C size=5>: % s /old/new</font> &nbsp;&nbsp; **<font face="华文细黑" size=4>全文替换</font>**
+>> * <font face="consolas" color=#DC143C size=5>: 1,$ s /old/new</font> &nbsp;&nbsp; **<font face="华文细黑" size=4>从第一行到最后一行</font>**
+>> * <font face="consolas" color=#DC143C size=5>: %s /old/new</font> &nbsp;&nbsp; **<font face="华文细黑" size=4>全文替换</font>**
 >> * <font face="consolas" color=#DC143C size=5>/g</font> &nbsp;&nbsp; **<font face="华文细黑" size=4>替换所有，否则若一行有多个，只替换第一个</font>**
 <!--
 3. __替换命令__
@@ -147,7 +149,133 @@
     * __: 10,15 y__ &nbsp;&nbsp; 复制10到15行内容
     * __: 10,15 d__ &nbsp;&nbsp; 删除(剪切)10到15行内容
 -->
-# 三. 基础知识
 
 
-    
+## 3. 数据的表示
+### (1). 进制 (转换)
+- **十进制转二进制**
+2 128 ······ 0
+2 64  ······ 0
+2 32  ······ 0
+2 16  ······ 0
+2 8   ······ 0
+2 4   ······ 0
+2 2   ······ 0
+2 1   ······ 1
+即 128 的二进制为 1000 0000
+负数取绝对值，最高位为符号位
+
+### (2). *原码、反码、补码
+> **程序内按补码存储**
+> 数据 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -5
+> 原码 0000 0101 &nbsp;&nbsp; 1000 0101 (原始二进制 最高位符号位 进位丢弃)
+> 反码 0000 0101 &nbsp;&nbsp; 1111 1010
+> 补码 0000 0101 &nbsp;&nbsp; 1111 1011 (反码+1)
+> **注-例：signed char [-128,127], -128补码为 1000 0000, 无原码和反码**
+
+### (3). *非数值型数据 ASCII
+**ASCII码：** linux 查表，注意范围
+```C
+man ASCII
+```
+
+## 4. 程序的编译和调试
+### (1). gcc编译器
+![文件类型](\pic\01\01.png)
+```C
+Linux C高级
+```
+   
+# 二. 数据类型、常量、变量、及运算符
+## 1. *数据类型
+- **溢出举例：**
+```C
+signed char a = 128;  // [-128, 127]  此处 a = -128
+// 128 原/反/补码 0000 0000 1000 0000 补码赋值给 a，只取低8位，即 1000 0000 = -128
+// -128 原码 1000 0000 1000 0000
+//      反码 1111 1111 0111 1111
+//      补码 1111 1111 1000 0000  赋值给 a，只取低8位，即 1000 0000
+unsigned char b = -1;  // [0, 255]  此处 b = 255
+// -1 原码 1000 0001
+//    反码 1111 1110
+//    补码 1111 1111 按无符号为 255
+```
+- 数据范围
+C语言 <usr/include/limits.h>
+
+## 2. 常量
+- **指数常量：**
+  1.176e+10 = 1.176x10^10
+  1.176e-10 = 1.176x10^-10
+
+## 3. 变量
+- **寄存器变量：** register
+
+## 4. 运算符
+- **%#：** 自动输出0x
+```C
+int a = 0x12;
+printf("%#x", a);  // 输出 0x12
+```
+- **,：** 从左到右依次执行
+```C
+int a = 1, b = 2, z = 0;
+z = (a+=5, b=a+1);  // z = 7
+```
+- **优先级：** 注意运算优先级
+
+
+
+# 三. 软件包管理及shell编程
+## 1. deb软件包管理 (无网络, 需处理依赖)
+![文件类型](\pic\02\dpkg.png)
+## 2. apt软件包管理 (有网络, 无需处理依赖)
+* **软件源配置文件：** /etc/apt/sources.list
+* **软件详细定位：** /var/lib/apt/lists/*
+* **软件源：** 1. Main(官方开源) 2. Universe(社区开源) 3. Restricted(官方非开源) 4. Multiverse(非官方非开源)
+* **刷新软件源：** 1. 修改配置文件 2. apt-get undate
+> **管理软件包（sudo）** 
+![文件类型](\pic\02\apt.png)
+![文件类型](\pic\02\apt-get.png)
+>> * **修复软件包依赖关系** 
+![文件类型](\pic\02\rely-on.png)
+>> * **安装软件包** sudo apt-get install
+![文件类型](\pic\02\install.png)
+>> * **重新安装软件包** sudo apt-get --reinstall install
+>> * **软件的卸载** 1. 不完全卸载 sudo apt-get remove 2. 完全卸载 sudo apt-get --purge remove
+![文件类型](\pic\02\remove.png)
+>> * **清理软件包缓冲区** sudo apt-get clean; sudo apt-get autoclean
+缓冲区目录：/var/cache/apt/archives/
+![文件类型](\pic\02\cache1.png)
+![文件类型](\pic\02\cache2.png)
+
+> **查询软件包信息（无需sudo）**
+![文件类型](\pic\02\query.png)
+>> * **查询软件包描述信息**
+![文件类型](\pic\02\show.png)
+>> * **获取软件包安装状态**
+![文件类型](\pic\02\policy.png)
+
+## 3. shell基本命令
+* **关机：** sudo shutdown -h now
+* **定时关机：** sudo shutdown -h +45 "Game over." （45分钟后关机）
+* **重启：** sudo shutdown -r now; sudo reboot now
+* **定时重启：** 同定时关机
+
+> **shell命令格式**
+> **1.**
+![文件类型](\pic\02\shell.png)
+> **2.** 
+![文件类型](\pic\02\format.png)
+> **3.** 
+![文件类型](\pic\02\format1.png)
+
+> **命令行操作**
+>> * **补齐命令和文件名**
+![文件类型](\pic\02\operation.png)
+>> * **查询命令历史**
+![文件类型](\pic\02\history.png)
+![文件类型](\pic\02\history1.png)
+
+## 4. shell中的特殊字符
+> * **通配符**
