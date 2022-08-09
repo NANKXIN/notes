@@ -229,31 +229,32 @@ z = (a+=5, b=a+1);  // z = 7
 # 三. 软件包管理及shell编程
 ## 1. deb软件包管理 (无网络, 需处理依赖)
 ![文件类型](\pic\02\dpkg.png)
+
 ## 2. apt软件包管理 (有网络, 无需处理依赖)
 * **软件源配置文件：** /etc/apt/sources.list
 * **软件详细定位：** /var/lib/apt/lists/*
 * **软件源：** 1. Main(官方开源) 2. Universe(社区开源) 3. Restricted(官方非开源) 4. Multiverse(非官方非开源)
 * **刷新软件源：** 1. 修改配置文件 2. apt-get undate
-> **管理软件包（sudo）** 
+> **<font size=4>管理软件包（sudo）</font>**
 ![文件类型](\pic\02\apt.png)
 ![文件类型](\pic\02\apt-get.png)
->> * **修复软件包依赖关系** 
+>> * **1. 修复软件包依赖关系** 
 ![文件类型](\pic\02\rely-on.png)
->> * **安装软件包** sudo apt-get install
+>> * **2. 安装软件包：sudo apt-get install**
 ![文件类型](\pic\02\install.png)
->> * **重新安装软件包** sudo apt-get --reinstall install
->> * **软件的卸载** 1. 不完全卸载 sudo apt-get remove 2. 完全卸载 sudo apt-get --purge remove
+>> * **3. 重新安装软件包：sudo apt-get --reinstall install**
+>> * **4. 软件的卸载：1. 不完全卸载 sudo apt-get remove 2. 完全卸载 sudo apt-get --purge remove**
 ![文件类型](\pic\02\remove.png)
->> * **清理软件包缓冲区** sudo apt-get clean; sudo apt-get autoclean
+>> * **5. 清理软件包缓冲区：sudo apt-get clean; sudo apt-get autoclean**
 缓冲区目录：/var/cache/apt/archives/
 ![文件类型](\pic\02\cache1.png)
 ![文件类型](\pic\02\cache2.png)
 
-> **查询软件包信息（无需sudo）**
+> **<font size=4>查询软件包信息（无需sudo）</font>**
 ![文件类型](\pic\02\query.png)
->> * **查询软件包描述信息**
+>> * **1. 查询软件包描述信息**
 ![文件类型](\pic\02\show.png)
->> * **获取软件包安装状态**
+>> * **2. 获取软件包安装状态**
 ![文件类型](\pic\02\policy.png)
 
 ## 3. shell基本命令
@@ -262,20 +263,127 @@ z = (a+=5, b=a+1);  // z = 7
 * **重启：** sudo shutdown -r now; sudo reboot now
 * **定时重启：** 同定时关机
 
-> **shell命令格式**
-> **1.**
+> **<font size=4>shell命令格式</font>**
+> * **1.**
 ![文件类型](\pic\02\shell.png)
-> **2.** 
+> * **2.** 
 ![文件类型](\pic\02\format.png)
-> **3.** 
+> * **3.** 
 ![文件类型](\pic\02\format1.png)
 
-> **命令行操作**
->> * **补齐命令和文件名**
+> **<font size=4>命令行操作</font>**
+>> * **1. 补齐命令和文件名**
 ![文件类型](\pic\02\operation.png)
->> * **查询命令历史**
-![文件类型](\pic\02\history.png)
-![文件类型](\pic\02\history1.png)
+>> * **2. 查询命令历史**
+>> ![文件类型](\pic\02\history.png)
+>> ![文件类型](\pic\02\history1.png)
 
 ## 4. shell中的特殊字符
-> * **通配符**
+> **<font size=4>通配符</font>**
+>> ![文件类型](\pic\02\currency1.png)
+>> ![文件类型](\pic\02\currency2.png)
+> * **<font color=#DC143C>1. 管道</font>**
+>> ![文件类型](\pic\02\pipe.png)
+> * **2. 输入输出重定向**
+>> ![文件类型](\pic\02\inout.png)
+>> ![文件类型](\pic\02\inout1.png)
+> * **3. 命令置换**
+>> **<font color=#DC143C>方法2：$() 代替 ``</font>**
+>> ![文件类型](\pic\02\replace.png)
+
+# 四. shell命令
+## 1. shell基础系统维护命令
+> **<font size=4>获取联机帮助</font>**
+>> **<font color=#DC143C>注意：直接 "man man" 查看man用法，主要是 1~9 和 A</font>**
+>> ![文件类型](\pic\02\man.png)
+>> ![文件类型](\pic\02\man1.png)
+> * **1. 基本系统维护命令**
+>> **(1). passwd**
+>> ![文件类型](\pic\02\passwd.png)
+>> **(2). su**
+>> **<font color=#DC143C>注意："su" 和 "su -" 不一样，su只更改用户，未更改环境</font>**
+>> ![文件类型](\pic\02\su.png)
+>> ![文件类型](\pic\02\su1.png)
+>> **(3). echo**
+>> ![文件类型](\pic\02\echo.png)
+>> **(4). date**
+>> ![文件类型](\pic\02\date.png)
+>> **(5). clear 同 ctrl+l**
+>> **(6). df**
+>> ![文件类型](\pic\02\df.png)
+>> ![文件类型](\pic\02\df1.png)
+>> **(7). du**
+>> ![文件类型](\pic\02\du.png)
+
+## 2. 用户管理命令
+> **<font size = 4>相关文件</font>**
+> ![文件类型](\pic\02\user.png)
+>> * **1. /etc/passwd文件**
+>> **<font color=#DC143C>注意："man 5 passwd" 查看文件格式</font>**
+>> ![文件类型](\pic\02\passwd-file.png)
+>> * **2. /etc/group文件**
+>> ![文件类型](\pic\02\group.png)
+
+> **<font size = 4>相关命令</font>**
+>> * **1. adduser**
+>> **<font color=#DC143C>可在 /etc/passwd 和 /etc/group 中查看新添加的用户，或 "ls /home" 查看</font>**
+>> ![文件类型](\pic\02\adduser.png)
+>> 配置文件
+>> ![文件类型](\pic\02\adduser-config.png)
+>> SKEL模版
+>> ![文件类型](\pic\02\skel.png)
+>> 添加新用户的过程
+>> ![文件类型](\pic\02\adduser-process.png)
+>> * **2. 设置初始口令：passwd**
+>> ![文件类型](\pic\02\passwd.png)
+>> * **3. 修改用户属性：usermod**
+>> ![文件类型](\pic\02\usermod.png)
+>> * **4. 删除用户：deluser**
+>> ![文件类型](\pic\02\deluser.png)
+>> * **5. 添加用户组：addgroup**
+>> ![文件类型](\pic\02\addgroup.png)
+>> * **6. 删除用户组：delgroup**
+>> ![文件类型](\pic\02\delgroup.png)
+
+## 3. 进程管理命令
+**<font color=#DC143C>程序的一次执行就是一个进程：如登两个QQ即两个进程</font>**
+> * **1. ps**
+**<font color=#DC143C>"ps aux | grep a.out"</font>**
+> ![文件类型](\pic\02\ps.png)
+> ![文件类型](\pic\02\ps1.png)
+> **<font color=#DC143C>Z-僵尸态：结束了，但资源未回收</font>**
+> ![文件类型](\pic\02\ps2.png)
+> * **2. top**
+> ![文件类型](\pic\02\top.png)
+> * **3. pstree**
+> ![文件类型](\pic\02\pstree.png)
+> * **4. kill**
+> ![文件类型](\pic\02\kill.png)
+
+## 4. 文件系统的类型和结构
+> ![文件类型](\pic\02\file-system.png)
+> ![文件类型](\pic\02\file-system1.png)
+> ![文件类型](\pic\02\file-system2.png)
+> * **1. SCSI与IDE设备命名**
+> **<font color=#DC143C>"df -T"</font>**
+> **<font color=#DC143C>1代表硬盘的第1个分区，2代表第3个分区</font>**
+> ![文件类型](\pic\02\scsi-ide.png)
+> * **2. Linux分区的命名方式**
+> ![文件类型](\pic\02\partition.png)
+> * **<font color=#DC143C size = 4>3. 交换分区</font>**
+> ![文件类型](\pic\02\exchange.png)
+> * **4. 文件系统逻辑结构**
+> ![文件类型](\pic\02\logic.png)
+> ![文件类型](\pic\02\logic1.png)
+> * **5. 文件系统结构**
+> ![文件类型](\pic\02\structure.png)
+> ![文件类型](\pic\02\structure1.png)
+> ![文件类型](\pic\02\structure2.png)
+> ![文件类型](\pic\02\directory.png)
+> ![文件类型](\pic\02\directory1.png)
+> * **6. 基本目录**
+> ![文件类型](\pic\02\directory2.png)
+
+## 5. 文件系统相关命令
+
+
