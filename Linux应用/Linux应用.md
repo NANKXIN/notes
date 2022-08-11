@@ -323,7 +323,6 @@ z = (a+=5, b=a+1);  // z = 7
 >> ![文件类型](\pic\02\passwd-file.png)
 >> * **2. /etc/group文件**
 >> ![文件类型](\pic\02\group.png)
-
 > **<font size = 4>相关命令</font>**
 >> * **1. adduser**
 >> **<font color=#DC143C>可在 /etc/passwd 和 /etc/group 中查看新添加的用户，或 "ls /home" 查看</font>**
@@ -373,17 +372,99 @@ z = (a+=5, b=a+1);  // z = 7
 > * **<font color=#DC143C size = 4>3. 交换分区</font>**
 > ![文件类型](\pic\02\exchange.png)
 > * **4. 文件系统逻辑结构**
-> ![文件类型](\pic\02\logic.png)
-> ![文件类型](\pic\02\logic1.png)
+> ![文件系统逻辑结构](\pic\02\logic.png)
+> ![文件系统逻辑结构](\pic\02\logic1.png)
 > * **5. 文件系统结构**
-> ![文件类型](\pic\02\structure.png)
-> ![文件类型](\pic\02\structure1.png)
-> ![文件类型](\pic\02\structure2.png)
-> ![文件类型](\pic\02\directory.png)
-> ![文件类型](\pic\02\directory1.png)
+> ![文件系统结构](\pic\02\structure.png)
+> ![文件系统结构](\pic\02\structure1.png)
+> ![文件系统结构](\pic\02\structure2.png)
+> ![文件系统结构](\pic\02\directory.png)
+> ![文件系统结构](\pic\02\directory1.png)
 > * **6. 基本目录**
-> ![文件类型](\pic\02\directory2.png)
+> ![基本目录](\pic\02\directory2.png)
 
 ## 5. 文件系统相关命令
+> * **1. 查看文件属性：file**
+> ![file](\pic\02\file.png)
+> * **2. 创建目录：mkdir**
+> **<font color=#DC143C>注：当前目录 "./" 或 空，上一级目录 "../"，根目录 "/"</font>**
+> ![mdkir](\pic\02\mkdir.png)
+> ![mdkir](\pic\02\mkdir1.png)
+> * **2. 删除目录：rmdir**
+> **<font color=#DC143C>目录内有文件："rm -r"</font>**
+> ![rmdir](\pic\02\rmdir.png)
+> ![rmdir](\pic\02\rmdir1.png)
+> ![rmdir](\pic\02\rmdir2.png)
+> * **3. 创建链接文件**
+> ![link](\pic\02\link.png)
+>> * **(1). 软链接：ln -s**
+>> **<font color=#DC143C>注意链接的是绝对路径还是相对路径，若是相对路径，移动链接后，可能失效</font>**
+>> **<font color=#DC143C>建议：使用绝对路径</font>**
+>> **<font color=#DC143C>注意：修改链接文件同时也会修改源文件</font>**
+>> ![ln](\pic\02\ln.png)
+>> ![ln](\pic\02\ln1.png)
+>> * **(2). 硬链接：ln (无 -s)**
+>> **<font color=#DC143C>linux内每个文件都有一个物理编号：inode，查看："ls -i"</font>**
+>> **<font color=#DC143C>硬链接文件和源文件本质上是同一个文件 (inode号相同)</font>**
+>> **<font color=#DC143C>硬链接一般用于做文件备份，保护文件</font>**
+> * **4. 文件压缩与归档**
+> **<font color=#DC143C>先 归档 再 压缩</font>**
+> ![compress](\pic\02\compress.png)
+> ![compress](\pic\02\compress1.png)
+> ![compress](\pic\02\compress2.png)
+> ![archive](\pic\02\archive.png)
+>> * **(1). gzip(压缩) 与 gunzip(解压) 命令**
+>> ![gzip](\pic\02\gzip.png)
+>> ![gunzip](\pic\02\gunzip.png)
+>> ![gzip-gunzip](\pic\02\gzip-gunzip.png)
+>> ![gzip-gunzip](\pic\02\gzip-gunzip1.png)
+>> * **(2). tar 命令**
+>> ![tar](\pic\02\tar.png)
+>> ![tar](\pic\02\tar1.png)
+>> **<font color=#DC143C>举例</font>**
+>> ![tar](\pic\02\tar2.png)
+>> ![tar](\pic\02\tar3.png)
+>> ![tar](\pic\02\tar4.png)
 
-
+## 6. 网络配置管理
+> * **基础知识**
+> ![net](\pic\02\net.png)
+> ![net](\pic\02\net1.png)
+> * **IP地址**
+> ![ip](\pic\02\ip.png)
+> ![ip](\pic\02\ip1.png)
+> * **<font color=#DC143C>配置IP地址</font>**
+>> * **查看IP：ifconfig**
+>> ![ip](\pic\02\ifconfig.png)
+>> **<font color=#DC143C>eth33：代表网卡; lo：代表主机本身，也称回送接口(Loopback),其IP地址约定为 127.0.0.1</font>**
+>> ![ip](\pic\02\ifconfig1.png)
+>> **多块网卡**
+>> ![ip](\pic\02\ifconfig2.png)
+>> ![ip](\pic\02\ifconfig3.png)
+>> * **IP修改：临时生效**
+>> ![ip](\pic\02\ifconfig4.png)
+>> ![ip](\pic\02\ifconfig5.png)
+>> * **配置动态IP：dhclient**
+>> ![ip](\pic\02\dhclient.png)
+>> ![ip](\pic\02\dhclient1.png)
+>> * **<font color=#DC143C>永久修改IP地址（注意：unbuntu20 无该文件）</font>**
+>> **IP配置**
+>> ![ip](\pic\02\interfaces.png)
+>> 动态
+>> ![ip](\pic\02\interfaces1.png)
+>> 静态
+>> ![ip](\pic\02\interfaces2.png)
+>> **DNS配置**
+>> ![ip](\pic\02\resolv.png)
+>> ![ip](\pic\02\resolv1.png)
+>> **<font color=#DC143C>注意：获取IP后，重启网络服务（包括dhclient）</font>**
+>> ![ip](\pic\02\dhclient2.png)
+> * **网络连接检测：ping**
+> ![ip](\pic\02\ping.png)
+> ![ip](\pic\02\ping1.png)
+> ![ip](\pic\02\ping2.png)
+> **<font color=#DC143C>"-c 3"：只 ping 3次</font>**
+> ![ip](\pic\02\ping3.png)
+> * **nslookup**
+> ![ip](\pic\02\nslookup.png)
+> ![ip](\pic\02\nslookup1.png)
