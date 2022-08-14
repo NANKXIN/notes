@@ -52,6 +52,7 @@
 * __:command__ &nbsp;&nbsp; 从命令行模式进入底行模式
 -->
 > <font face="华文细黑" color=#008B8B size=5>常用操作</font>
+>> * <font face="consolas" color=#DC143C size=5>:vsp file</font> &nbsp;&nbsp; **<font face="华文细黑" size=4>vi 中打开其它文件</font>**
 >> 1. <font face="华文细黑" color=#008B8B size=4>保存 / 退出</font>
 >> * <font face="consolas" color=#DC143C size=5>:q</font> &nbsp;&nbsp; **<font face="华文细黑" size=4>退出未修改的文件</font>**
 >> * <font face="consolas" color=#DC143C size=5>:q!</font> &nbsp;&nbsp; **<font face="华文细黑" size=4>强制退出，不保存</font>**
@@ -150,7 +151,7 @@
     * __: 10,15 d__ &nbsp;&nbsp; 删除(剪切)10到15行内容
 -->
 
-
+<!--
 ## 3. 数据的表示
 ### (1). 进制 (转换)
 - **十进制转二进制**
@@ -185,7 +186,9 @@ man ASCII
 ```C
 Linux C高级
 ```
-   
+-->
+
+<!--
 # 二. 数据类型、常量、变量、及运算符
 ## 1. *数据类型
 - **溢出举例：**
@@ -223,7 +226,7 @@ int a = 1, b = 2, z = 0;
 z = (a+=5, b=a+1);  // z = 7
 ```
 - **优先级：** 注意运算优先级
-
+-->
 
 
 # 三. 软件包管理及shell编程
@@ -387,7 +390,7 @@ z = (a+=5, b=a+1);  // z = 7
 > * **1. 查看文件属性：file**
 > ![file](\pic\02\file.png)
 > * **2. 创建目录：mkdir**
-> **<font color=#DC143C>注：当前目录 "./" 或 空，上一级目录 "../"，根目录 "/"</font>**
+> **<font color=#DC143C>注：当前目录 "./" 或 空，上一级目录 "../"，根目录 "/"，主目录 "~"</font>**
 > ![mdkir](\pic\02\mkdir.png)
 > ![mdkir](\pic\02\mkdir1.png)
 > * **2. 删除目录：rmdir**
@@ -468,3 +471,211 @@ z = (a+=5, b=a+1);  // z = 7
 > * **nslookup**
 > ![ip](\pic\02\nslookup.png)
 > ![ip](\pic\02\nslookup1.png)
+
+
+# 五. shell脚本编程
+## 1. 变量
+> * **1. 基本过程**
+>> **<font color=#DC143C>文件以 .sh 结尾</font>**
+>> ![shell](\pic\02\shell-step.png)
+>> ![shell](\pic\02\shell-step1.png)
+>> ![shell](\pic\02\shell-step2.png)
+>> ![shell](\pic\02\shell-step3.png)
+>> ![shell](\pic\02\shell-step4.png)
+> * **2. shell变量**
+>> ![shell](\pic\02\shell-value.png)
+>> **<font color=#DC143C>打印变量要加 "$"，否则会被当成 字符串</font>**
+>> ![shell](\pic\02\shell-value1.png)
+>> **<font color=#DC143C>shell变量无数据类型</font>**
+>> **<font color=#DC143C>"=" 两边不能加 空格</font>**
+>> ![shell](\pic\02\shell-value2.png)
+> * **3. 用户自定义变量**
+>> **<font color=#DC143C>变量名大写, unset 删除变量赋值</font>**
+>> ![shell](\pic\02\shell-value3.png)
+>> ![shell](\pic\02\shell-value4.png)
+>> ![shell](\pic\02\shell-value5.png)
+> * **4. 位置变量**
+>> ![shell](\pic\02\shell-value6.png)
+>> **<font color=#DC143C>类似于C语言 main函数的输入参数</font>**
+>> **<font color=#DC143C>执行文件前加当前路径 "./"，否则会被当成常规shell命令来执行</font>**
+>> ![shell](\pic\02\shell-value7.png)
+>> ![shell](\pic\02\shell-value8.png)
+>> **<font color=#DC143C>不同于C语言的是，命令个数 "\$#" 不包含文件本身</font>**
+>> ![shell](\pic\02\shell-value9.png)
+>> ![shell](\pic\02\shell-value10.png)
+>> **<font color=#DC143C>但 "\$0" 为文件本身</font>**
+>> ![shell](\pic\02\shell-value11.png)
+>> ![shell](\pic\02\shell-value12.png)
+>> **<font color=#DC143C>转义符 \ 和C语言一样</font>**
+>> ![shell](\pic\02\shell-value13.png)
+>> ![shell](\pic\02\shell-value14.png)
+>> **<font color=#DC143C>数子用{}起来，不加{}入下</font>**
+>> ![shell](\pic\02\shell-value15.png)
+>> ![shell](\pic\02\shell-value16.png)
+>> **<font color=#DC143C>加{}，注意 "\$0" 是文件名</font>**
+>> ![shell](\pic\02\shell-value17.png)
+>> ![shell](\pic\02\shell-value18.png)
+> * **5. 常用shell环境变量**
+>> **<font color=#DC143C>类似于C语言中的默认变量，注意自定义时不要冲突</font>**
+>> ![shell](\pic\02\shell-value19.png)
+
+## 2. 功能语句
+> ![shell](\pic\02\shell-sentence.png)
+> * **1. 注释**
+>> **<font color=#DC143C>注意：第一行注释用来指明用哪种类型的shell来执行</font>**
+>> ![shell](\pic\02\shell-sentence1.png)
+> * **2. read**
+>> ![shell](\pic\02\shell-sentence2.png)
+>> **<font color=#DC143C>例1：</font>**
+>> **<font color=#DC143C>注：脚本中变量无数据类型，所有输入都会被当成字符串处理</font>**
+>> ![shell](\pic\02\shell-read.png)
+>> ![shell](\pic\02\shell-read1.png)
+>> ![shell](\pic\02\shell-read2.png)
+>> **<font color=#DC143C>例2：</font>**
+>> **<font color=#DC143C>注：多余的会赋值给最后一个变量</font>**
+>> ![shell](\pic\02\shell-read3.png)
+>> ![shell](\pic\02\shell-read4.png)
+>> **<font color=#DC143C>例3：</font>**
+>> **<font color=#DC143C>bash: -n 不换行</font>**
+>> ![shell](\pic\02\shell-read5.png)
+>> ![shell](\pic\02\shell-read6.png)
+>> **<font color=#DC143C>sh: \c 不换行</font>**
+>> ![shell](\pic\02\shell-read7.png)
+>> ![shell](\pic\02\shell-read6.png)
+> * **3. expr**
+>> **<font color=#DC143C> * 是通配符，需要转义</font>**
+>> ![shell](\pic\02\shell-expr.png)
+>> ![shell](\pic\02\shell-expr1.png)
+>> **<font color=#DC143C>例1：</font>**
+>> **<font color=#DC143C>算术符号两边要加空格</font>**
+>> ![shell](\pic\02\shell-expr2.png)
+>> ![shell](\pic\02\shell-expr3.png)
+>> **<font color=#DC143C>例2：</font>**
+>> **<font color=#DC143C>注意命令置换 ``</font>**
+>> **<font color=#DC143C>等号两边不能加空格</font>**
+>> ![shell](\pic\02\shell-expr4.png)
+>> ![shell](\pic\02\shell-expr3.png)
+> * **4. test**
+>> ![shell](\pic\02\shell-test.png)
+>> **<font color=#DC143C>字符串</font>**
+>> ![shell](\pic\02\shell-test1.png)
+>> **<font color=#DC143C>整数</font>**
+>> ![shell](\pic\02\shell-test2.png)
+>> **<font color=#DC143C>文件</font>**
+>> ![shell](\pic\02\shell-test7.png)
+>> **<font color=#DC143C>例1：字符串</font>**
+>> **<font color=#DC143C>"\$?" 是上一条语句的执行结果</font>**
+>> **<font color=#DC143C>和C语言相反：假是1，真是0</font>**
+>> ![shell](\pic\02\shell-test3.png)
+>> ![shell](\pic\02\shell-test4.png)
+>> **<font color=#DC143C>例2：整数</font>**
+>> ![shell](\pic\02\shell-test5.png)
+>> ![shell](\pic\02\shell-test6.png)
+>> **<font color=#DC143C>例3：文件</font>**
+>> **<font color=#DC143C>\$HOME：用户主目录</font>**
+>> ![shell](\pic\02\shell-test8.png)
+>> ![shell](\pic\02\shell-test9.png)
+
+## 3. 分支语句
+> * **结构性语句**
+>> ![shell](\pic\02\shell-branch.png)
+> * **分支语句1：if then fi**
+>> **<font color=#DC143C>和C语言相反：假是1，真是0</font>**
+>> ![shell](\pic\02\shell-branch1.png)
+>> **<font color=#DC143C>例：</font>**
+>> **<font color=#DC143C>用 [ ] 代替 test 命令，前后必须有空格</font>**
+>> **<font color=#DC143C>只输入文件名，\$# = 0，与1不相等，成立 (-ne是否不相等)</font>**
+>> ![shell](\pic\02\shell-branch2.png)
+>> ![shell](\pic\02\shell-branch3.png)
+>> **<font color=#DC143C>相当于</font>**
+>> ![shell](\pic\02\shell-branch4.png)
+>> ![shell](\pic\02\shell-branch3.png)
+>> **<font color=#DC143C>完整</font>**
+>> ![shell](\pic\02\shell-branch5.png)
+>> ![shell](\pic\02\shell-branch6.png)
+> * **分支语句2：if then else fi：同C语言**
+>> ![shell](\pic\02\shell-branch7.png)
+> * **分支语句3：if then elif else fi：同C语言**
+>> ![shell](\pic\02\shell-branch8.png)
+> * **分支语句3：case esac**
+>> ![shell](\pic\02\shell-branch9.png)
+>> ![shell](\pic\02\shell-branch10.png)
+>> **<font color=#DC143C>例1：</font>**
+>> ![shell](\pic\02\shell-branch11.png)
+>> **<font color=#DC143C>例2：</font>**
+>> ![shell](\pic\02\shell-branch12.png)
+>> ![shell](\pic\02\shell-branch13.png)
+>> **<font color=#DC143C>例3：</font>**
+>> ![shell](\pic\02\shell-branch14.png)
+>> ![shell](\pic\02\shell-branch15.png)
+
+## 4. 循环语句
+> * **1. for**
+>> ![shell](\pic\02\shell-cycle.png)
+>> **<font color=#DC143C>例1：</font>**
+>> ![shell](\pic\02\shell-cycle1.png)
+>> ![shell](\pic\02\shell-cycle2.png)
+>> **<font color=#DC143C>例2：</font>**
+>> ![shell](\pic\02\shell-cycle3.png)
+>> **<font color=#DC143C>例3：</font>**
+>> **<font color=#DC143C>seq 1 2 10：起始1，增量2，终止10；具体 "man seq"</font>**
+>> ![shell](\pic\02\shell-cycle4.png)
+>> **<font color=#DC143C>例4：</font>**
+>> ![shell](\pic\02\shell-cycle5.png)
+>> **<font color=#DC143C>例5：</font>**
+>> ![shell](\pic\02\shell-cycle6.png)
+>> **<font color=#DC143C>例6：死循环</font>**
+>> **<font color=#DC143C>for (( ;; ))</font>**
+>> **<font color=#DC143C>例7：</font>**
+>> ![shell](\pic\02\shell-cycle8.png)
+>> ![shell](\pic\02\shell-cycle7.png)
+> * **2. while**
+> ![shell](\pic\02\shell-while.png)
+> ![shell](\pic\02\shell-while1.png)
+>> **<font color=#DC143C>例1：</font>**
+>> ![shell](\pic\02\shell-while2.png)
+>> **<font color=#DC143C>例2：</font>**
+>> ![shell](\pic\02\shell-while3.png)
+>> **<font color=#DC143C>例3：死循环</font>**
+>> **<font color=#DC143C>while true</font>**
+>> ![shell](\pic\02\shell-while4.png)
+>> **<font color=#DC143C>例4：</font>**
+>> **<font color=#DC143C>生成文件：>（即重定向符）</font>**
+>> ![shell](\pic\02\shell-while5.png)
+>> **<font color=#DC143C>例5：生成"FILE\*"文件（例子内为 FILE1 FILE2）</font>**
+>> **<font color=#DC143C>删除同理：将 ">" 换成 "rm" 即可</font>**
+>> ![shell](\pic\02\shell-while6.png)
+> * **3. break 和 continue**
+>> **<font color=#DC143C>同C语言一样：break跳出整个循环；continue跳出1层循环</font>**
+>> ![shell](\pic\02\shell-break-countinue.png)
+>> **<font color=#DC143C>例1：</font>**
+>> ![shell](\pic\02\shell-break-countinue1.png)
+>> **<font color=#DC143C>例2：</font>**
+>> ![shell](\pic\02\shell-break-continue1.png)
+>> ![shell](\pic\02\shell-break-continue2.png)
+>> **<font color=#DC143C>例3：</font>**
+>> ![shell](\pic\02\shell-break-continue3.png)
+>> **<font color=#DC143C>例4：设置跳出层数</font>**
+>> ![shell](\pic\02\shell-break-continue4.png)
+
+## 5. 函数
+> ![shell](\pic\02\shell-func.png)
+>> **<font color=#DC143C>例1：</font>**
+>> ![shell](\pic\02\shell-func1.png)
+>> **<font color=#DC143C>例2：</font>**
+>> ![shell](\pic\02\shell-func2.png)
+>> **<font color=#DC143C>例3：</font>**
+>> ![shell](\pic\02\shell-func3.png)
+>> **<font color=#DC143C>例4：无 return，修改搜索语句</font>**
+>> **<font color=#DC143C>^$S: 即以 \$S: 开头的文件</font>**
+>> ![shell](\pic\02\shell-func4.png)
+> * **函数变量作用域**
+> ![shell](\pic\02\shell-func5.png)
+>> **<font color=#DC143C>例1：</font>**
+>> **<font color=#DC143C>lcvariable 为局部变量，外部无法调用</font>**
+>> ![shell](\pic\02\shell-func6.png)
+>> ![shell](\pic\02\shell-func7.png)
+
+
+# 六. C语言高级编程
+## 1. gcc和gdb的用法
