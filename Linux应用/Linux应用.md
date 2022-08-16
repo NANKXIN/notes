@@ -679,3 +679,64 @@ z = (a+=5, b=a+1);  // z = 7
 
 # 六. C语言高级编程
 ## 1. gcc和gdb的用法
+> * **GUN**
+>> ![gun](\pic\02\gun.png)
+>> ![gun](\pic\02\gun1.png)
+> * **GCC**
+>> ![gcc](\pic\02\gcc.png)
+>> ![gcc](\pic\02\gcc1.png)
+> * **编辑器的主要组件**
+>> ![gcc](\pic\02\gcc2.png)
+> * **GCC的基本用法和选项**
+>> ![gcc](\pic\02\gcc3.png)
+> * **GCC的错误类型及对策**
+>> ![gcc](\pic\02\gcc4.png)
+>> ![gcc](\pic\02\gcc5.png)
+> * **GCC编译过程**
+>> ![gcc](\pic\02\gcc6.png)
+>> ![gcc](\pic\02\gcc10.png)
+>> **<font color=#DC143C>1. 预处理：gcc -E test -o test.i</font>**
+>> **<font color=#DC143C>替换所有 # 开头的内容（头文件、宏定义、条件编译等），删除注释，不检查语法错误</font>**
+>> ![gcc](\pic\02\gcc11.png)
+>> **<font color=#DC143C>2. 编译：gcc -S test.i -o test.s</font>**
+>> **<font color=#DC143C>只编译不汇编，生成汇编代码，期间会检查语法错误</font>**
+>> ![gcc](\pic\02\gcc12.png)
+>> **<font color=#DC143C>3. 汇编：gcc -c test.s -o test.o</font>**
+>> **<font color=#DC143C>编译、汇编，不链接，生成目标文件（二进制机器指令）</font>**
+>> ![gcc](\pic\02\gcc13.png)
+>> **<font color=#DC143C>4. 链接：gcc test.o -o test</font>**
+>> **<font color=#DC143C>链接所有的.o文件、库文件，生成可执行文件</font>**
+>> ![gcc](\pic\02\gcc14.png)
+>> * **<font color=#DC143C>例1：</font>**
+>> ![gcc](\pic\02\gcc7.png)
+>> ![gcc](\pic\02\gcc8.png)
+>> **<font color=#DC143C>sqrt 需要 -lm，指定对应的库</font>**
+>> **<font color=#DC143C>-Wall：显示警告</font>**
+>> ![gcc](\pic\02\gcc9.png)
+> * **GDB（调试运行时的错误，不检查语法）**
+>> ![gcc](\pic\02\gdb.png)
+>> **<font color=#DC143C>调试流程</font>**
+>> ![gcc](\pic\02\gdb1.png)
+>> **<font color=#DC143C>例：</font>**
+>> ![gcc](\pic\02\gdb2.png)
+>> **<font color=#DC143C>l：一次10行</font>**
+>> **<font color=#DC143C>l 1：返回第一次</font>**
+>> ![gcc](\pic\02\gdb3.png)
+>> ![gcc](\pic\02\gdb4.png)
+>> **<font color=#DC143C>b 11：第11行打断点</font>**
+>> **<font color=#DC143C>info b：显示断点信息</font>**
+>> ![gcc](\pic\02\gdb5.png)
+>> **<font color=#DC143C>del 1：删除第1个断点</font>**
+>> ![gcc](\pic\02\gdb6.png)
+>> **<font color=#DC143C>r：程序运行，此处运行到断点1处</font>**
+>> ![gcc](\pic\02\gdb7.png)
+>> **<font color=#DC143C>p m：显示变量m的值</font>**
+>> ![gcc](\pic\02\gdb8.png)
+>> **<font color=#DC143C>n：单步跟踪</font>**
+>> **<font color=#DC143C>s：单步跟踪进入(函数)</font>**
+>> ![gcc](\pic\02\gdb9.png)
+>> **<font color=#DC143C>set args：设置输入参数</font>**
+>> ![gcc](\pic\02\gdb10.png)
+>> **<font color=#DC143C>c：继续运行</font>**
+>> **<font color=#DC143C>q：退出</font>**
+>> **<font color=#DC143C>其它：查字典</font>**
