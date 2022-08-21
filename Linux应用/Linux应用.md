@@ -543,16 +543,16 @@ z = (a+=5, b=a+1);  // z = 7
 >> ![shell](\pic\02\shell-read7.png)
 >> ![shell](\pic\02\shell-read6.png)
 > * **3. expr**
->> **<font color=#DC143C> * 是通配符，需要转义</font>**
+>> **<font color=#DC143C size=4> * 是通配符，需要转义</font>**
 >> ![shell](\pic\02\shell-expr.png)
 >> ![shell](\pic\02\shell-expr1.png)
 >> **<font color=#DC143C>例1：</font>**
->> **<font color=#DC143C>算术符号两边要加空格</font>**
+>> **<font color=#DC143C size=4>算术符号两边要加空格</font>**
 >> ![shell](\pic\02\shell-expr2.png)
 >> ![shell](\pic\02\shell-expr3.png)
 >> **<font color=#DC143C>例2：</font>**
->> **<font color=#DC143C>注意命令置换 ``</font>**
->> **<font color=#DC143C>等号两边不能加空格</font>**
+>> **<font color=#DC143C size=4>注意命令置换 ``</font>**
+>> **<font color=#DC143C size=4>等号两边不能加空格</font>**
 >> ![shell](\pic\02\shell-expr4.png)
 >> ![shell](\pic\02\shell-expr3.png)
 > * **4. test**
@@ -740,3 +740,144 @@ z = (a+=5, b=a+1);  // z = 7
 >> **<font color=#DC143C>c：继续运行</font>**
 >> **<font color=#DC143C>q：退出</font>**
 >> **<font color=#DC143C>其它：查字典</font>**
+
+## 2. C复习
+> * **结构体**
+>> * ![c](\pic\02\struct.png)
+>> * ![c](\pic\02\struct1.png)
+>> **<font color=#DC143C>同类型结构体变量可直接赋值</font>**
+>> * ![c](\pic\02\struct2.png)
+> * **存储**
+>> **<font color=#DC143C>代码区：存放二进制代码</font>**
+>> **<font color=#DC143C>静态存储区：全局变量、静态变量、常量</font>**
+>> **<font color=#DC143C>栈/堆区：不解释</font>**
+>> * ![c](\pic\02\mem.png)
+> * **malloc/free**
+>> **<font color=#DC143C>(1). malloc 申请失败，返回 NULL，也不需要 free</font>**
+>> **<font color=#DC143C>(2). free(p) 操作只是释放了p所指向的堆内存，p指向不变，为空悬指针，所以释放后，将 p = NULL;</font>**
+>> **<font color=#DC143C>(3). malloc 申请的内存，不能释放多次</font>**
+>> **<font color=#DC143C>(4). malloc 申请的内存，释放前，不能修改指针指向</font>**
+>> * __<font color=#DC143C>char s[]局部变量，不解释；static char s[]静态变量，生命周期到main()结束，可以被return；char *s 字符串常量，不能被 return</font>__
+>> * __<font color=#DC143C>建议：使用动态内存，不解释</font>__
+>> * ![c](\pic\02\malloc.png)
+>> * __<font color=#DC143C>错误：修改了s存储的地址，return后，无法被正确释放</font>__
+>> * ![c](\pic\02\malloc1.png)
+> * **野指针**
+>> * __<font color=#DC143C>(1). 未初始化：为一个随机值</font>__
+>> * __<font color=#DC143C>(2). free 后未 = NULL：存储了一个无法被访问的内存地址</font>__
+>> * __<font color=#DC143C>(2). 指针操作越界：如访问数组，指向了数组范围之外</font>__
+>> * ![c](\pic\02\malloc2.png)
+>> * __<font color=#DC143C>例1：p未初始化</font>__
+>> * ![c](\pic\02\malloc3.png)
+>> * __<font color=#DC143C>例2：指针操作越界</font>__
+>> * ![c](\pic\02\malloc4.png)
+
+# 七. Makefile
+## 1. 原理及基础知识
+> * __1. 原理__
+>> ![makefile](\pic\02\make.png)
+> * __2. 基本结构__
+>> ![makefile](\pic\02\make1.png)
+>> ![makefile](\pic\02\make2.png)
+>> ![makefile](\pic\02\make3.png)
+>> * __<font color=#DC143C>例1：命令执行顺序根据目标文件的依赖，即 f1.o f2.o main.o</font>__
+>> * __<font color=#DC143C>.PHONY:clean - 设定clean为命令，而非文件</font>__
+>> ![makefile](\pic\02\make4.png)
+> * __3. Make使用__
+>> ![makefile](\pic\02\make21.png)
+> * __4. 创建和使用变量__
+>> ![makefile](\pic\02\make5.png)
+>> ![makefile](\pic\02\make6.png)
+>> * __<font color=#DC143C>(1). 递归展开方式：foo的值从后面找</font>__
+>> ![makefile](\pic\02\make8.png)
+>> ![makefile](\pic\02\make9.png)
+>> * __<font color=#DC143C>(2). 简单方式：x的值从前面找，类C语言</font>__
+>> ![makefile](\pic\02\make10.png)
+>> ![makefile](\pic\02\make11.png)
+>> * __<font color=#DC143C>(3). 用 ?= 定义变量</font>__
+>> ![makefile](\pic\02\make12.png)
+>> ![makefile](\pic\02\make13.png)
+>> * __<font color=#DC143C>(4). 添加值</font>__
+>> ![makefile](\pic\02\make14.png)
+>>*  __<font color=#DC143C>(5). 预定义变量 (默认有值)</font>__
+>> __<font color=#DC143C>例中 CC 即为 gcc，RM 为 rm -f</font>__
+>> ![makefile](\pic\02\make15.png)
+>> ![makefile](\pic\02\make16.png)
+>> * __<font color=#DC143C>(6). 自动变量</font>__
+>> ![makefile](\pic\02\make18.png)
+>> * __<font color=#DC143C>(7). 环境变量</font>__
+>> ![makefile](\pic\02\make20.png)
+>> * __<font color=#DC143C>例1：自定义变量</font>__
+>> ![makefile](\pic\02\make17.png)
+>> * __<font color=#DC143C>例2：自动变量和预定义变量</font>__
+>> ![makefile](\pic\02\make19.png)
+>> * __<font color=#DC143C>例3：</font>__
+>> ![makefile](\pic\02\make7.png)
+>> * __<font color=#DC143C>例4：指定 include文件所在的目录（gcc -I）</font>__
+>> ![makefile](\pic\02\make23.png)
+
+## 2. 命令的选项及隐含的规则
+> * __1. 复习Make使用的几个重要选项（上一小节）__
+> ![makefile](\pic\02\make21.png)
+>> * __<font color=#DC143C>-C：执行指定目录下的 Makefile</font>__
+>> * __<font color=#DC143C>-f：make -f file 代替 make（make -f file clean 代替 make clean）; 指定文件当成Makefile，如调试时备份Makefile</font>__
+>> * __<font color=#DC143C>-i：不执行错误的命令，执行能执行的命令（大工程，编译时间长，防止万一某个命令错了，不带 -i 即全部执行失败）</font>__
+>> * __<font color=#DC143C>-n：只打印，不执行（工程大，只看一下执行的过程）</font>__
+>> * __<font color=#DC143C>-p：显示 make变量数据库 以及 隐含规则</font>__
+>> * __<font color=#DC143C>-w：如果执行过程中make改变目录，打印当前目录（make 是默认带 -w 的）</font>__
+>> * __<font color=#DC143C>include 包含其它文件（#为注释）</font>__
+>> ![makefile](\pic\02\make24.png)
+> * __2. 常用的隐含规则__
+>> * __(1). 编译C语言的隐含规则：-c过程（生成.o文件过程）__
+>> ![makefile](\pic\02\make25.png)
+>> * __<font color=#DC143C>目标文件的生成：会自动查询同名的.c文件，自动生成.o文件；默认为 gcc -c，CFLAGS 需自己定义</font>__
+>> * __<font color=#DC143C>注意：如果生成.o过程中，有特殊选项，一定要重新给 CFLAGS 赋值</font>__
+>> ![makefile](\pic\02\make26.png)
+>> * __<font color=#DC143C>更简洁</font>__
+>> ![makefile](\pic\02\make27.png)
+>> * __(2). 链接Object文件的隐含规则（生成执行文件过程）__
+>> ![makefile](\pic\02\make28.png)
+>> * __<font color=#DC143C>注意：执行文件要和目标文件的其中一个同名（f1 或 f2 或 main）</font>__
+>> ![makefile](\pic\02\make29.png)
+
+## 3. VPATH及嵌套的Makefile
+> * __1. VPATH的用法__
+>> ![makefile](\pic\02\vpath.png)
+>> * __<font color=#DC143C>例：目录如下</font>__
+>> ![makefile](\pic\02\vpath1.png)
+>> __<font color=#DC143C>不使用 VPATH 的基础 Makefile</font>__
+>> ![makefile](\pic\02\vpath2.png)
+>> ![makefile](\pic\02\vpath3.png)
+>> __<font color=#DC143C>删除文件：</font>__
+>> __<font color=#DC143C>-exec 详见搜索（类似管道），"{}" 为查找出来的文件，";" 为结束符（加上转义符斜杆），第二个 ";" 为两个命令之间分隔</font>__
+>> __<font color=#DC143C>注意：是 "*.o"，".o" 会把文件全删了</font>__
+>> ![makefile](\pic\02\vpath4.png)
+>> * __<font color=#DC143C>简化1：隐含规则</font>__
+>> ![makefile](\pic\02\vpath5.png)
+>> * __<font color=#DC143C>简化2：隐含规则 + VPATH声明依赖路径</font>__
+>> ![makefile](\pic\02\vpath6.png)
+>> ![makefile](\pic\02\vpath7.png)
+> * __2. Makefile的嵌套__
+>> ![makefile](\pic\02\nesting.png)
+>> ![makefile](\pic\02\nesting1.png)
+>> ![makefile](\pic\02\nesting2.png)
+>> ![makefile](\pic\02\nesting3.png)
+>> ![makefile](\pic\02\nesting7.png)
+>> ![makefile](\pic\02\nesting4.png)
+>> ![makefile](\pic\02\nesting8.png)
+>> * __<font color=#DC143C>依赖文件Makefile解析：</font>__
+>> ![makefile](\pic\02\nesting5.png)
+>> __../\$(OBJS_DIR)/main.o:main.c__
+>> __依赖文件为当前目录下的main.c，生成的目标文件在 ../obj/ 内__
+>> * __<font color=#DC143C>根文件Makefile解析：</font>__
+>> ![makefile](\pic\02\nesting6.png)
+>> __all: CHECK_DIR \$(SUBDIRS)__
+>> __all 依赖 CHECK_DIR 和 SUBDIRS__
+>> __CHECK_DIR 执行的命令为 mkdir -p bin__
+>> __SUBDIRS 依赖 ECHO__
+>> __ECHO 为 两句打印语句__
+>> __SUBDIRS 为 f1 f2 main obj__
+>> __SUBDIRS 执行的命令为 make -C f1; make -C f2; make -C main; make -C obj__
+>> __echo 前加 @：是因为make执行的时候本身就会打印命令，所以隐藏掉make命令__
+>> __make -C dir：调用 dir 目录下的make（见上一节）__
+>> __export：使得这些变量在 子目录下的子Makefile内也能调用__
