@@ -887,71 +887,135 @@ z = (a+=5, b=a+1);  // z = 7
 
 ## 1. 标准IO介绍
 > __标准C中定义好的一组用来输入和输出的API__
-> * __1. 文件__
+> * __<font size=5>1. 文件</font>__
 >> ![io](\pic\04\file.png)
-> * __2. 系统调用、缓冲__
+> * __<font size=5>2. 系统调用、缓冲</font>__
 >> ![io](\pic\04\io.png)
 >> __系统调用：应用程序通过操作系统提供的接口访问硬件；不同的操作系统，系统调用接口不兼容__
 >> ![io](\pic\04\os.png)
 >> __缓冲：无缓冲 - APP读多少，系统从硬盘中取多少，每次读取都要进行系统调用；有缓冲 - 不管APP读多少，先读一批数据到缓冲中，APP直接从缓冲区中读取，减少系统调用的次数__
 >> ![io](\pic\04\buffer.png)
-> * __3. FILE/流__
+> * __<font size=5>3. FILE/流</font>__
 >> __Linux下不区分文本流和二进制流__
 >> ![io](\pic\04\io1.png)
 >> ![io](\pic\04\io2.png)
-> * __4. 流缓冲类型__
+> * __<font size=5>4. 流缓冲类型</font>__
 >> __全缓冲 - 标准I/O默认(打开文件)：当流的缓冲区满时才执行实际的I/O操作；当缓冲区空的时候，才会从实际的文件中读取数据__
 >> __<font color=#DC143C>行缓冲 - 标准输入/输出(终端相关 - printf)：缓冲区满 或者 遇到换行符，才进行实际的I/O操作；即标准输出的 printf 必须加上 '\n' 才能输出</font>__
 >> __无缓冲(标准错误输出)：直接读取/写入文件__
 >> ![io](\pic\04\io3.png)
-> * __5. 默认流__
+> * __<font size=5>5. 默认流</font>__
 >> __Linux运行时，系统自动打开的3个流；对应3个文件描述符__
 >> ![io](\pic\04\io4.png)
 
 ## 2. 流的打开和关闭
-> * __1. 打开流__
+> * __<font size=5>1. 打开流</font>__
 >> ![io](\pic\04\io5.png)
->> * __(1). mode 参数__
+>> * __<font size=4>(1). mode 参数</font>__
 >> __<font color=#DC143C>w+: 因为 w 将文件的内容清空，所以只能读打开文件后新写入的内容</font>__
 >> ![io](\pic\04\io6.png)
 >> ![io](\pic\04\io7.png)
->> __<font color=#DC143C>例：</font>__
->> ![io](\pic\04\io8.png)
->> * __(2). 权限__
+>>> __<font color=#DC143C>例：</font>__
+>>> ![io](\pic\04\io8.png)
+>> * __<font size=4>(2). 权限</font>__
 >> __<font color=#DC143C>文件权限补充：ls -l 查看，依次为所有者、群组、其它用户</font>__
 >> ![io](\pic\04\io9.png)
 >> ![io](\pic\04\io10.png)
->> * __(3). 处理错误信息__
+>> * __<font size=4>(3). 处理错误信息</font>__
 >> ![io](\pic\04\io11.png)
->> __<font color=#DC143C>例1：</font>__
->> ![io](\pic\04\io12.png)
->> __<font color=#DC143C>例2：</font>__
->> ![io](\pic\04\io13.png)
-> * __2. 关闭流__
+>>> __<font color=#DC143C>例1：</font>__
+>>> ![io](\pic\04\io12.png)
+>>> __<font color=#DC143C>例2：</font>__
+>>> ![io](\pic\04\io13.png)
+> * __<font size=4>2. 关闭流</font>__
 >> ![io](\pic\04\io14.png)
-> * __3. 一个程序打开流的最大个数__
+> * __<font size=4>3. 一个程序打开流的最大个数</font>__
 >> ![io](\pic\04\io15.png)
 
 ## 3. 按字符输入和输出
-> * __1. 读写流__
+> __<font color=#DC143C size=4>既能处理文本文件 (字符串)，也能处理二进制文件，缺点效率低</font>__
+> * __<font size=5>读写流</font>__
 >> __<font color=#DC143C>一般推荐用第三种方式</font>__
 >> ![io](\pic\04\io16.png)
->> * __(1). 按字符输入__
+>> * __<font size=4>(1). 按字符输入</font>__
 >> ![io](\pic\04\io17.png)
->> __<font color=#DC143C>例：</font>__
->> __<font color=#DC143C>再次强调：标准输出流是行缓冲，printf 要 '\n' 才能输出</font>__
->> ![io](\pic\04\io18.png)
->> * __(2). 按字符输出__
+>>> __<font color=#DC143C>例：</font>__
+>>> __<font color=#DC143C>再次强调：标准输出流是行缓冲，printf 要 '\n' 才能输出</font>__
+>>> ![io](\pic\04\io18.png)
+> * __<font size=4>(2). 按字符输出</font>__
 >> ![io](\pic\04\io19.png)
+>>> __<font color=#DC143C>例1：</font>__
+>>> ![io](\pic\04\io20.png)
+>>> __<font color=#DC143C>例2：diff 文件比较命令，有不同会输出</font>__
+>>> ![io](\pic\04\io21.png)
+>>> ![io](\pic\04\io22.png)
+
+## 4. 按行输入和输出
+> __<font color=#DC143C size=4>只能处理文本文件 (字符串)，无法处理二进制文件 (二进制文件中通常会包含 '\0')</font>__
+> * __<font size=4>(1). 按行输入</font>__
+>> ![io](\pic\04\io23.png)
+>> ![io](\pic\04\io32.png)
+>>> __<font color=#DC143C>例：</font>__
+>>> ![io](\pic\04\io24.png)
+>>> __<font color=#DC143C>abcd<回车>：abcd\n\0（输入的一定是字符串）</font>__
+>>> ![io](\pic\04\io25.png)
+>>> __<font color=#DC143C>abcdef<回车>：abcde\0（只能读取N-1个）</font>__
+>>> ![io](\pic\04\io26.png)
+> * __<font size=4>(2). 按行输出</font>__
+>> __<font color=#DC143C size=4>puts 和 fputs 都是将缓冲区s内的字符串输出到流内，直到遇到'\0'后停止</font>__
+>> __<font color=#DC143C size=4>puts 会追加 '\n'（因为是标准输出流），fputs 不会追加 '\n'</font>__
+>> __<font color=#DC143C size=4>fputs 写入的字符串，不包含末尾的 '\0'</font>__
+>> ![io](\pic\04\io27.png)
+>>> __<font color=#DC143C>例：</font>__
+>>> ![io](\pic\04\io28.png)
+
+## 5. 按对象输入和输出
+> ![io](\pic\04\io29.png)
+> ![io](\pic\04\io30.png)
 >> __<font color=#DC143C>例1：</font>__
->> ![io](\pic\04\io20.png)
->> __<font color=#DC143C>例2：diff 文件比较命令，有不同会输出</font>__
->> ![io](\pic\04\io21.png)
->> ![io](\pic\04\io22.png)
->> * __(3). 按行输入__
+>> ![io](\pic\04\io31.png)
+>> __<font color=#DC143C>例2：</font>__
+>> ![io](\pic\04\io33.png)
+>> ![io](\pic\04\io34.png)
 
->> * __(4). 按行输出__
+## 6. 流相关操作
+> * __<font size=4>(1). 刷新流</font>__
+>> __<font color=#DC143C>1. 全缓冲：缓冲区满；行缓冲：缓冲区满/换行</font>__
+>> __<font color=#DC143C>2. 当流关闭(fclose)时 / 程序结束时调用exit</font>__
+>> __<font color=#DC143C>3. fflush函数</font>__
+>> ![io](\pic\04\io35.png)
+>>> __<font color=#DC143C>例：标准IO打开的流都是全缓冲，以下代码只是将字符 'a' 写入到流的缓冲区里，并未写入到文件里</font>__
+>>> ![io](\pic\04\io36.png)
+>>> ![io](\pic\04\io37.png)
+>>> ![io](\pic\04\io38.png)
+>>> __<font color=#DC143C>修改代码，通过 fflush 刷新流</font>__
+>>> ![io](\pic\04\io39.png)
+>>> ![io](\pic\04\io40.png)
+>>> ![io](\pic\04\io41.png)
+> * __<font size=4>(2). 定位流</font>__
+>> __<font color=#DC143C>当流打开时，内部有一个当前读写位置</font>__
+>> __rewind 定位到起始点，相当于 fseek(sp, 0, SEEK_SET);__
+>> ![io](\pic\04\io42.png)
+>> ![io](\pic\04\io43.png)
+>>> __<font color=#DC143C>例1：</font>__
+>>> ![io](\pic\04\io44.png)
+>>> __<font color=#DC143C>例2：</font>__
+>>> ![io](\pic\04\io45.png)
+> * __<font size=4>(3). 判断流 (出错/结束)</font>__
+>> ![io](\pic\04\io46.png)
 
->> * __(5). 按对象输入__
+## 7. sprintf和fprintf的用法
+> * __<font size=4>(1). 格式化输出</font>__
+>> __<font color=#DC143C>fprintf - 将字符串输出到指定的流中（fprintf(stdout...) = printf）；成功：返回写入的字符总数，失败：返回EOF</font>__
+>> __<font color=#DC143C>sprintf - 将字符串输出到指定的缓冲区中；成功：返回写入的字符总数，不包括追加在末尾的'\0'，失败：返回EOF</font>__
+>> ![io](\pic\04\io47.png)
+>>> __<font color=#DC143C>例1：</font>__
+>>> ![io](\pic\04\io48.png)
+>>> __<font color=#DC143C>例2：</font>__
+>>> ![io](\pic\04\io49.png)
+>>> ![io](\pic\04\io50.png)
+>>> ![io](\pic\04\io51.png)
+>>> ![io](\pic\04\io52.png)
+>>> ![io](\pic\04\io53.png)
 
->> * __(6). 按对象输出__
+## 8. 文件IO介绍
