@@ -918,7 +918,8 @@ z = (a+=5, b=a+1);  // z = 7
 >>> __<font color=#DC143C>例：</font>__
 >>> ![io](\pic\04\io8.png)
 >> * __<font size=4>(2). 权限</font>__
->> __<font color=#DC143C>文件权限补充：ls -l 查看，依次为所有者、群组、其它用户</font>__
+>> __<font color=#DC143C>文件权限补充：ls -l查看，d代表目录，权限依次为 所有者(u)、群组(g)、其它用户(o)</font>__
+>> __<font color=#DC143C>文件权限为一组8进制数(0开头)，0777 = rwx rwx rwx</font>__
 >> ![io](\pic\04\io9.png)
 >> ![io](\pic\04\io10.png)
 >> * __<font size=4>(3). 处理错误信息</font>__
@@ -962,7 +963,7 @@ z = (a+=5, b=a+1);  // z = 7
 >>> __<font color=#DC143C>abcdef<回车>：abcde\0（只能读取N-1个）</font>__
 >>> ![io](\pic\04\io26.png)
 > * __<font size=4>(2). 按行输出</font>__
->> __<font color=#DC143C size=4>puts 和 fputs 都是将缓冲区s内的字符串输出到流内，直到遇到'\0'后停止</font>__
+>> __<font color=#DC143C size=4>puts 和 fputs 都是将缓冲区s内的字符串输出到流内，直到遇到'\0'后停止（都不包含'\0'）</font>__
 >> __<font color=#DC143C size=4>puts 会追加 '\n'（因为是标准输出流），fputs 不会追加 '\n'</font>__
 >> __<font color=#DC143C size=4>fputs 写入的字符串，不包含末尾的 '\0'</font>__
 >> ![io](\pic\04\io27.png)
@@ -1008,6 +1009,7 @@ z = (a+=5, b=a+1);  // z = 7
 > * __<font size=4>(1). 格式化输出</font>__
 >> __<font color=#DC143C>fprintf - 将字符串输出到指定的流中（fprintf(stdout...) = printf）；成功：返回写入的字符总数，失败：返回EOF</font>__
 >> __<font color=#DC143C>sprintf - 将字符串输出到指定的缓冲区中；成功：返回写入的字符总数，不包括追加在末尾的'\0'，失败：返回EOF</font>__
+>> __<font color=#DC143C size=4>sprintf 会追加 '\0'，fprintf 不写入 '\0'</font>__
 >> ![io](\pic\04\io47.png)
 >>> __<font color=#DC143C>例1：</font>__
 >>> ![io](\pic\04\io48.png)
@@ -1019,3 +1021,66 @@ z = (a+=5, b=a+1);  // z = 7
 >>> ![io](\pic\04\io53.png)
 
 ## 8. 文件IO介绍
+> __<font color=#DC143C>标准IO相当于在文件IO上封装了一个缓冲</font>__
+> ![fileio](\pic\04\fileio.png)
+> ![fileio](\pic\04\fileio1.png)
+> * __<font size=4>(1). 文件描述符</font>__
+>> __<font color=#DC143C>不同程序内获取的文件描述符互不干扰，即使序号一样</font>__
+>> __<font color=#DC143C>0、1、2 分别是：标准输入流、标准输出流、标准错误流</font>__
+>> ![fileio](\pic\04\fileio2.png)
+> * __<font size=4>(2). 打开文件：open</font>__
+>> __<font color=#DC143C>权限还受掩码影响，实际权限：mode & ~umask</font>__
+>> __<font color=#DC143C>O_CREAT、O_EXCL 一般同时使用</font>__
+>> ![fileio](\pic\04\fileio3.png)
+>> ![fileio](\pic\04\fileio4.png)
+>>> __<font color=#DC143C>例1：0666(8进制) 110110110 rw-rw-rw-</font>__
+>>> ![fileio](\pic\04\fileio5.png)
+>>> __<font color=#DC143C>例2：</font>__
+>>> ![fileio](\pic\04\fileio6.png)
+> * __<font size=4>(3). 关闭文件：close</font>__
+>> ![fileio](\pic\04\fileio7.png)
+
+## 9. 文件IO编程接口
+> * __<font size=4>(1). 读取文件：read</font>__
+>> __<font color=#DC143C>count: 读取字节数</font>__
+>> ![fileio](\pic\04\fileio8.png)
+>>> __<font color=#DC143C>例：</font>__
+>>> ![fileio](\pic\04\fileio9.png)
+> * __<font size=4>(2). 写入文件：write</font>__
+>> __<font color=#DC143C>count: 写入字节数</font>__
+>> ![fileio](\pic\04\fileio10.png)
+>>> __<font color=#DC143C>例：</font>__
+>>> __<font color=#DC143C>复习：gets/fgets读取，直到回车结束；gets不读取\n，会追加\0；fgets会读取\n，并追加\0</font>__
+>>> ![fileio](\pic\04\fileio11.png)
+> * __<font size=4>(3). 定位文件：lseek</font>__
+>> __<font color=#DC143C>返回值和 fseek 不一样</font>__
+>> ![fileio](\pic\04\fileio12.png)
+>>> __<font color=#DC143C>例：</font>__
+>>> ![fileio](\pic\04\fileio13.png)
+>>> ![fileio](\pic\04\fileio14.png)
+
+## 10. 目录操作和文件属性
+> * __<font size=4>(1). 打开目录：opendir</font>__
+>> ![fileio](\pic\04\fileio15.png)
+> * __<font size=4>(2). 读取目录：readdir</font>__
+>> __<font color=#DC143C>目录中每一个子目录或文件都对应一个目录项，所以要循环读取，直到读到目录尾</font>__
+>> ![fileio](\pic\04\fileio17.png)
+> * __<font size=4>(3). 关闭目录：closedir</font>__
+>> ![fileio](\pic\04\fileio16.png)
+>>> __<font color=#DC143C>例：</font>__
+>>> ![fileio](\pic\04\fileio18.png)
+> * __<font size=4>(4). 修改文件访问权限：chmod / fchmod</font>__
+>> __<font color=#DC143C>一个通过路径，一个通过文件描述符</font>__
+>> ![fileio](\pic\04\fileio19.png)
+> * __<font size=4>(5). 获取文件属性：stat / lstat / fstat</font>__
+>> __<font color=#DC143C>建议使用 lstat：目标文件是源文件</font>__
+>> ![fileio](\pic\04\fileio20.png)
+>> __<font size=4>常见属性</font>__
+>> ![fileio](\pic\04\fileio21.png)
+>> __<font size=4>文件类型 - st_mode：和8进制的类型掩码相与，即文件类型(都是8进制)</font>__
+>> ![fileio](\pic\04\fileio22.png)
+>> __<font size=4>文件访问权限 - st_mode：低9位存放的就是权限 (8-6: 所有者rwx, 5-3: 同组用户rwx, 2-0: 其它用户rwx)</font>__
+>> ![fileio](\pic\04\fileio23.png)
+>>> __<font color=#DC143C>例：</font>__
+>>> ![fileio](\pic\04\fileio24.png)
+>>> ![fileio](\pic\04\fileio25.png)
