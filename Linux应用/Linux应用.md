@@ -409,7 +409,8 @@ z = (a+=5, b=a+1);  // z = 7
 >> * **(2). 硬链接：ln (无 -s)**
 >> **<font color=#DC143C>linux内每个文件都有一个物理编号：inode，查看："ls -i"</font>**
 >> **<font color=#DC143C>硬链接文件和源文件本质上是同一个文件 (inode号相同)</font>**
->> **<font color=#DC143C>硬链接一般用于做文件备份，保护文件</font>**
+>> **<font color=#DC143C>硬链接一般用于做文件备份，保护文件，防止误删 (inode号对应的所有文件被删除，文件才真正删除)</font>**
+>> ![ln](\pic\02\ln3.png)
 > * **4. 文件压缩与归档**
 > **<font color=#DC143C>先 归档 再 压缩</font>**
 > ![compress](\pic\02\compress.png)
