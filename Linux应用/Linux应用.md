@@ -1084,3 +1084,42 @@ z = (a+=5, b=a+1);  // z = 7
 >>> __<font color=#DC143C>例：</font>__
 >>> ![fileio](\pic\04\fileio24.png)
 >>> ![fileio](\pic\04\fileio25.png)
+
+## 11. 静态库的制作
+> * __<font size=4>(1). 库</font>__
+>> ![lib](\pic\04\lib.png)
+>> ![lib](\pic\04\lib1.png)
+> * __<font size=4>(2). 特点</font>__
+>> ![lib](\pic\04\lib2.png)
+> * __<font size=4>(3). 创建</font>__
+>> * __<font color=#DC143C>静态库名称：lib 开头，格式 .a</font>__
+>> * __<font color=#DC143C>调用库内的函数要声明函数原型</font>__
+>> * __<font color=#DC143C>-L.：指定库搜索路径为当前路径；-lhello：指定hello库 (编译器默认从缺省路径查找C库)</font>__
+>> * __<font color=#DC143C>静态库被删除了程序也能执行 (相关的代码已经被复制到程序内)</font>__
+>> ![lib](\pic\04\lib3.png)
+>> ![lib](\pic\04\lib4.png)
+>> ![lib](\pic\04\lib5.png)
+>> ![lib](\pic\04\lib6.png)
+>> ![lib](\pic\04\lib7.png)
+
+## 12. 共享库的制作
+> * __<font size=4>(1). 特点</font>__
+>> ![lib](\pic\04\lib8.png)
+> * __<font size=4>(2). 创建</font>__
+>> * __<font color=#DC143C>-fPIC: 编译生成位置无关代码</font>__
+>> * __<font color=#DC143C>共享库名称：lib开头，格式 .so.n，n通常代码版本</font>__
+>> * __<font color=#DC143C>符号链接名称：去掉版本号 (修改版本只需要修改链接指向即可)</font>__
+>> * __<font color=#DC143C>gcc 链接默认先找 共享库；直接链接静态库：-static</font>__
+>> * __<font color=#DC143C>由于执行时系统会在缺省路径查找库，需添加共享库的加载路径 (设为当前路径)：export LD_LIBRARY_PATH=$LD_LIBARY_PATH:.  注意：此方法只在当前的 shell 中有效</font>__
+>> * __<font color=#DC143C>gcc 默认先从当前目录查找 头文件</font>__
+>> ![lib](\pic\04\lib9.png)
+>> ![lib](\pic\04\lib10.png)
+>> ![lib](\pic\04\lib11.png)
+>> ![lib](\pic\04\lib12.png)
+>> ![lib](\pic\04\lib13.png)
+> * __<font size=4>(3). 查找共享库</font>__
+>> * __<font color=#DC143C>建议使用方法3</font>__
+>> ![lib](\pic\04\lib14.png)
+>> ![lib](\pic\04\lib15.png)
+>> ![lib](\pic\04\lib16.png)
+# Linux并发
