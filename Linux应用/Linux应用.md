@@ -887,240 +887,301 @@ z = (a+=5, b=a+1);  // z = 7
 # 八. Linux I/O
 
 ## 1. 标准IO介绍
-> __标准C中定义好的一组用来输入和输出的API__
-> * __<font size=5>1. 文件</font>__
->> ![io](\pic\04\file.png)
-> * __<font size=5>2. 系统调用、缓冲</font>__
->> ![io](\pic\04\io.png)
->> __系统调用：应用程序通过操作系统提供的接口访问硬件；不同的操作系统，系统调用接口不兼容__
->> ![io](\pic\04\os.png)
->> __缓冲：无缓冲 - APP读多少，系统从硬盘中取多少，每次读取都要进行系统调用；有缓冲 - 不管APP读多少，先读一批数据到缓冲中，APP直接从缓冲区中读取，减少系统调用的次数__
->> ![io](\pic\04\buffer.png)
-> * __<font size=5>3. FILE/流</font>__
->> __Linux下不区分文本流和二进制流__
->> ![io](\pic\04\io1.png)
->> ![io](\pic\04\io2.png)
-> * __<font size=5>4. 流缓冲类型</font>__
->> __全缓冲 - 标准I/O默认(打开文件)：当流的缓冲区满时才执行实际的I/O操作；当缓冲区空的时候，才会从实际的文件中读取数据__
->> __<font color=#DC143C>行缓冲 - 标准输入/输出(终端相关 - printf)：缓冲区满 或者 遇到换行符，才进行实际的I/O操作；即标准输出的 printf 必须加上 '\n' 才能输出</font>__
->> __无缓冲(标准错误输出)：直接读取/写入文件__
->> ![io](\pic\04\io3.png)
-> * __<font size=5>5. 默认流</font>__
->> __Linux运行时，系统自动打开的3个流；对应3个文件描述符__
->> ![io](\pic\04\io4.png)
+__标准C中定义好的一组用来输入和输出的API__
+
+### (1). 文件
+![io](\pic\04\file.png)
+
+### (2). 系统调用、缓冲
+![io](\pic\04\io.png)
+* __系统调用：应用程序通过操作系统提供的接口访问硬件；不同的操作系统，系统调用接口不兼容__
+![io](\pic\04\os.png)
+* __缓冲：无缓冲 - APP读多少，系统从硬盘中取多少，每次读取都要进行系统调用；有缓冲 - 不管APP读多少，先读一批数据到缓冲中，APP直接从缓冲区中读取，减少系统调用的次数__
+![io](\pic\04\buffer.png)
+
+### (3). FILE/流
+__Linux下不区分文本流和二进制流__
+![io](\pic\04\io1.png)
+![io](\pic\04\io2.png)
+
+### (4). 流缓冲类型
+* __全缓冲 - 标准I/O默认(打开文件)：当流的缓冲区满时才执行实际的I/O操作；当缓冲区空的时候，才会从实际的文件中读取数据__
+* __<font color=#DC143C>行缓冲 - 标准输入/输出(终端相关 - printf)：缓冲区满 或者 遇到换行符，才进行实际的I/O操作；即标准输出的 printf 必须加上 '\n' 才能输出</font>__
+* __无缓冲(标准错误输出)：直接读取/写入文件__
+![io](\pic\04\io3.png)
+
+### (5). 默认流
+__Linux运行时，系统自动打开的3个流；对应3个文件描述符__
+![io](\pic\04\io4.png)
 
 ## 2. 流的打开和关闭
-> * __<font size=5>1. 打开流</font>__
->> ![io](\pic\04\io5.png)
->> * __<font size=4>(1). mode 参数</font>__
->> __<font color=#DC143C>w+: 因为 w 将文件的内容清空，所以只能读打开文件后新写入的内容</font>__
->> ![io](\pic\04\io6.png)
->> ![io](\pic\04\io7.png)
->>> __<font color=#DC143C>例：</font>__
->>> ![io](\pic\04\io8.png)
->> * __<font size=4>(2). 权限</font>__
->> __<font color=#DC143C>文件权限补充：ls -l查看，d代表目录，权限依次为 所有者(u)、群组(g)、其它用户(o)</font>__
->> __<font color=#DC143C>文件权限为一组8进制数(0开头)，0777 = rwx rwx rwx</font>__
->> ![io](\pic\04\io9.png)
->> ![io](\pic\04\io10.png)
->> * __<font size=4>(3). 处理错误信息</font>__
->> ![io](\pic\04\io11.png)
->>> __<font color=#DC143C>例1：</font>__
->>> ![io](\pic\04\io12.png)
->>> __<font color=#DC143C>例2：</font>__
->>> ![io](\pic\04\io13.png)
-> * __<font size=4>2. 关闭流</font>__
->> ![io](\pic\04\io14.png)
-> * __<font size=4>3. 一个程序打开流的最大个数</font>__
->> ![io](\pic\04\io15.png)
+
+### (1). 打开流
+![io](\pic\04\io5.png)
+* __<font size=4>(1). mode 参数</font>__
+__<font color=#DC143C>w+: 因为 w 将文件的内容清空，所以只能读打开文件后新写入的内容</font>__
+![io](\pic\04\io6.png)
+![io](\pic\04\io7.png)
+> * __<font color=#DC143C>例：</font>__
+> ![io](\pic\04\io8.png)
+* __<font size=4>(2). 权限</font>__
+__<font color=#DC143C>文件权限补充：ls -l查看，d代表目录，权限依次为 所有者(u)、群组(g)、其它用户(o)</font>__
+__<font color=#DC143C>文件权限为一组8进制数(0开头)，0777 = rwx rwx rwx</font>__
+![io](\pic\04\io9.png)
+![io](\pic\04\io10.png)
+* __<font size=4>(3). 处理错误信息</font>__
+![io](\pic\04\io11.png)
+> * __<font color=#DC143C>例1：</font>__
+> ![io](\pic\04\io12.png)
+> * __<font color=#DC143C>例2：</font>__
+> ![io](\pic\04\io13.png)
+
+### (2). 关闭流
+![io](\pic\04\io14.png)
+
+### (3). 一个程序打开流的最大个数
+![io](\pic\04\io15.png)
 
 ## 3. 按字符输入和输出
-> __<font color=#DC143C size=4>既能处理文本文件 (字符串)，也能处理二进制文件，缺点效率低</font>__
-> * __<font size=5>读写流</font>__
->> __<font color=#DC143C>一般推荐用第三种方式</font>__
->> ![io](\pic\04\io16.png)
->> * __<font size=4>(1). 按字符输入</font>__
->> ![io](\pic\04\io17.png)
->>> __<font color=#DC143C>例：</font>__
->>> __<font color=#DC143C>再次强调：标准输出流是行缓冲，printf 要 '\n' 才能输出</font>__
->>> ![io](\pic\04\io18.png)
-> * __<font size=4>(2). 按字符输出</font>__
->> ![io](\pic\04\io19.png)
->>> __<font color=#DC143C>例1：</font>__
->>> ![io](\pic\04\io20.png)
->>> __<font color=#DC143C>例2：diff 文件比较命令，有不同会输出</font>__
->>> ![io](\pic\04\io21.png)
->>> ![io](\pic\04\io22.png)
+__<font color=#DC143C size=4>既能处理文本文件 (字符串)，也能处理二进制文件，缺点效率低</font>__
+
+### (1). 读写流
+__<font color=#DC143C>一般推荐用第三种方式</font>__
+![io](\pic\04\io16.png)
+
+### (2). 按字符输入
+![io](\pic\04\io17.png)
+> * __<font color=#DC143C>例：</font>__
+> __<font color=#DC143C>再次强调：标准输出流是行缓冲，printf 要 '\n' 才能输出</font>__
+> ![io](\pic\04\io18.png)
+
+### (3). 按字符输出
+![io](\pic\04\io19.png)
+> * __<font color=#DC143C>例1：</font>__
+> ![io](\pic\04\io20.png)
+> * __<font color=#DC143C>例2：diff 文件比较命令，有不同会输出</font>__
+> ![io](\pic\04\io21.png)
+> ![io](\pic\04\io22.png)
 
 ## 4. 按行输入和输出
-> __<font color=#DC143C size=4>只能处理文本文件 (字符串)，无法处理二进制文件 (二进制文件中通常会包含 '\0')</font>__
-> * __<font size=4>(1). 按行输入</font>__
->> ![io](\pic\04\io23.png)
->> ![io](\pic\04\io32.png)
->>> __<font color=#DC143C>例：</font>__
->>> ![io](\pic\04\io24.png)
->>> __<font color=#DC143C>abcd<回车>：abcd\n\0（输入的一定是字符串）</font>__
->>> ![io](\pic\04\io25.png)
->>> __<font color=#DC143C>abcdef<回车>：abcde\0（只能读取N-1个）</font>__
->>> ![io](\pic\04\io26.png)
-> * __<font size=4>(2). 按行输出</font>__
->> __<font color=#DC143C size=4>puts 和 fputs 都是将缓冲区s内的字符串输出到流内，直到遇到'\0'后停止（都不包含'\0'）</font>__
->> __<font color=#DC143C size=4>puts 会追加 '\n'（因为是标准输出流），fputs 不会追加 '\n'</font>__
->> __<font color=#DC143C size=4>fputs 写入的字符串，不包含末尾的 '\0'</font>__
->> ![io](\pic\04\io27.png)
->>> __<font color=#DC143C>例：</font>__
->>> ![io](\pic\04\io28.png)
+__<font color=#DC143C size=4>只能处理文本文件 (字符串)，无法处理二进制文件 (二进制文件中通常会包含 '\0')</font>__
+
+### (1). 按行输入
+![io](\pic\04\io23.png)
+![io](\pic\04\io32.png)
+> __<font color=#DC143C>例：</font>__
+> ![io](\pic\04\io24.png)
+>> __<font color=#DC143C>abcd<回车>：abcd\n\0（输入的一定是字符串）</font>__
+![io](\pic\04\io25.png)
+>> __<font color=#DC143C>abcdef<回车>：abcde\0（只能读取N-1个）</font>__
+![io](\pic\04\io26.png)
+
+### (2). 按行输出
+* __<font color=#DC143C size=4>puts 和 fputs 都是将缓冲区s内的字符串输出到流内，直到遇到'\0'后停止（都不包含'\0'）</font>__
+* __<font color=#DC143C size=4>puts 会追加 '\n'（因为是标准输出流），fputs 不会追加 '\n'</font>__
+* __<font color=#DC143C size=4>fputs 写入的字符串，不包含末尾的 '\0'</font>__
+![io](\pic\04\io27.png)
+> __<font color=#DC143C>例：</font>__
+> ![io](\pic\04\io28.png)
 
 ## 5. 按对象输入和输出
-> ![io](\pic\04\io29.png)
-> ![io](\pic\04\io30.png)
->> __<font color=#DC143C>例1：</font>__
->> ![io](\pic\04\io31.png)
->> __<font color=#DC143C>例2：</font>__
->> ![io](\pic\04\io33.png)
->> ![io](\pic\04\io34.png)
+![io](\pic\04\io29.png)
+![io](\pic\04\io30.png)
+> * __<font color=#DC143C>例1：</font>__
+> ![io](\pic\04\io31.png)
+> * __<font color=#DC143C>例2：</font>__
+> ![io](\pic\04\io33.png)
+> ![io](\pic\04\io34.png)
 
 ## 6. 流相关操作
-> * __<font size=4>(1). 刷新流</font>__
->> __<font color=#DC143C>1. 全缓冲：缓冲区满；行缓冲：缓冲区满/换行</font>__
->> __<font color=#DC143C>2. 当流关闭(fclose)时 / 程序结束时调用exit</font>__
->> __<font color=#DC143C>3. fflush函数</font>__
->> ![io](\pic\04\io35.png)
->>> __<font color=#DC143C>例：标准IO打开的流都是全缓冲，以下代码只是将字符 'a' 写入到流的缓冲区里，并未写入到文件里</font>__
->>> ![io](\pic\04\io36.png)
->>> ![io](\pic\04\io37.png)
->>> ![io](\pic\04\io38.png)
->>> __<font color=#DC143C>修改代码，通过 fflush 刷新流</font>__
->>> ![io](\pic\04\io39.png)
->>> ![io](\pic\04\io40.png)
->>> ![io](\pic\04\io41.png)
-> * __<font size=4>(2). 定位流</font>__
->> __<font color=#DC143C>当流打开时，内部有一个当前读写位置</font>__
->> __rewind 定位到起始点，相当于 fseek(sp, 0, SEEK_SET);__
->> ![io](\pic\04\io42.png)
->> ![io](\pic\04\io43.png)
->>> __<font color=#DC143C>例1：</font>__
->>> ![io](\pic\04\io44.png)
->>> __<font color=#DC143C>例2：</font>__
->>> ![io](\pic\04\io45.png)
-> * __<font size=4>(3). 判断流 (出错/结束)</font>__
->> ![io](\pic\04\io46.png)
+
+### (1). 刷新流
+* __<font color=#DC143C>1. 全缓冲：缓冲区满；行缓冲：缓冲区满/换行</font>__
+* __<font color=#DC143C>2. 当流关闭(fclose)时 / 程序结束时调用exit</font>__
+* __<font color=#DC143C>3. fflush函数</font>__
+![io](\pic\04\io35.png)
+> __<font color=#DC143C>例：标准IO打开的流都是全缓冲，以下代码只是将字符 'a' 写入到流的缓冲区里，并未写入到文件里</font>__
+> ![io](\pic\04\io36.png)
+> ![io](\pic\04\io37.png)
+> ![io](\pic\04\io38.png)
+> __<font color=#DC143C>修改代码，通过 fflush 刷新流</font>__
+> ![io](\pic\04\io39.png)
+> ![io](\pic\04\io40.png)
+> ![io](\pic\04\io41.png)
+
+### (2). 定位流
+__<font color=#DC143C>当流打开时，内部有一个当前读写位置</font>__
+__rewind 定位到起始点，相当于 fseek(sp, 0, SEEK_SET);__
+![io](\pic\04\io42.png)
+![io](\pic\04\io43.png)
+> * __<font color=#DC143C>例1：</font>__
+> ![io](\pic\04\io44.png)
+> * __<font color=#DC143C>例2：</font>__
+> ![io](\pic\04\io45.png)
+
+### (3). 判断流 (出错/结束)
+![io](\pic\04\io46.png)
 
 ## 7. sprintf和fprintf的用法
-> * __<font size=4>(1). 格式化输出</font>__
->> __<font color=#DC143C>fprintf - 将字符串输出到指定的流中（fprintf(stdout...) = printf）；成功：返回写入的字符总数，失败：返回EOF</font>__
->> __<font color=#DC143C>sprintf - 将字符串输出到指定的缓冲区中；成功：返回写入的字符总数，不包括追加在末尾的'\0'，失败：返回EOF</font>__
->> __<font color=#DC143C size=4>sprintf 会追加 '\0'，fprintf 不写入 '\0'</font>__
->> ![io](\pic\04\io47.png)
->>> __<font color=#DC143C>例1：</font>__
->>> ![io](\pic\04\io48.png)
->>> __<font color=#DC143C>例2：</font>__
->>> ![io](\pic\04\io49.png)
->>> ![io](\pic\04\io50.png)
->>> ![io](\pic\04\io51.png)
->>> ![io](\pic\04\io52.png)
->>> ![io](\pic\04\io53.png)
+* __<font color=#DC143C>fprintf - 将字符串输出到指定的流中（fprintf(stdout...) = printf）；成功：返回写入的字符总数，失败：返回EOF</font>__
+* __<font color=#DC143C>sprintf - 将字符串输出到指定的缓冲区中；成功：返回写入的字符总数，不包括追加在末尾的'\0'，失败：返回EOF</font>__
+* __<font color=#DC143C size=4>sprintf 会追加 '\0'，fprintf 不写入 '\0'</font>__
+![io](\pic\04\io47.png)
+> * __<font color=#DC143C>例1：</font>__
+> ![io](\pic\04\io48.png)
+> * __<font color=#DC143C>例2：</font>__
+> ![io](\pic\04\io49.png)
+> ![io](\pic\04\io50.png)
+> ![io](\pic\04\io51.png)
+> ![io](\pic\04\io52.png)
+> ![io](\pic\04\io53.png)
 
 ## 8. 文件IO介绍
-> __<font color=#DC143C>标准IO相当于在文件IO上封装了一个缓冲</font>__
-> ![fileio](\pic\04\fileio.png)
-> ![fileio](\pic\04\fileio1.png)
-> * __<font size=4>(1). 文件描述符</font>__
->> __<font color=#DC143C>不同程序内获取的文件描述符互不干扰，即使序号一样</font>__
->> __<font color=#DC143C>0、1、2 分别是：标准输入流、标准输出流、标准错误流</font>__
->> ![fileio](\pic\04\fileio2.png)
-> * __<font size=4>(2). 打开文件：open</font>__
->> __<font color=#DC143C>权限还受掩码影响，实际权限：mode & ~umask</font>__
->> __<font color=#DC143C>O_CREAT、O_EXCL 一般同时使用</font>__
->> ![fileio](\pic\04\fileio3.png)
->> ![fileio](\pic\04\fileio4.png)
->>> __<font color=#DC143C>例1：0666(8进制) 110110110 rw-rw-rw-</font>__
->>> ![fileio](\pic\04\fileio5.png)
->>> __<font color=#DC143C>例2：</font>__
->>> ![fileio](\pic\04\fileio6.png)
-> * __<font size=4>(3). 关闭文件：close</font>__
->> ![fileio](\pic\04\fileio7.png)
+__<font color=#DC143C>标准IO相当于在文件IO上封装了一个缓冲</font>__
+![fileio](\pic\04\fileio.png)
+![fileio](\pic\04\fileio1.png)
+
+### (1). 文件描述符
+* __<font color=#DC143C>不同程序内获取的文件描述符互不干扰，即使序号一样</font>__
+* __<font color=#DC143C>0、1、2 分别是：标准输入流、标准输出流、标准错误流</font>__
+![fileio](\pic\04\fileio2.png)
+
+### (2). 打开文件：open
+* __<font color=#DC143C>权限还受掩码影响，实际权限：mode & ~umask</font>__
+* __<font color=#DC143C>O_CREAT、O_EXCL 一般同时使用</font>__
+![fileio](\pic\04\fileio3.png)
+![fileio](\pic\04\fileio4.png)
+> * __<font color=#DC143C>例1：0666(8进制) 110110110 rw-rw-rw-</font>__
+> ![fileio](\pic\04\fileio5.png)
+> * __<font color=#DC143C>例2：</font>__
+> ![fileio](\pic\04\fileio6.png)
+
+### (3). 关闭文件：close
+![fileio](\pic\04\fileio7.png)
 
 ## 9. 文件IO编程接口
-> * __<font size=4>(1). 读取文件：read</font>__
->> __<font color=#DC143C>count: 读取字节数</font>__
->> ![fileio](\pic\04\fileio8.png)
->>> __<font color=#DC143C>例：</font>__
->>> ![fileio](\pic\04\fileio9.png)
-> * __<font size=4>(2). 写入文件：write</font>__
->> __<font color=#DC143C>count: 写入字节数</font>__
->> ![fileio](\pic\04\fileio10.png)
->>> __<font color=#DC143C>例：</font>__
->>> __<font color=#DC143C>复习：gets/fgets读取，直到回车结束；gets不读取\n，会追加\0；fgets会读取\n，并追加\0</font>__
->>> ![fileio](\pic\04\fileio11.png)
-> * __<font size=4>(3). 定位文件：lseek</font>__
->> __<font color=#DC143C>返回值和 fseek 不一样</font>__
->> ![fileio](\pic\04\fileio12.png)
->>> __<font color=#DC143C>例：</font>__
->>> ![fileio](\pic\04\fileio13.png)
->>> ![fileio](\pic\04\fileio14.png)
+
+### (1). 读取文件：read
+__<font color=#DC143C>count: 读取字节数</font>__
+![fileio](\pic\04\fileio8.png)
+> * __<font color=#DC143C>例：</font>__
+> ![fileio](\pic\04\fileio9.png)
+
+### (2). 写入文件：write
+__<font color=#DC143C>count: 写入字节数</font>__
+![fileio](\pic\04\fileio10.png)
+> * __<font color=#DC143C>例：</font>__
+> __<font color=#DC143C>复习：gets/fgets读取，直到回车结束；gets不读取\n，会追加\0；fgets会读取\n，并追加\0</font>__
+> ![fileio](\pic\04\fileio11.png)
+
+### (3). 定位文件：lseek
+__<font color=#DC143C>返回值和 fseek 不一样</font>__
+![fileio](\pic\04\fileio12.png)
+> * __<font color=#DC143C>例：</font>__
+> ![fileio](\pic\04\fileio13.png)
+> ![fileio](\pic\04\fileio14.png)
 
 ## 10. 目录操作和文件属性
-> * __<font size=4>(1). 打开目录：opendir</font>__
->> ![fileio](\pic\04\fileio15.png)
-> * __<font size=4>(2). 读取目录：readdir</font>__
->> __<font color=#DC143C>目录中每一个子目录或文件都对应一个目录项，所以要循环读取，直到读到目录尾</font>__
->> ![fileio](\pic\04\fileio17.png)
-> * __<font size=4>(3). 关闭目录：closedir</font>__
->> ![fileio](\pic\04\fileio16.png)
->>> __<font color=#DC143C>例：</font>__
->>> ![fileio](\pic\04\fileio18.png)
-> * __<font size=4>(4). 修改文件访问权限：chmod / fchmod</font>__
->> __<font color=#DC143C>一个通过路径，一个通过文件描述符</font>__
->> ![fileio](\pic\04\fileio19.png)
-> * __<font size=4>(5). 获取文件属性：stat / lstat / fstat</font>__
->> __<font color=#DC143C>建议使用 lstat：目标文件是源文件</font>__
->> ![fileio](\pic\04\fileio20.png)
->> __<font size=4>常见属性</font>__
->> ![fileio](\pic\04\fileio21.png)
->> __<font size=4>文件类型 - st_mode：和8进制的类型掩码相与，即文件类型(都是8进制)</font>__
->> ![fileio](\pic\04\fileio22.png)
->> __<font size=4>文件访问权限 - st_mode：低9位存放的就是权限 (8-6: 所有者rwx, 5-3: 同组用户rwx, 2-0: 其它用户rwx)</font>__
->> ![fileio](\pic\04\fileio23.png)
->>> __<font color=#DC143C>例：</font>__
->>> ![fileio](\pic\04\fileio24.png)
->>> ![fileio](\pic\04\fileio25.png)
+
+### (1). 打开目录：opendir
+![fileio](\pic\04\fileio15.png)
+
+### (2). 读取目录：readdir
+__<font color=#DC143C>目录中每一个子目录或文件都对应一个目录项，所以要循环读取，直到读到目录尾</font>__
+![fileio](\pic\04\fileio17.png)
+
+### (3). 关闭目录：closedir
+![fileio](\pic\04\fileio16.png)
+> * __<font color=#DC143C>例：</font>__
+> ![fileio](\pic\04\fileio18.png)
+
+### (4). 修改文件访问权限：chmod / fchmod
+__<font color=#DC143C>一个通过路径，一个通过文件描述符</font>__
+![fileio](\pic\04\fileio19.png)
+
+### (5). 获取文件属性：stat / lstat / fstat
+__<font color=#DC143C>建议使用 lstat：目标文件是源文件</font>__
+![fileio](\pic\04\fileio20.png)
+* __<font size=4>常见属性</font>__
+![fileio](\pic\04\fileio21.png)
+* __<font size=4>文件类型 - st_mode：和8进制的类型掩码相与，即文件类型(都是8进制)</font>__
+![fileio](\pic\04\fileio22.png)
+* __<font size=4>文件访问权限 - st_mode：低9位存放的就是权限 (8-6: 所有者rwx, 5-3: 同组用户rwx, 2-0: 其它用户rwx)</font>__
+![fileio](\pic\04\fileio23.png)
+> * __<font color=#DC143C>例：</font>__
+> ![fileio](\pic\04\fileio24.png)
+> ![fileio](\pic\04\fileio25.png)
 
 ## 11. 静态库的制作
-> * __<font size=4>(1). 库</font>__
->> ![lib](\pic\04\lib.png)
->> ![lib](\pic\04\lib1.png)
-> * __<font size=4>(2). 特点</font>__
->> ![lib](\pic\04\lib2.png)
-> * __<font size=4>(3). 创建</font>__
->> * __<font color=#DC143C>静态库名称：lib 开头，格式 .a</font>__
->> * __<font color=#DC143C>调用库内的函数要声明函数原型</font>__
->> * __<font color=#DC143C>-L.：指定库搜索路径为当前路径；-lhello：指定hello库 (编译器默认从缺省路径查找C库)</font>__
->> * __<font color=#DC143C>静态库被删除了程序也能执行 (相关的代码已经被复制到程序内)</font>__
->> ![lib](\pic\04\lib3.png)
->> ![lib](\pic\04\lib4.png)
->> ![lib](\pic\04\lib5.png)
->> ![lib](\pic\04\lib6.png)
->> ![lib](\pic\04\lib7.png)
+
+### (1). 库
+![lib](\pic\04\lib.png)
+![lib](\pic\04\lib1.png)
+
+### (2). 特点
+![lib](\pic\04\lib2.png)
+
+### (3). 创建
+* __<font color=#DC143C>静态库名称：lib 开头，格式 .a</font>__
+* __<font color=#DC143C>调用库内的函数要声明函数原型</font>__
+* __<font color=#DC143C>-L.：指定库搜索路径为当前路径；-lhello：指定hello库 (编译器默认从缺省路径查找C库)</font>__
+* __<font color=#DC143C>静态库被删除了程序也能执行 (相关的代码已经被复制到程序内)</font>__
+![lib](\pic\04\lib3.png)
+![lib](\pic\04\lib4.png)
+![lib](\pic\04\lib5.png)
+![lib](\pic\04\lib6.png)
+![lib](\pic\04\lib7.png)
 
 ## 12. 共享库的制作
-> * __<font size=4>(1). 特点</font>__
->> ![lib](\pic\04\lib8.png)
-> * __<font size=4>(2). 创建</font>__
->> * __<font color=#DC143C>-fPIC: 编译生成位置无关代码</font>__
->> * __<font color=#DC143C>共享库名称：lib开头，格式 .so.n，n通常代码版本</font>__
->> * __<font color=#DC143C>符号链接名称：去掉版本号 (修改版本只需要修改链接指向即可)</font>__
->> * __<font color=#DC143C>gcc 链接默认先找 共享库；直接链接静态库：-static</font>__
->> * __<font color=#DC143C>由于执行时系统会在缺省路径查找库，需添加共享库的加载路径 (设为当前路径)：export LD_LIBRARY_PATH=$LD_LIBARY_PATH:.  注意：此方法只在当前的 shell 中有效</font>__
->> * __<font color=#DC143C>gcc 默认先从当前目录查找 头文件</font>__
->> ![lib](\pic\04\lib9.png)
->> ![lib](\pic\04\lib10.png)
->> ![lib](\pic\04\lib11.png)
->> ![lib](\pic\04\lib12.png)
->> ![lib](\pic\04\lib13.png)
-> * __<font size=4>(3). 查找共享库</font>__
->> * __<font color=#DC143C>建议使用方法3</font>__
->> ![lib](\pic\04\lib14.png)
->> ![lib](\pic\04\lib15.png)
->> ![lib](\pic\04\lib16.png)
-# Linux并发
+
+### (1). 特点
+![lib](\pic\04\lib8.png)
+
+### (2). 创建
+* __<font color=#DC143C>-fPIC: 编译生成位置无关代码</font>__
+* __<font color=#DC143C>共享库名称：lib开头，格式 .so.n，n通常代码版本</font>__
+* __<font color=#DC143C>符号链接名称：去掉版本号 (修改版本只需要修改链接指向即可)</font>__
+* __<font color=#DC143C>gcc 链接默认先找 共享库；直接链接静态库：-static</font>__
+* __<font color=#DC143C>由于执行时系统会在缺省路径查找库，需添加共享库的加载路径 (设为当前路径)：export LD_LIBRARY_PATH=$LD_LIBARY_PATH:.  注意：此方法只在当前的 shell 中有效</font>__
+* __<font color=#DC143C>gcc 默认先从当前目录查找 头文件</font>__
+![lib](\pic\04\lib9.png)
+![lib](\pic\04\lib10.png)
+![lib](\pic\04\lib11.png)
+![lib](\pic\04\lib12.png)
+![lib](\pic\04\lib13.png)
+
+### (3). 查找共享库
+__<font color=#DC143C>建议使用方法3</font>__
+![lib](\pic\04\lib14.png)
+![lib](\pic\04\lib15.png)
+![lib](\pic\04\lib16.png)
+
+# 九. Linux并发
+
+## 1. Linux进程
+
+### (1). 概念
+![process](\pic\05\process.png)
+
+### (2). 内容
+![process](\pic\05\process1.png)
+![process](\pic\05\process2.png)
+__PC: program counter 下一条指令的地址__
+
+### (3). 类型
+![process](\pic\05\process3.png)
+__前台进程：从终端(shell)输入，从终端输出__
+__后台进程：加地址号，18645是进程号，无法从终端读取输入，可以往终端输出__
+![process](\pic\05\process4.png)
+
+### (4). 状态
+__准备运行也叫就绪态__
+__死亡态也叫僵尸态__
+![process](\pic\05\process5.png)
+![process](\pic\05\process6.png)
+
+## 2. 进程编辑命令
+
+## 3. fork函数和exit函数
+
+## 4. excel函数族和system函数
