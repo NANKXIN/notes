@@ -237,7 +237,7 @@ z = (a+=5, b=a+1);  // z = 7
 * **软件源配置文件：** /etc/apt/sources.list
 * **软件详细定位：** /var/lib/apt/lists/*
 * **软件源：** 1. Main(官方开源) 2. Universe(社区开源) 3. Restricted(官方非开源) 4. Multiverse(非官方非开源)
-* **刷新软件源：** 1. 修改配置文件 2. apt-get undate
+* **刷新软件源：** 1. 修改配置文件 2. apt-get update
 > **<font size=4>管理软件包（sudo）</font>**
 ![文件类型](\pic\02\apt.png)
 ![文件类型](\pic\02\apt-get.png)
@@ -1181,6 +1181,50 @@ __死亡态也叫僵尸态__
 ![process](\pic\05\process6.png)
 
 ## 2. 进程编辑命令
+
+### (1). 查看进程信息
+![process](\pic\05\process7.png)
+__ps -ef | more：显示所有进程信息，more：一页一页显示__
+__ps -ef | grep test：列出并查找对应的进程信息__
+__UID：进程所有者，PID：进程号，PPID：副进程号，C：CPU的占有率，STIME：开始时间，TTY：关联的终端，TIME：执行时占用的时间，CMD：对应程序的名称__
+![process](\pic\05\process8.png)
+__ps aux：较 -ef，还能显示当前状态，具体状态码的含义：man ps__
+![process](\pic\05\process9.png)
+![process](\pic\05\process10.png)
+__top：查看进程的动态信息__
+__/proc：进程信息目录，再进入需要查看的进程号目录__
+![process](\pic\05\process11.png)
+![process](\pic\05\process12.png)
+![process](\pic\05\process13.png)
+__fd目录：当前进程打开的所有的文件信息__
+![process](\pic\05\process14.png)
+
+### (2). 修改进程优先级
+![process](\pic\05\process15.png)
+__NI：nice值，越小，优先级越高 [-20, 19]，默认为0__
+![process](\pic\05\process16.png)
+__nice -n x ./test：指定 test 的优先级为 x__
+__<font color=#DC143C>普通用户最小只能是0，管理员全优先级</font>__
+![process](\pic\05\process17.png)
+![process](\pic\05\process18.png)
+__renice -n x PID：修改正在运行的对应进程号的进程优先级__
+__<font color=#DC143C>权限同 nice 一样</font>__
+![process](\pic\05\process19.png)
+
+### (3). 前后台进程的切换
+__<font color=#DC143C>后台进程也叫后台作业</font>__
+![process](\pic\05\process20.png)
+__./test &：test在后台运行__
+![process](\pic\05\process21.png)
+__jobs：查看当前终端下的后台进程__
+![process](\pic\05\process22.png)
+__fg n：将后台作业1在前台运行 (foreground)__
+![process](\pic\05\process23.png)
+__ctrl+z：讲当前的前台进程在后台挂起，并处于停止态__
+![process](\pic\05\process24.png)
+__bg n：将后台作业n放到前台，为运行态__
+![process](\pic\05\process25.png)
+
 
 ## 3. fork函数和exit函数
 
