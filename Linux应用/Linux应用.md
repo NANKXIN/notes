@@ -1225,7 +1225,51 @@ __ctrl+z：讲当前的前台进程在后台挂起，并处于停止态__
 __bg n：将后台作业n放到前台，为运行态__
 ![process](\pic\05\process25.png)
 
-
 ## 3. fork函数和exit函数
 
-## 4. excel函数族和system函数
+### (1). 创建进程 - fork
+![process](\pic\05\fork.png)
+> * __<font color=#DC143C>例：</font>__
+> ![process](\pic\05\fork1.png)
+
+### (2). 父子进程
+![process](\pic\05\fork2.png)
+__子进程继承了父进程几乎所有的数据，包括变量、打开的文件、PC等__
+__子进程从fork的下一条语句开始执行__
+__父子进程执行的先后顺序：不确定，看父进程的时间片__
+__可以多次调用fork，多次创建子进程；子进程同样也可以调用fork__
+
+### (3). 结束进程 - exit / _exit
+__status 只有低8位有效__
+___exit 不会刷新进程中打开的流的缓冲区__
+![process](\pic\05\fork3.png)
+> * __<font color=#DC143C>例1：</font>__
+> __printf 无换行符，执行完并不会输出__
+> __exit(0); 刷新流，打印第1个字符串__
+> __下一个语句不会执行__
+> ![process](\pic\05\fork4.png)
+> * __<font color=#DC143C>例2：</font>__
+> ![process](\pic\05\fork5.png)
+
+## 4. exec函数族和system函数
+
+### (1). 进程 - exec函数族
+![process](\pic\05\fork6.png)
+__在 shell 内执行程序就是创建了一个子进程，exec执行指定的程序__
+
+### (2). 进程 - execl / execlp
+__path：可相对，可绝对__
+__arg：可变参数，第1个为执行的程序名称，后面依次为传递给程序的选项和内容，最后一个参数必须是NULL__
+__file：直接是程序的名称，PATH见动态库章节__
+![process](\pic\05\fork7.png)
+> * __<font color=#DC143C>例：</font>__
+> ![process](\pic\05\fork8.png)
+
+### (3). 进程 - execv / execvp
+![process](\pic\05\fork9.png)
+> * __<font color=#DC143C>例：</font>__
+> ![process](\pic\05\exec.png)
+
+### (4). 进程 - system
+__自动创建子进程，执行command__
+![process](\pic\05\exec1.png)
