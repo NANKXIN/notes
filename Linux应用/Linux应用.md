@@ -1438,6 +1438,7 @@ __bg n：将后台作业n放到前台，为运行态__
 ![process](\pic\05\fork.png)
 >
 > * __<font color=#DC143C>例：</font>__
+> __<font color=#DC143C>Pid = 0 下为子进程代码；pid > 0 下为父进程代码</font>__
 > ![process](\pic\05\fork1.png)
 
 ### (2). 父子进程
@@ -1450,9 +1451,10 @@ __可以多次调用fork，多次创建子进程；子进程同样也可以调�
 
 ### (3). 结束进程 - exit / _exit
 
-__status 只有低8位有效__
+__<font color=#DC143C>(status & 0xFF) 返回给父进程</font>__
 ___exit 不会刷新进程中打开的流的缓冲区__
 ![process](\pic\05\fork3.png)
+![process](\pic\05\exit.png)
 >
 > * __<font color=#DC143C>例1：</font>__
 > __printf 无换行符，执行完并不会输出__
@@ -1493,3 +1495,87 @@ __自动创建子进程，执行command__
 
 ## 5. wait函数和waitpid函数
 
+### (1). 进程回收
+
+* __孤儿进程：父进程结束，子进程未结束，子进程自动在后台运行，且被init进程收养__
+* __僵尸进程：子进程结束但未被父进程回收，除PCB以外的资源被释放，直到父进程结束，变成孤儿进程，PCB才会被init进程释放__
+![process](\pic\05\recovery.png)
+
+### (2). wait
+
+![process](\pic\05\wait.png)
+>
+> * __<font color=#DC143C>例：</font>__
+> __sleep(1); exit(2); 为子进程执行，其它都为父进程执行__
+> __wait 堵塞直到子进程 sleep 1s 结束__
+> ![process](\pic\05\wait1.png)
+
+### (3). 进程返回值和结束方法
+
+__<font color=#DC143C>子进程返回值只取低8位</font>__
+__<font color=#DC143C>具体：man wait</font>__
+![process](\pic\05\return.png)
+
+> __status:__
+>
+> * __0-6位为0: 正常返回__
+> * __0-6不为0: 为信号值__
+> * __8-15位: 子进程 exit 返回的值__
+
+### (4). waitpid
+
+> __pid:__
+>
+> * __-1: 任意子进程__
+> * __非-1: 具体子进程__
+>
+> __option:__
+>
+> * __0: 阻塞__
+> * __WNOHANG: 非阻塞，若返回0，表示要回收的子进程未结束__
+
+![process](\pic\05\waitpid.png)
+
+> * __<font color=#DC143C>例：</font>__
+> ![process](\pic\05\waitpid1.png)
+
+## 6. Linux守护进程
+
+### (1). 守护进程特点
+
+![process](\pic\05\daemon.png)
+
+* __后台进程：只能输出到终端，不能从终端输入__
+* __区别于交互进程：守护进程和终端无关__
+![process](\pic\05\daemon1.png)
+
+### (2). 会话、控制终端
+
+* __进程组：父进程即其子进程__
+* __会话：打开一个终端，第一个进程shell为会话的首进程，也叫做会话组组长，在该shell下执行的所有程序、创建的所有进程都属于同一个会话；终端也叫做会话的控制终端；一个会话最多只能打开一个控制终端__
+* __终端无关：终端关闭时不能结束守护进程，所以守护进程和终端无关__
+![process](\pic\05\daemon2.png)
+
+### (3). 守护进程创建
+
+* __fork 返回值用于判断父进程和子进程，0为子进程，>0为父进程__
+* __此时子进程仍依附于终端__
+![process](\pic\05\daemon3.png)
+
+* __原先的会话是在打开终端的时候创建的__
+* __新创建会话后，子进程不再属于原先的会话，也和原先的终端无关__
+![process](\pic\05\daemon4.png)
+
+* __根目录 和 tmp目录 权限不一样__
+* __守护进程的工作目录指向一个永远不需要卸载的目录__
+![process](\pic\05\daemon5.png)
+
+* __守护进程内创建的文件权限一般不受限制__
+![process](\pic\05\daemon6.png)
+
+* __关闭从父进程继承来的文件__
+![process](\pic\05\daemon7.png)
+
+> * __<font color=#DC143C>例：</font>__
+> ![process](\pic\05\daemon8.png)
+> ![process](\pic\05\daemon9.png)
