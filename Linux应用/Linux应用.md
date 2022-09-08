@@ -1,5 +1,3 @@
-[TOC]
-
 # 一. 必备Linux命令和C语言基础
 
 ## 1. Linux常用命令
@@ -864,10 +862,15 @@ __<font color=#DC143C>同类型结构体变量可直接赋值</font>__
 
 ### (2). 存储
 
+__<font color=#DC143C>只读区：代码区 + 常量区</font>__
 __<font color=#DC143C>代码区：存放二进制代码</font>__
+__<font color=#DC143C>常量区：全局 const + 字符串常量，程序结束后才释放</font>__
 __<font color=#DC143C>静态存储区：全局变量、静态变量、常量</font>__
 __<font color=#DC143C>栈/堆区：不解释</font>__
 ![c](\pic\02\mem.png)
+![c](\pic\02\mem1.png)
+![c](\pic\02\mem2.png)
+![c](\pic\02\mem3.png)
 
 ### (3). malloc/free
 
@@ -1579,3 +1582,49 @@ __<font color=#DC143C>具体：man wait</font>__
 > * __<font color=#DC143C>例：</font>__
 > ![process](\pic\05\daemon8.png)
 > ![process](\pic\05\daemon9.png)
+
+# 十. 线程专题
+
+## 1. 线程模型及线程创建
+
+![thread](\pic\05\thread.png)
+
+* __进程切换：cache刷新，TLB刷新，开销大__
+* __线程切换：同一个进程，cahce、TLB不需要频繁刷新，或只刷新一部分__
+![thread](\pic\05\thread1.png)
+
+### (1). 线程特点
+
+![thread](\pic\05\thread2.png)
+__静态变量：全局变量也是__
+![thread](\pic\05\thread3.png)
+__堆栈：即局部变量互不影响__
+![thread](\pic\05\thread4.png)
+
+### (2). 线程库
+
+![thread](\pic\05\thread5.png)
+
+### (3). 线程创建 - pthread_create
+
+![thread](\pic\05\thread6.png)
+
+### (4). 线程回收 - pthread_join
+
+![thread](\pic\05\thread7.png)
+
+### (5). 线程结束 - pthread_exit
+
+* __<font color=#DC143C>进程结束：进程内所有的线程都会结束</font>__
+![thread](\pic\05\thread8.png)
+
+> * __<font color=#DC143C>例：</font>__
+> __<font color=#DC143C>字符串常量存放在只读的数据段内，线程结束，字符串还存在，不会被释放 —— 见 六.2.2 存储</font>__
+> ![thread](\pic\05\thread9.png)
+> ![thread](\pic\05\thread10.png)
+> __<font color=#DC143C>编译：</font>__
+> ![thread](\pic\05\thread11.png)
+> __<font color=#DC143C>结果：</font>__
+> ![thread](\pic\05\thread12.png)
+
+## 2. 线程同步 - 信号量
