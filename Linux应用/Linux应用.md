@@ -1626,5 +1626,67 @@ __堆栈：即局部变量互不影响__
 > ![thread](\pic\05\thread11.png)
 > __<font color=#DC143C>结果：</font>__
 > ![thread](\pic\05\thread12.png)
+> __<font color=#DC143C>pthread_join 使用错误</font>__
+> ![thread](\pic\05\thread12-.png)
 
 ## 2. 线程同步 - 信号量
+
+![thread](\pic\05\thread13.png)
+
+### (1). 同步
+
+![thread](\pic\05\thread14.png)
+![thread](\pic\05\thread15.png)
+![thread](\pic\05\thread16.png)
+
+### (2). Posix 信号量
+
+* __无名信号量：一般进程内部，线程之间__
+* __有名信号量：即可进程，也可线程__
+![thread](\pic\05\thread17.png)
+
+### (3). 函数 - 初始化
+
+![thread](\pic\05\thread18.png)
+
+### (4). 函数 - P/V操作
+
+![thread](\pic\05\thread19.png)
+
+### (5). 实例
+
+> * __<font color=#DC143C>例1：不安全</font>__
+> ![thread](\pic\05\thread20.png)
+> ![thread](\pic\05\thread21.png)
+> ![thread](\pic\05\thread22.png)
+> * __<font color=#DC143C>例2：安全</font>__
+> ![thread](\pic\05\thread23.png)
+> ![thread](\pic\05\thread24.png)
+> ![thread](\pic\05\thread25.png)
+
+## 3. 线程互斥
+
+* __同一时间只能有一个线程拥有锁__
+![thread](\pic\05\thread26.png)
+
+### (1). 初始化 - pthread_mutex_init
+
+![thread](\pic\05\thread27.png)
+
+### (2). 申请锁 - pthread_mutex_lock
+
+![thread](\pic\05\thread28.png)
+
+### (3). 释放锁 - pthread_mutex_unlock
+
+![thread](\pic\05\thread29.png)
+
+### (4). 例
+
+> ![thread](\pic\05\thread30.png)
+> ![thread](\pic\05\thread31.png)
+> ![thread](\pic\05\thread32.png)
+> __不使用互斥锁__
+> ![thread](\pic\05\thread33.png)
+> __使用互斥锁，-D_LOCK\_: 传递一个宏定义__
+> ![thread](\pic\05\thread34.png)
