@@ -1765,16 +1765,28 @@ __<font color=#DC143C>是否会设置errno，查看man手册的 RETURN VALUE</fo
 ![process](\pic\05\pro-comm20.png)
 
 > * __<font color=#DC143C>例：</font>__
-> __<font color=#DC143C>3个程序；管道文件大小为0，因为管道数据是保存在内存里面</font>__
-> __<font color=#DC143C>当前只有读端或写端的时候（只运行读程序或写程序），open打开有名管道时会阻塞</font>__
-> __<font color=#DC143C>只有读端和写端都存在时（读写程序都运行），两个程序的open才能成功</font>__
+> __<font color=#DC143C>1. 一共3个程序</font>__
+> __<font color=#DC143C>2. 管道文件大小为0，因为管道数据是保存在内存里面</font>__
+> __<font color=#DC143C>3. 当前只有读端或写端的时候（只运行读程序或写程序），open打开有名管道时会阻塞</font>__
+> __<font color=#DC143C>4. 只有读端和写端都存在时（读写程序都运行），两个程序的open才能成功</font>__
 > ![process](\pic\05\pro-comm21.png)
 > ![process](\pic\05\pro-comm22.png)
 > ![process](\pic\05\pro-comm23.png)
 > ![process](\pic\05\pro-comm24.png)
 
-
 ## 13. 信号机制及信号相关命令
+
+### (1). 信号机制
+
+* __模拟中断：非硬件，由内核模拟，处理方式和中断一致__
+* __异步：一个进程在任何条件下都能接收到信号，不需要特殊处理__
+![process](\pic\05\pro-comm25.png)
+
+### (2). 常用信号
+
+![process](\pic\05\pro-comm26.png)
+
+### (3). 相关命令
 
 ## 14. 信号发送及定时器
 
