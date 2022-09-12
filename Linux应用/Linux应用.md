@@ -1583,9 +1583,7 @@ __<font color=#DC143C>具体：man wait</font>__
 > ![process](\pic\05\daemon8.png)
 > ![process](\pic\05\daemon9.png)
 
-# 十. 线程专题
-
-## 1. 线程模型及线程创建
+## 7. 线程模型及线程创建
 
 ![thread](\pic\05\thread.png)
 
@@ -1618,7 +1616,8 @@ __堆栈：即局部变量互不影响__
 * __<font color=#DC143C>进程结束：进程内所有的线程都会结束</font>__
 ![thread](\pic\05\thread8.png)
 
-> * __<font color=#DC143C>例：</font>__
+### (6). 实例
+
 > __<font color=#DC143C>字符串常量存放在只读的数据段内，线程结束，字符串还存在，不会被释放 —— 见 六.2.2 存储</font>__
 > ![thread](\pic\05\thread9.png)
 > ![thread](\pic\05\thread10.png)
@@ -1629,7 +1628,7 @@ __堆栈：即局部变量互不影响__
 > __<font color=#DC143C>pthread_join 使用错误</font>__
 > ![thread](\pic\05\thread12-.png)
 
-## 2. 线程同步 - 信号量
+## 8. 线程同步 - 信号量
 
 ![thread](\pic\05\thread13.png)
 
@@ -1664,7 +1663,7 @@ __堆栈：即局部变量互不影响__
 > ![thread](\pic\05\thread24.png)
 > ![thread](\pic\05\thread25.png)
 
-## 3. 线程互斥
+## 9. 线程互斥
 
 * __同一时间只能有一个线程拥有锁__
 ![thread](\pic\05\thread26.png)
@@ -1681,7 +1680,7 @@ __堆栈：即局部变量互不影响__
 
 ![thread](\pic\05\thread29.png)
 
-### (4). 例
+### (4). 实例
 
 > ![thread](\pic\05\thread30.png)
 > ![thread](\pic\05\thread31.png)
@@ -1690,3 +1689,105 @@ __堆栈：即局部变量互不影响__
 > ![thread](\pic\05\thread33.png)
 > __使用互斥锁，-D_LOCK\_: 传递一个宏定义__
 > ![thread](\pic\05\thread34.png)
+
+## 10. 进程间通信综述及无名管道
+
+### (1). 进程间通信
+
+* __前6种：本地通信__
+* __套接字：网络通信__
+![process](\pic\05\pro-comm.png)
+
+### (2). 无名管道
+
+![process](\pic\05\pro-comm1.png)
+__<font color=#DC143C>只能用于有亲缘关系的进程之间：文件只在内存中存在，无路径；子进程继承父进程打开的文件</font>__
+__<font color=#DC143C>单工：一个进程只能读或只能写</font>__
+__<font color=#DC143C>区别于普通文件：管道内容被读取后，内容清空，且无法定位</font>__
+![process](\pic\05\pro-comm2.png)
+__<font color=#DC143C>是否会设置errno，查看man手册的 RETURN VALUE</font>__
+![process](\pic\05\pro-comm3.png)
+![process](\pic\05\pro-comm4.png)
+
+> * __<font color=#DC143C>例：</font>__
+> ![process](\pic\05\pro-comm5.png)
+> ![process](\pic\05\pro-comm6.png)
+> ![process](\pic\05\pro-comm7.png)
+
+## 11. 进程间通信 - 无名管道详解
+
+### (1). 读取
+
+* __<font color=#DC143C>写端存在：至少有一个线程可以通过写端文件描述符向管道内写入数据</font>__
+* __<font color=#DC143C>写端不存在：写端文件被关闭；发送线程发送完毕后，关闭写端文件，接收线程判断写端不存在，并且读取数据返回0，即判定发送完毕</font>__
+* __实际大小：根据读取缓冲区大小和管道内数据决定；管道大小>=读取大小，=读取大小；管道数据<读取大小，=管道大小__
+![process](\pic\05\pro-comm8.png)
+![process](\pic\05\pro-comm9.png)
+
+### (2). 写入
+
+* __<font color=#DC143C>读端存在：至少有一个线程可以通过读端文件描述符读取管道中的内容</font>__
+* __<font color=#DC143C>无空间：指空间不足，不保证原子操作，例：写入1024，空间256，会堵塞直到全部写入完毕</font>__
+![process](\pic\05\pro-comm10.png)
+* __<font color=#DC143C>读端不存在：读端文件被关闭，写入数据不会被读取</font>__
+![process](\pic\05\pro-comm14.png)
+
+### (3). 获取管道大小
+
+![process](\pic\05\pro-comm11.png)
+
+> * __<font color=#DC143C>例：缺省大小为64K</font>__
+> ![process](\pic\05\pro-comm12.png)
+> ![process](\pic\05\pro-comm13.png)
+
+### (4). 验证管道断裂
+
+![process](\pic\05\pro-comm15.png)
+
+> * __<font color=#DC143C>例：</font>__
+> ![process](\pic\05\pro-comm16.png)
+> ![process](\pic\05\pro-comm17.png)
+> __<font color=#DC143C>低7位非0，为异常结束（被信号结束）</font>__
+> ![process](\pic\05\pro-comm18.png)
+> __<font color=#DC143C>0x0d = 13 = SIGPIPE：代表管道断裂</font>__
+
+## 12. 进程间通信 - 有名管道详解
+
+### (1). 有名管道特点
+
+* __<font color=#DC143C>无论无名还是有名管道，当读端和写端都被关闭后，管道内的数据都会被释放</font>__
+![process](\pic\05\pro-comm19.png)
+
+### (2). 创建 - mkfifo
+
+* __path：相对/绝对，默认在当前路径__
+* __mode：主要是读/写权限，无执行__
+![process](\pic\05\pro-comm20.png)
+
+> * __<font color=#DC143C>例：</font>__
+> __<font color=#DC143C>3个程序；管道文件大小为0，因为管道数据是保存在内存里面</font>__
+> __<font color=#DC143C>当前只有读端或写端的时候（只运行读程序或写程序），open打开有名管道时会阻塞</font>__
+> __<font color=#DC143C>只有读端和写端都存在时（读写程序都运行），两个程序的open才能成功</font>__
+> ![process](\pic\05\pro-comm21.png)
+> ![process](\pic\05\pro-comm22.png)
+> ![process](\pic\05\pro-comm23.png)
+> ![process](\pic\05\pro-comm24.png)
+
+
+## 13. 信号机制及信号相关命令
+
+## 14. 信号发送及定时器
+
+## 15. IPC机制及共享内存
+
+## 16. 共享内存的实现
+
+## 17. 消息队列机制及相关函数
+
+## 18. 消息队列的实现
+
+## 19. 信号灯集机制及相关函数
+
+## 20. 利用信号灯集实现共享内存的同步
+
+## 21. 利用信号灯集实现共享内存的同步
