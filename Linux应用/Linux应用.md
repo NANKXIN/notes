@@ -1662,6 +1662,9 @@ __堆栈：即局部变量互不影响__
 > ![thread](\pic\05\thread23.png)
 > ![thread](\pic\05\thread24.png)
 > ![thread](\pic\05\thread25.png)
+> ![process](\pic\05\pro-comm-ex10.jpg)
+> ![process](\pic\05\pro-comm-ex11.jpg)
+> ![process](\pic\05\pro-comm-ex12.jpg)
 
 ## 9. 线程互斥
 
@@ -1689,6 +1692,9 @@ __堆栈：即局部变量互不影响__
 > ![thread](\pic\05\thread33.png)
 > __使用互斥锁，-D_LOCK\_: 传递一个宏定义__
 > ![thread](\pic\05\thread34.png)
+> ![process](\pic\05\pro-comm-ex7.jpg)
+> ![process](\pic\05\pro-comm-ex8.jpg)
+> ![process](\pic\05\pro-comm-ex9.jpg)
 
 ## 10. 进程间通信综述及无名管道
 
@@ -1713,6 +1719,9 @@ __<font color=#DC143C>是否会设置errno，查看man手册的 RETURN VALUE</fo
 > ![process](\pic\05\pro-comm5.png)
 > ![process](\pic\05\pro-comm6.png)
 > ![process](\pic\05\pro-comm7.png)
+> ![process](\pic\05\pro-comm-ex4.jpg)
+> ![process](\pic\05\pro-comm-ex5.jpg)
+> ![process](\pic\05\pro-comm-ex6.jpg)
 
 ## 11. 进程间通信 - 无名管道详解
 
@@ -1773,6 +1782,9 @@ __<font color=#DC143C>是否会设置errno，查看man手册的 RETURN VALUE</fo
 > ![process](\pic\05\pro-comm22.png)
 > ![process](\pic\05\pro-comm23.png)
 > ![process](\pic\05\pro-comm24.png)
+> ![process](\pic\05\pro-comm-ex1.jpg)
+> ![process](\pic\05\pro-comm-ex2.jpg)
+> ![process](\pic\05\pro-comm-ex3.jpg)
 
 ## 13. 信号机制及信号相关命令
 
