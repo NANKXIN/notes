@@ -1773,11 +1773,11 @@ __<font color=#DC143C>是否会设置errno，查看man手册的 RETURN VALUE</fo
 * __mode：主要是读/写权限，无执行__
 ![process](\pic\05\pro-comm20.png)
 
-> * __<font color=#DC143C>例：</font>__
-> __<font color=#DC143C>1. 一共3个程序</font>__
-> __<font color=#DC143C>2. 管道文件大小为0，因为管道数据是保存在内存里面</font>__
-> __<font color=#DC143C>3. 当前只有读端或写端的时候（只运行读程序或写程序），open打开有名管道时会阻塞</font>__
-> __<font color=#DC143C>4. 只有读端和写端都存在时（读写程序都运行），两个程序的open才能成功</font>__
+> * __<font face="华文细黑" color=#DC143C>例：</font>__
+> __<font face="华文细黑" color=#DC143C>1. 一共3个程序</font>__
+> __<font face="华文细黑" color=#DC143C>2. 管道文件大小为0，因为管道数据是保存在内存里面</font>__
+> __<font face="华文细黑" color=#DC143C>3. 当前只有读端或写端的时候（只运行读程序或写程序），open打开有名管道时会阻塞</font>__
+> __<font face="华文细黑" color=#DC143C>4. 只有读端和写端都存在时（读写程序都运行），两个程序的open才能成功</font>__
 > ![process](\pic\05\pro-comm21.png)
 > ![process](\pic\05\pro-comm22.png)
 > ![process](\pic\05\pro-comm23.png)
@@ -1790,15 +1790,29 @@ __<font color=#DC143C>是否会设置errno，查看man手册的 RETURN VALUE</fo
 
 ### (1). 信号机制
 
-* __模拟中断：非硬件，由内核模拟，处理方式和中断一致__
-* __异步：一个进程在任何条件下都能接收到信号，不需要特殊处理__
+* __<font face="华文细黑">中断：中断<font face="consolas">CPU<font face="华文细黑">的执行；接收到中断信号，执行完当前指令结束后，处理中断</font>__
+* __<font face="华文细黑">模拟中断：非硬件，由内核模拟，处理方式和中断一致</font>__
+* __<font face="华文细黑">异步：一个进程在任何条件下都能接收到信号，不需要特殊处理</font>__
+* __<font face="consolas" color=#DC143C>kill -l：<font face="华文细黑">查看中断列表；前<font face="consolas">31<font face="华文细黑">种为不可靠信号，不支持信号排队</font>__
+* __<font face="华文细黑" color=#DC143C>捕捉信号(注册信号)：设定对应的信号处理函数</font>__
 ![process](\pic\05\pro-comm25.png)
 
 ### (2). 常用信号
 
+* __<font face="consolas" color=#DC143C>SIGSEV：<font face="华文细黑">段错误</font>__
 ![process](\pic\05\pro-comm26.png)
+* __<font face="consolas" color=#DC143C>SIGCONT：gdb c</font>__
+* __<font face="consolas" color=#DC143C>SIGALRM：<font face="华文细黑">定时器到达，默认为终止进程，一般修改为捕捉</font>__
+![process](\pic\05\pro-comm27.png)
 
 ### (3). 相关命令
+
+* __<font face="华文细黑" color=#DC143C>默认发送<font face="consolas">15：SIGTERM</font>__
+* __<font face="consolas" color=#DC143C>PID：<font face="华文细黑">可以是多个值</font>__
+* __<font face="consolas" color=#DC143C>-1：<font face="华文细黑">除<font face="consolas">init<font face="华文细黑">进程和当前进程外的所有进程发送信号；<font face="consolas">n：<font face="华文细黑">给进程<font face="consolas" >n<font face="华文细黑">发送信号；<font face="consolas">-n：<font face="华文细黑">给进程组n的所有进程发送信号</font>__
+![process](\pic\05\pro-comm28.png)
+* __</font><font face="华文细黑" color=#DC143C>普通用户只能向自己创建的进程发信号</font>__
+![process](\pic\05\pro-comm29.png)
 
 ## 14. 信号发送及定时器
 
