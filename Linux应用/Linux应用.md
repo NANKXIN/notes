@@ -1760,6 +1760,10 @@ __<font color=#DC143C>是否会设置errno，查看man手册的 RETURN VALUE</fo
 > ![process](\pic\05\pro-comm18.png)
 > __<font color=#DC143C>0x0d = 13 = SIGPIPE：代表管道断裂</font>__
 
+___
+__以下开始按视频内容大纲列分标题，上面的复习时再修改__
+___
+
 ## 12. 进程间通信 - 有名管道详解
 
 ### (1). 有名管道特点
@@ -1767,11 +1771,13 @@ __<font color=#DC143C>是否会设置errno，查看man手册的 RETURN VALUE</fo
 * __<font color=#DC143C>无论无名还是有名管道，当读端和写端都被关闭后，管道内的数据都会被释放</font>__
 ![process](\pic\05\pro-comm19.png)
 
-### (2). 创建 - mkfifo
+### (2). 有名管道创建
 
 * __path：相对/绝对，默认在当前路径__
 * __mode：主要是读/写权限，无执行__
 ![process](\pic\05\pro-comm20.png)
+
+### (3). 有名管道读写
 
 > * __<font face="华文细黑" color=#DC143C>例：</font>__
 > __<font face="华文细黑" color=#DC143C>1. 一共3个程序</font>__
@@ -1785,6 +1791,7 @@ __<font color=#DC143C>是否会设置errno，查看man手册的 RETURN VALUE</fo
 > ![process](\pic\05\pro-comm-ex1.jpg)
 > ![process](\pic\05\pro-comm-ex2.jpg)
 > ![process](\pic\05\pro-comm-ex3.jpg)
+
 
 ## 13. 信号机制及信号相关命令
 
@@ -1815,6 +1822,12 @@ __<font color=#DC143C>是否会设置errno，查看man手册的 RETURN VALUE</fo
 ![process](\pic\05\pro-comm29.png)
 
 ## 14. 信号发送及定时器
+
+### (1). 信号发送
+
+### (2). 定时器
+
+### (3). 信号捕捉
 
 ## 15. IPC机制及共享内存
 
