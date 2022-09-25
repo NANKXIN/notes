@@ -1409,29 +1409,29 @@ __fd目录：当前进程打开的所有的文件信息__
 ### (2). 修改进程优先级
 
 ![process](\pic\05\process15.png)
-__NI：nice值，越小，优先级越高 [-20, 19]，默认为0__
+NI：nice值，越小，优先级越高 [-20, 19]，默认为0
 ![process](\pic\05\process16.png)
-__nice -n x ./test：指定 test 的优先级为 x__
-__<font color=#DC143C>普通用户最小只能是0，管理员全优先级</font>__
+nice -n x ./test：指定 test 的优先级为 x
+<font color=#DC143C>普通用户最小只能是0，管理员全优先级</font>
 ![process](\pic\05\process17.png)
 ![process](\pic\05\process18.png)
-__renice -n x PID：修改正在运行的对应进程号的进程优先级__
-__<font color=#DC143C>权限同 nice 一样</font>__
+renice -n x PID：修改正在运行的对应进程号的进程优先级
+<font color=#DC143C>权限同 nice 一样</font>
 ![process](\pic\05\process19.png)
 
 ### (3). 前后台进程的切换
 
-__<font color=#DC143C>后台进程也叫后台作业</font>__
+<font color=#DC143C>后台进程也叫后台作业</font>
 ![process](\pic\05\process20.png)
-__./test &：test在后台运行__
+./test &：test在后台运行
 ![process](\pic\05\process21.png)
-__jobs：查看当前终端下的后台进程__
+jobs：查看当前终端下的后台进程
 ![process](\pic\05\process22.png)
-__fg n：将后台作业1在前台运行 (foreground)__
+fg n：将后台作业1在前台运行 (foreground)
 ![process](\pic\05\process23.png)
-__ctrl+z：讲当前的前台进程在后台挂起，并处于停止态__
+ctrl+z：讲当前的前台进程在后台挂起，并处于停止态
 ![process](\pic\05\process24.png)
-__bg n：将后台作业n放到前台，为运行态__
+bg n：将后台作业n放到前台，为运行态
 ![process](\pic\05\process25.png)
 
 ## 3. fork函数和exit函数
@@ -1440,31 +1440,31 @@ __bg n：将后台作业n放到前台，为运行态__
 
 ![process](\pic\05\fork.png)
 >
-> * __<font color=#DC143C>例：</font>__
-> __<font color=#DC143C>Pid = 0 下为子进程代码；pid > 0 下为父进程代码</font>__
+> * <font color=#DC143C>例：</font>
+> <font color=#DC143C>Pid = 0 下为子进程代码；pid > 0 下为父进程代码</font>
 > ![process](\pic\05\fork1.png)
 
 ### (2). 父子进程
 
 ![process](\pic\05\fork2.png)
-__子进程继承了父进程几乎所有的数据，包括变量、打开的文件、PC等__
-__子进程从fork的下一条语句开始执行__
-__父子进程执行的先后顺序：不确定，看父进程的时间片__
-__可以多次调用fork，多次创建子进程；子进程同样也可以调用fork__
+子进程继承了父进程几乎所有的数据，包括变量、打开的文件、PC等
+子进程从fork的下一条语句开始执行
+父子进程执行的先后顺序：不确定，看父进程的时间片
+可以多次调用fork，多次创建子进程；子进程同样也可以调用fork
 
 ### (3). 结束进程 - exit / _exit
 
-__<font color=#DC143C>(status & 0xFF) 返回给父进程</font>__
-___exit 不会刷新进程中打开的流的缓冲区__
+<font color=#DC143C>(status & 0xFF) 返回给父进程</font>
+_exit 不会刷新进程中打开的流的缓冲区
 ![process](\pic\05\fork3.png)
 ![process](\pic\05\exit.png)
 >
-> * __<font color=#DC143C>例1：</font>__
-> __printf 无换行符，执行完并不会输出__
-> __exit(0); 刷新流，打印第1个字符串__
-> __下一个语句不会执行__
+> * <font color=#DC143C>例1：</font>
+> printf 无换行符，执行完并不会输出
+> exit(0); 刷新流，打印第1个字符串
+> 下一个语句不会执行
 > ![process](\pic\05\fork4.png)
-> * __<font color=#DC143C>例2：</font>__
+> * <font color=#DC143C>例2：</font>
 > ![process](\pic\05\fork5.png)
 
 ## 4. exec函数族和system函数
@@ -1472,74 +1472,74 @@ ___exit 不会刷新进程中打开的流的缓冲区__
 ### (1). 进程 - exec函数族
 
 ![process](\pic\05\fork6.png)
-__在 shell 内执行程序就是创建了一个子进程，exec执行指定的程序__
+在 shell 内执行程序就是创建了一个子进程，exec执行指定的程序
 
 ### (2). 进程 - execl / execlp
 
-__path：可相对，可绝对__
-__arg：可变参数，第1个为执行的程序名称，后面依次为传递给程序的选项和内容，最后一个参数必须是NULL__
-__file：直接是程序的名称，PATH见动态库章节__
+path：可相对，可绝对
+arg：可变参数，第1个为执行的程序名称，后面依次为传递给程序的选项和内容，最后一个参数必须是NULL
+file：直接是程序的名称，PATH见动态库章节
 ![process](\pic\05\fork7.png)
 >
-> * __<font color=#DC143C>例：</font>__
+> * <font color=#DC143C>例：</font>
 > ![process](\pic\05\fork8.png)
 
 ### (3). 进程 - execv / execvp
 
 ![process](\pic\05\fork9.png)
 >
-> * __<font color=#DC143C>例：</font>__
+> * <font color=#DC143C>例：</font>
 > ![process](\pic\05\exec.png)
 
 ### (4). 进程 - system
 
-__自动创建子进程，执行command__
+自动创建子进程，执行command
 ![process](\pic\05\exec1.png)
 
 ## 5. wait函数和waitpid函数
 
 ### (1). 进程回收
 
-* __孤儿进程：父进程结束，子进程未结束，子进程自动在后台运行，且被init进程收养__
-* __僵尸进程：子进程结束但未被父进程回收，除PCB以外的资源被释放，直到父进程结束，变成孤儿进程，PCB才会被init进程释放__
+* 孤儿进程：父进程结束，子进程未结束，子进程自动在后台运行，且被init进程收养
+* 僵尸进程：子进程结束但未被父进程回收，除PCB以外的资源被释放，直到父进程结束，变成孤儿进程，PCB才会被init进程释放
 ![process](\pic\05\recovery.png)
 
 ### (2). wait
 
 ![process](\pic\05\wait.png)
 >
-> * __<font color=#DC143C>例：</font>__
-> __sleep(1); exit(2); 为子进程执行，其它都为父进程执行__
-> __wait 堵塞直到子进程 sleep 1s 结束__
+> * <font color=#DC143C>例：</font>
+> sleep(1); exit(2); 为子进程执行，其它都为父进程执行
+> wait 堵塞直到子进程 sleep 1s 结束
 > ![process](\pic\05\wait1.png)
 
 ### (3). 进程返回值和结束方法
 
-__<font color=#DC143C>子进程返回值只取低8位</font>__
-__<font color=#DC143C>具体：man wait</font>__
+<font color=#DC143C>子进程返回值只取低8位</font>
+<font color=#DC143C>具体：man wait</font>
 ![process](\pic\05\return.png)
 
-> __status:__
+> status:
 >
-> * __0-6位为0: 正常返回__
-> * __0-6不为0: 为信号值__
-> * __8-15位: 子进程 exit 返回的值__
+> * 0-6位为0: 正常返回
+> * 0-6不为0: 为信号值
+> * 8-15位: 子进程 exit 返回的值
 
 ### (4). waitpid
 
-> __pid:__
+> pid:
 >
-> * __-1: 任意子进程__
-> * __非-1: 具体子进程__
+> * -1: 任意子进程
+> * 非-1: 具体子进程
 >
-> __option:__
+> option:
 >
-> * __0: 阻塞__
-> * __WNOHANG: 非阻塞，若返回0，表示要回收的子进程未结束__
+> * 0: 阻塞
+> * WNOHANG: 非阻塞，若返回0，表示要回收的子进程未结束
 
 ![process](\pic\05\waitpid.png)
 
-> * __<font color=#DC143C>例：</font>__
+> * <font color=#DC143C>例：</font>
 > ![process](\pic\05\waitpid1.png)
 
 ## 6. Linux守护进程
@@ -1548,38 +1548,38 @@ __<font color=#DC143C>具体：man wait</font>__
 
 ![process](\pic\05\daemon.png)
 
-* __后台进程：只能输出到终端，不能从终端输入__
-* __区别于交互进程：守护进程和终端无关__
+* 后台进程：只能输出到终端，不能从终端输入
+* 区别于交互进程：守护进程和终端无关
 ![process](\pic\05\daemon1.png)
 
 ### (2). 会话、控制终端
 
-* __进程组：父进程即其子进程__
-* __会话：打开一个终端，第一个进程shell为会话的首进程，也叫做会话组组长，在该shell下执行的所有程序、创建的所有进程都属于同一个会话；终端也叫做会话的控制终端；一个会话最多只能打开一个控制终端__
-* __终端无关：终端关闭时不能结束守护进程，所以守护进程和终端无关__
+* 进程组：父进程即其子进程
+* 会话：打开一个终端，第一个进程shell为会话的首进程，也叫做会话组组长，在该shell下执行的所有程序、创建的所有进程都属于同一个会话；终端也叫做会话的控制终端；一个会话最多只能打开一个控制终端
+* 终端无关：终端关闭时不能结束守护进程，所以守护进程和终端无关
 ![process](\pic\05\daemon2.png)
 
 ### (3). 守护进程创建
 
-* __fork 返回值用于判断父进程和子进程，0为子进程，>0为父进程__
-* __此时子进程仍依附于终端__
+* fork 返回值用于判断父进程和子进程，0为子进程，>0为父进程
+* 此时子进程仍依附于终端
 ![process](\pic\05\daemon3.png)
 
-* __原先的会话是在打开终端的时候创建的__
-* __新创建会话后，子进程不再属于原先的会话，也和原先的终端无关__
+* 原先的会话是在打开终端的时候创建的
+* 新创建会话后，子进程不再属于原先的会话，也和原先的终端无关
 ![process](\pic\05\daemon4.png)
 
-* __根目录 和 tmp目录 权限不一样__
-* __守护进程的工作目录指向一个永远不需要卸载的目录__
+* 根目录 和 tmp目录 权限不一样
+* 守护进程的工作目录指向一个永远不需要卸载的目录
 ![process](\pic\05\daemon5.png)
 
-* __守护进程内创建的文件权限一般不受限制__
+* 守护进程内创建的文件权限一般不受限制
 ![process](\pic\05\daemon6.png)
 
-* __关闭从父进程继承来的文件__
+* 关闭从父进程继承来的文件
 ![process](\pic\05\daemon7.png)
 
-> * __<font color=#DC143C>例：</font>__
+> * <font color=#DC143C>例：</font>
 > ![process](\pic\05\daemon8.png)
 > ![process](\pic\05\daemon9.png)
 
@@ -1587,16 +1587,16 @@ __<font color=#DC143C>具体：man wait</font>__
 
 ![thread](\pic\05\thread.png)
 
-* __进程切换：cache刷新，TLB刷新，开销大__
-* __线程切换：同一个进程，cahce、TLB不需要频繁刷新，或只刷新一部分__
+* 进程切换：cache刷新，TLB刷新，开销大
+* 线程切换：同一个进程，cahce、TLB不需要频繁刷新，或只刷新一部分
 ![thread](\pic\05\thread1.png)
 
 ### (1). 线程特点
 
 ![thread](\pic\05\thread2.png)
-__静态变量：全局变量也是__
+静态变量：全局变量也是
 ![thread](\pic\05\thread3.png)
-__堆栈：即局部变量互不影响__
+堆栈：即局部变量互不影响
 ![thread](\pic\05\thread4.png)
 
 ### (2). 线程库
@@ -1613,19 +1613,19 @@ __堆栈：即局部变量互不影响__
 
 ### (5). 线程结束 - pthread_exit
 
-* __<font color=#DC143C>进程结束：进程内所有的线程都会结束</font>__
+* <font color=#DC143C>进程结束：进程内所有的线程都会结束</font>
 ![thread](\pic\05\thread8.png)
 
 ### (6). 实例
 
-> __<font color=#DC143C>字符串常量存放在只读的数据段内，线程结束，字符串还存在，不会被释放 —— 见 六.2.2 存储</font>__
+> <font color=#DC143C>字符串常量存放在只读的数据段内，线程结束，字符串还存在，不会被释放 —— 见 六.2.2 存储</font>
 > ![thread](\pic\05\thread9.png)
 > ![thread](\pic\05\thread10.png)
-> __<font color=#DC143C>编译：</font>__
+> <font color=#DC143C>编译：</font>
 > ![thread](\pic\05\thread11.png)
-> __<font color=#DC143C>结果：</font>__
+> <font color=#DC143C>结果：</font>
 > ![thread](\pic\05\thread12.png)
-> __<font color=#DC143C>pthread_join 使用错误</font>__
+> <font color=#DC143C>pthread_join 使用错误</font>
 > ![thread](\pic\05\thread12-.png)
 
 ## 8. 线程同步 - 信号量
@@ -1640,8 +1640,8 @@ __堆栈：即局部变量互不影响__
 
 ### (2). Posix 信号量
 
-* __无名信号量：一般进程内部，线程之间__
-* __有名信号量：即可进程，也可线程__
+* 无名信号量：一般进程内部，线程之间
+* 有名信号量：即可进程，也可线程
 ![thread](\pic\05\thread17.png)
 
 ### (3). 函数 - 初始化
@@ -1654,11 +1654,11 @@ __堆栈：即局部变量互不影响__
 
 ### (5). 实例
 
-> * __<font color=#DC143C>例1：不安全</font>__
+> * <font color=#DC143C>例1：不安全</font>
 > ![thread](\pic\05\thread20.png)
 > ![thread](\pic\05\thread21.png)
 > ![thread](\pic\05\thread22.png)
-> * __<font color=#DC143C>例2：安全</font>__
+> * <font color=#DC143C>例2：安全</font>
 > ![thread](\pic\05\thread23.png)
 > ![thread](\pic\05\thread24.png)
 > ![thread](\pic\05\thread25.png)
@@ -1688,9 +1688,9 @@ __堆栈：即局部变量互不影响__
 > ![thread](\pic\05\thread30.png)
 > ![thread](\pic\05\thread31.png)
 > ![thread](\pic\05\thread32.png)
-> __不使用互斥锁__
+> 不使用互斥锁
 > ![thread](\pic\05\thread33.png)
-> __使用互斥锁，-D_LOCK\_: 传递一个宏定义__
+> 使用互斥锁，-D_LOCK\_: 传递一个宏定义
 > ![thread](\pic\05\thread34.png)
 > ![process](\pic\05\pro-comm-ex7.jpg)
 > ![process](\pic\05\pro-comm-ex8.jpg)
@@ -1707,15 +1707,15 @@ __堆栈：即局部变量互不影响__
 ### (2). 无名管道
 
 ![process](\pic\05\pro-comm1.png)
-__<font color=#DC143C>只能用于有亲缘关系的进程之间：文件只在内存中存在，无路径；子进程继承父进程打开的文件</font>__
-__<font color=#DC143C>单工：一个进程只能读或只能写</font>__
-__<font color=#DC143C>区别于普通文件：管道内容被读取后，内容清空，且无法定位</font>__
+<font color=#DC143C>只能用于有亲缘关系的进程之间：文件只在内存中存在，无路径；子进程继承父进程打开的文件</font>
+<font color=#DC143C>单工：一个进程只能读或只能写</font>
+<font color=#DC143C>区别于普通文件：管道内容被读取后，内容清空，且无法定位</font>
 ![process](\pic\05\pro-comm2.png)
-__<font color=#DC143C>是否会设置errno，查看man手册的 RETURN VALUE</font>__
+<font color=#DC143C>是否会设置errno，查看man手册的 RETURN VALUE</font>
 ![process](\pic\05\pro-comm3.png)
 ![process](\pic\05\pro-comm4.png)
 
-> * __<font color=#DC143C>例：</font>__
+> * <font color=#DC143C>例：</font>
 > ![process](\pic\05\pro-comm5.png)
 > ![process](\pic\05\pro-comm6.png)
 > ![process](\pic\05\pro-comm7.png)
@@ -1727,25 +1727,25 @@ __<font color=#DC143C>是否会设置errno，查看man手册的 RETURN VALUE</fo
 
 ### (1). 读取
 
-* __<font color=#DC143C>写端存在：至少有一个线程可以通过写端文件描述符向管道内写入数据</font>__
-* __<font color=#DC143C>写端不存在：写端文件被关闭；发送线程发送完毕后，关闭写端文件，接收线程判断写端不存在，并且读取数据返回0，即判定发送完毕</font>__
-* __实际大小：根据读取缓冲区大小和管道内数据决定；管道大小>=读取大小，=读取大小；管道数据<读取大小，=管道大小__
+* <font color=#DC143C>写端存在：至少有一个线程可以通过写端文件描述符向管道内写入数据</font>
+* <font color=#DC143C>写端不存在：写端文件被关闭；发送线程发送完毕后，关闭写端文件，接收线程判断写端不存在，并且读取数据返回0，即判定发送完毕</font>
+* 实际大小：根据读取缓冲区大小和管道内数据决定；管道大小>=读取大小，=读取大小；管道数据<读取大小，=管道大小
 ![process](\pic\05\pro-comm8.png)
 ![process](\pic\05\pro-comm9.png)
 
 ### (2). 写入
 
-* __<font color=#DC143C>读端存在：至少有一个线程可以通过读端文件描述符读取管道中的内容</font>__
-* __<font color=#DC143C>无空间：指空间不足，不保证原子操作，例：写入1024，空间256，会堵塞直到全部写入完毕</font>__
+* <font color=#DC143C>读端存在：至少有一个线程可以通过读端文件描述符读取管道中的内容</font>
+* <font color=#DC143C>无空间：指空间不足，不保证原子操作，例：写入1024，空间256，会堵塞直到全部写入完毕</font>
 ![process](\pic\05\pro-comm10.png)
-* __<font color=#DC143C>读端不存在：读端文件被关闭，写入数据不会被读取</font>__
+* <font color=#DC143C>读端不存在：读端文件被关闭，写入数据不会被读取</font>
 ![process](\pic\05\pro-comm14.png)
 
 ### (3). 获取管道大小
 
 ![process](\pic\05\pro-comm11.png)
 
-> * __<font color=#DC143C>例：缺省大小为64K</font>__
+> * <font color=#DC143C>例：缺省大小为64K</font>
 > ![process](\pic\05\pro-comm12.png)
 > ![process](\pic\05\pro-comm13.png)
 
@@ -1753,12 +1753,12 @@ __<font color=#DC143C>是否会设置errno，查看man手册的 RETURN VALUE</fo
 
 ![process](\pic\05\pro-comm15.png)
 
-> * __<font color=#DC143C>例：</font>__
+> * <font color=#DC143C>例：</font>
 > ![process](\pic\05\pro-comm16.png)
 > ![process](\pic\05\pro-comm17.png)
-> __<font color=#DC143C>低7位非0，为异常结束（被信号结束）</font>__
+> <font color=#DC143C>低7位非0，为异常结束（被信号结束）</font>
 > ![process](\pic\05\pro-comm18.png)
-> __<font color=#DC143C>0x0d = 13 = SIGPIPE：代表管道断裂</font>__
+> <font color=#DC143C>0x0d = 13 = SIGPIPE：代表管道断裂</font>
 
 ___
 __以下开始按视频内容大纲列分标题，上面的复习时再修改__
@@ -1768,22 +1768,22 @@ ___
 
 ### (1). 有名管道特点
 
-* __<font color=#DC143C>无论无名还是有名管道，当读端和写端都被关闭后，管道内的数据都会被释放</font>__
+* <font color=#DC143C>无论无名还是有名管道，当读端和写端都被关闭后，管道内的数据都会被释放</font>
 ![process](\pic\05\pro-comm19.png)
 
 ### (2). 有名管道创建
 
-* __path：相对/绝对，默认在当前路径__
-* __mode：主要是读/写权限，无执行__
+* path：相对/绝对，默认在当前路径
+* mode：主要是读/写权限，无执行
 ![process](\pic\05\pro-comm20.png)
 
 ### (3). 有名管道读写
 
-> * __<font face="华文细黑" color=#DC143C>例：</font>__
-> __<font face="华文细黑" color=#DC143C>1. 一共3个程序</font>__
-> __<font face="华文细黑" color=#DC143C>2. 管道文件大小为0，因为管道数据是保存在内存里面</font>__
-> __<font face="华文细黑" color=#DC143C>3. 当前只有读端或写端的时候（只运行读程序或写程序），open打开有名管道时会阻塞</font>__
-> __<font face="华文细黑" color=#DC143C>4. 只有读端和写端都存在时（读写程序都运行），两个程序的open才能成功</font>__
+> * <font color=#DC143C>例：</font>
+> <font color=#DC143C>1. 一共3个程序</font>
+> <font color=#DC143C>2. 管道文件大小为0，因为管道数据是保存在内存里面</font>
+> <font color=#DC143C>3. 当前只有读端或写端的时候（只运行读程序或写程序），open打开有名管道时会阻塞</font>
+> <font color=#DC143C>4. 只有读端和写端都存在时（读写程序都运行），两个程序的open才能成功</font>
 > ![process](\pic\05\pro-comm21.png)
 > ![process](\pic\05\pro-comm22.png)
 > ![process](\pic\05\pro-comm23.png)
@@ -1792,38 +1792,41 @@ ___
 > ![process](\pic\05\pro-comm-ex2.jpg)
 > ![process](\pic\05\pro-comm-ex3.jpg)
 
-
 ## 13. 信号机制及信号相关命令
 
 ### (1). 信号机制
 
-* __<font face="华文细黑">中断：中断<font face="consolas">CPU<font face="华文细黑">的执行；接收到中断信号，执行完当前指令结束后，处理中断</font>__
-* __<font face="华文细黑">模拟中断：非硬件，由内核模拟，处理方式和中断一致</font>__
-* __<font face="华文细黑">异步：一个进程在任何条件下都能接收到信号，不需要特殊处理</font>__
-* __<font face="consolas" color=#DC143C>kill -l：<font face="华文细黑">查看中断列表；前<font face="consolas">31<font face="华文细黑">种为不可靠信号，不支持信号排队</font>__
-* __<font face="华文细黑" color=#DC143C>捕捉信号(注册信号)：设定对应的信号处理函数</font>__
+* 中断：中断CPU的执行；接收到中断信号，执行完当前指令结束后，处理中断
+* 模拟中断：非硬件，由内核模拟，处理方式和中断一致
+* 异步：一个进程在任何条件下都能接收到信号，不需要特殊处理
+* <font color=#DC143C>kill -l：查看中断列表；前31种为不可靠信号，不支持信号排队</font>
+* <font color=#DC143C>捕捉信号(注册信号)：设定对应的信号处理函数</font>
 ![process](\pic\05\pro-comm25.png)
 
 ### (2). 常用信号
 
-* __<font face="consolas" color=#DC143C>SIGSEV：<font face="华文细黑">段错误</font>__
+* SIGSEV：段错误
 ![process](\pic\05\pro-comm26.png)
-* __<font face="consolas" color=#DC143C>SIGCONT：gdb c</font>__
-* __<font face="consolas" color=#DC143C>SIGALRM：<font face="华文细黑">定时器到达，默认为终止进程，一般修改为捕捉</font>__
+* SIGCONT：gdb c
+* SIGALRM：定时器到达，默认为终止进程，一般修改为捕捉
 ![process](\pic\05\pro-comm27.png)
 
 ### (3). 相关命令
 
-* __<font face="华文细黑" color=#DC143C>默认发送<font face="consolas">15：SIGTERM</font>__
-* __<font face="consolas" color=#DC143C>PID：<font face="华文细黑">可以是多个值</font>__
-* __<font face="consolas" color=#DC143C>-1：<font face="华文细黑">除<font face="consolas">init<font face="华文细黑">进程和当前进程外的所有进程发送信号；<font face="consolas">n：<font face="华文细黑">给进程<font face="consolas" >n<font face="华文细黑">发送信号；<font face="consolas">-n：<font face="华文细黑">给进程组n的所有进程发送信号</font>__
+* 默认发送15：SIGTERM
+* PID：可以是多个值
+* <font color=#DC143C>-1：除init进程和当前进程外的所有进程发送信号；n：给进程n发送信号；-n：给进程组n的所有进程发送信号</font>
 ![process](\pic\05\pro-comm28.png)
-* __</font><font face="华文细黑" color=#DC143C>普通用户只能向自己创建的进程发信号</font>__
+* 普通用户只能向自己创建的进程发信号
 ![process](\pic\05\pro-comm29.png)
 
 ## 14. 信号发送及定时器
 
 ### (1). 信号发送
+
+* kill函数的参数和Kill命令的含义是一样的，-1：除init进程和当前进程外的所有进程
+* raise函数向当前进程发送信号
+![process](\pic\05\pro-comm30.png)
 
 ### (2). 定时器
 
