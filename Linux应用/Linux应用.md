@@ -1830,6 +1830,7 @@ fork 返回值用于判断父进程和子进程，0为子进程，>0为父进程
 
 * SIGSEV：段错误
 ![process](\pic\05\pro-comm26.png)
+
 * SIGCONT：gdb c
 * SIGALRM：定时器到达，默认为终止进程，一般修改为捕捉
 ![process](\pic\05\pro-comm27.png)
@@ -1840,6 +1841,7 @@ fork 返回值用于判断父进程和子进程，0为子进程，>0为父进程
 * PID：可以是多个值
 * <font color=#DC143C>-1：除init进程和当前进程外的所有进程发送信号；n：给进程n发送信号；-n：给进程组n的所有进程发送信号</font>
 ![process](\pic\05\pro-comm28.png)
+
 * 普通用户只能向自己创建的进程发信号
 ![process](\pic\05\pro-comm29.png)
 
@@ -1858,14 +1860,63 @@ fork 返回值用于判断父进程和子进程，0为子进程，>0为父进程
 * pause: 堵塞进程，当进程接收到信号后，进程首先响应信号，若进程未结束，则从 pause 返回，并继续执行
 ![process](\pic\05\pro-comm31.png)
 
-> * <font color=#DC143C>例：</font>
+> <font color=#DC143C>例：</font>
+>
 > * alarm设定3秒定时器，然后pause堵塞进程，3秒后内核发送定时器信号给进程，默认是终止，并未执行pause后面的程序
 > * Alarm clock: 定时器信号缺省的处理方式
 > ![process](\pic\05\pro-comm32.png)
 
 ### (3). 信号捕捉
 
+![process](\pic\05\pro-comm33.png)
+
+> <font color=#DC143C>例：</font>
+>
+> * signal函数只是设置信号的处理函数，kill函数发送信号
+> * 如果多个信号共用一个回调函数，可以使用 signal 的形参 signo
+> ![process](\pic\05\pro-comm34.png)
+
 ## 15. IPC机制及共享内存
+
+### (1). System V IPC
+
+* KEY: 不同的进程获取IPC对象ID的媒介
+![IPC](\pic\05\ipc.png)
+
+* ipcs: 显示系统中所有的IPC对象（消息队列、共享内存、信号灯集）
+* key: 值为0表示该对象为私有对象
+![IPC](\pic\05\ipc1.png)
+
+* IPC通讯流程
+![IPC](\pic\05\ipc2.png)
+
+### (2). ftok
+
+* 合法key值: 唯一（path指向的文件的i节点编号 与 proj_id的低8位组合）
+* proj_id: 只取低8位
+![IPC](\pic\05\ipc3.png)
+
+> <font color=#DC143C>例：</font>
+> <font color=#DC143C>每个进程获取key的参数都必须一样，否则key值不一样</font>
+> ![IPC](\pic\05\ipc4.png)
+
+### (3). 共享内存特点
+
+![IPC](\pic\05\ipc5.png)
+
+* 使用步骤：
+![IPC](\pic\05\ipc6.png)
+
+### (4). 共享内存创建
+
+![IPC](\pic\05\ipc7.png)
+
+> <font color=#DC143C>例1：</font>
+> ![IPC](\pic\05\ipc8.png)
+> <font color=#DC143C>例2：</font>
+> <font color=#DC143C>指定 IPC_CREAT，若共享内存不存在，则创建；若存在，打开并返回ID</font>
+> <font color=#DC143C>每个进程用相同方式打开，一个进程创建</font>
+> ![IPC](\pic\05\ipc9.png)
 
 ## 16. 共享内存的实现
 
