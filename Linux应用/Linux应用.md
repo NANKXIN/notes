@@ -1961,11 +1961,72 @@ fork 返回值用于判断父进程和子进程，0为子进程，>0为父进程
 
 ### (2). 打开/创建消息队列
 
+![queue](\pic\05\queue3.png)
 
+> <font color=#DC143C>例1：</font>
+> <font color=#DC143C>注意: "." 当前目标为相对地址, 进程文件不在同一文件, key值不一样</font>
+> ![queue](\pic\05\queue4.png)
 
 ### (3). 发送消息
 
+<font color=#DC143C>msgflg: 0,堵塞发送; IPC_NOWAIT,立即返回</font>
+
+![queue](\pic\05\queue5.png)
+
+### (4). 消息格式
+
+![queue](\pic\05\queue6.png)
+> <font color=#DC143C>例1：</font>
+> <font color=#DC143C>结构体第1个成员long型, 代表消息的类型</font>
+> <font color=#DC143C>第2个成员为消息的正文, 类型自定义</font>
+
+```C
+typedef struct {
+    long mtype;         // 消息类型：正整数
+    char mtext[64];     // 消息正文(具体类型自定义)
+} MSG;
+#define LEN (sizeof(MSG)-sizeof(long))  // 消息正文的长度
+
+int main()
+{
+    MSG buf;
+    // ...
+    buf.mtype = 100;
+    fgets(buf.mtext, 64, stdin);
+    msgsnd(msgid, &buf, LEN, 0);
+    // ...
+    return 0;
+}
+```
+
 ## 18. 消息队列的实现
+
+### (1). 接收消息
+
+<font color=#DC143C>msgtype = 0: 收到第1条消息, 任意类型</font>
+<font color=#DC143C>msgtype > 0: 收到第1条msgtype类型的消息</font>
+<font color=#DC143C>msgtype < 0: 收到第1条最低类型(<=|msgtype|>)的消息</font>
+
+![queue](\pic\05\queue7.png)
+
+> <font color=#DC143C>例：</font>
+> ![queue](\pic\05\queue8.png)
+
+### (2). 控制消息队列
+
+<font color=#DC143C>和共享内存不同：执行消息队列删除后，消息队列会被立即删除，而不是等待所有数据接收完毕</font>
+
+![queue](\pic\05\queue9.png)
+
+### (3). 消息队列示例
+
+> <font color=#DC143C>例：</font>
+> ![queue](\pic\05\queue15.png)
+> ![queue](\pic\05\queue10.png)
+> ![queue](\pic\05\queue11.png)
+> ![queue](\pic\05\queue12.png)
+> ![queue](\pic\05\queue13.png)
+> ![queue](\pic\05\queue14.png)
 
 ## 19. 信号灯集机制及相关函数
 
