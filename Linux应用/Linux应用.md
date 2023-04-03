@@ -2030,6 +2030,215 @@ int main()
 
 ## 19. 信号灯集机制及相关函数
 
+### (1). 信号灯机制
+
+> ![signal](\pic\05\sys5_sig0.png)
+> ![signal](\pic\05\sys5_sig1.png)
+> ![signal](\pic\05\sys5_sig2.png)
+
+### (2). 打开/创建信号灯
+
+> ![signal](\pic\05\sys5_sig3.png)
+
+* IPC_EXCL: 检查信号灯是否已经被创建
+
+```C
+if ((semid = semget(key, 3, IPC_CREAT|0666|IPC_EXCL)) < 0)
+{
+    if (errno == EEXIST)  // 信号灯已经被创建
+    {
+        semid = semget(key, 3, 0666);  // 重新打开即可
+    }
+    else
+    {
+        // 新创建，初始化信号灯
+    }
+}
+```
+
+### (3). 信号灯初始化
+
+> ![signal](\pic\05\sys5_sig4.png)
+
+* SETVAL: 设置信号灯的值
+* IPC_RMID: 删除信号灯
+* union semun: 见man手册
+
+> <font color=#DC143C>例：</font>
+> ![signal](\pic\05\sys5_sig5.png)
+
+```C
+union semun myun;
+
+myun.val = 2;
+if (semctl(semid, 0, SETVAL, myun) < 0)
+{
+    perror("semctl");
+    exit(-1);
+}
+myun.val = 0;
+if (semctl(semid, 1, SETVAL, myun) < 0)
+{
+    perror("semctl");
+    exit(-1);
+}
+```
+
 ## 20. 利用信号灯集实现共享内存的同步
 
-## 21. 利用信号灯集实现共享内存的同步
+### (1). 信号灯 - P/V操作
+
+> ![signal](\pic\05\sys5_sig6.png)
+> ![signal](\pic\05\sys5_sig7.png)
+> <font color=#DC143C>例：若信号灯有0、1、2三个信号，获取0和2</font>
+
+```C
+struct sem_buf buf[3];
+
+// 注意：数组连续
+buf[0].sem_num = 0;   // 信号0
+buf[0].sem_op = -1;   // P操作：数量-1
+buf[0].sem_flg = 0;   // 堵塞等待
+buf[1].sem_num = 2;   // 信号2
+buf[1].sem_op = -1;
+buf[1].sem_flg = 0;
+
+semop(semid, buf, 2);
+```
+
+### (2). 信号灯、共享内存
+
+> <font color=#DC143C>例：</font>
+> ![signal](\pic\05\sys5_sig8.png)
+
+```C
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/sem.h>
+
+
+#define N       ( 64 )  // 共享内存大小
+#define READ    ( 0 )   // 信号灯：可读
+#define WRITE   ( 1 )   // 信号灯：可写
+
+union semun {
+    int val;
+    struct semid_ds *buf;
+    unsigned short *array;
+    struct seminfo *__buf;
+};
+
+
+void init_sem(int semid, int s[], int n)
+{
+    int i;
+    union semun myun;
+
+    for (i = 0; i < n; i++)
+    {
+        myun.val = s[i];
+        semctl(semid, i, SETVAL, myun);
+    }
+}
+
+void pv(int semid, int num, int op)
+{
+    struct sembuf buf;
+
+    buf.sem_num = num;
+    buf.sem_op = op;
+    buf.sem_flg = 0;
+    semop(semid, &buf, 1);
+}
+
+int main()
+{
+    int shmid, semid, s[] = {0, 1};
+    pid_t pid;
+    key_t key;
+    char *shmaddr;
+
+    if ((key = ftok(".", 's')) == -1)
+    {
+        perror("ftok");
+        exit(EXIT_FAILURE);
+    }
+
+    if ((shmid = shmget(key, N, IPC_CREAT|0666)) < 0)
+    {
+        perror("shmget");
+        exit(EXIT_FAILURE);
+    }
+
+    if ((semid = semget(key, 2, IPC_CREAT|0666)) < 0)
+    {
+        perror("semget");
+        goto __error1;  // 信号灯创建失败，删除共享内存
+    }
+
+    init_sem(semid, s, 2);  // 初始化信号灯
+
+    if ((shmaddr = (char *)shmat(shmid, NULL, 0)) == (char *)-1)
+    {
+        perror("shmat");
+        goto __error2;  // 映射共享内存出错，先删除信号灯
+    }
+
+    if ((pid = fork()) < 0)
+    {
+        perror("fork");
+        goto __error2;
+    }
+    else if (pid == 0)  // 子进程
+    {
+        char *p, *q;
+        while (1)
+        {
+            pv(semid, READ, -1);
+            p = q = shmaddr;
+            while (*q)
+            {
+                if (*q != ' ')
+                {
+                    *p++ = *q;
+                }
+                q++;
+            }
+            *p = '\0';
+            printf("%s", shmaddr);
+            pv(semid, WRITE, 1);
+        }
+    }
+    else  // 父进程
+    {
+        while (1)
+        {
+            pv(semid, WRITE, -1);
+            printf("input >");
+            fgets(shmaddr, N, stdin);
+            if (strcmp(shmaddr, "quit\n") == 0)
+                break;
+            pv(semid, READ, 1);  // 唤醒子进程进行读操作
+        }
+        kill(pid, SIGUSR1);  // 结束子进程
+    }
+
+__error2:
+    semctl(semid, 0, IPC_RMID);
+
+__error1:
+    shmctl(shmid, IPC_RMID, NULL);
+
+    return 0;
+}
+```
+
+> ![signal](\pic\05\sys5_sig9.png)
+
+# 十. Linux网络
