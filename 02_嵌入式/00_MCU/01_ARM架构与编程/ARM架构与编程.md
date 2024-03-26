@@ -23,7 +23,7 @@
 
 
 
-# 三. ARM架构
+# 三. ARM 架构
 
 ### 3.1 地址空间
 
@@ -45,7 +45,7 @@ CISC指令（复杂指令）：
 
 
 
-### 3.2 ARM内部寄存器
+### 3.2 ARM 内部寄存器
 
 <img src = ".\00_pic\03_ARM架构\P5.png" style = "zoom:100%">
 
@@ -78,4 +78,85 @@ CISC指令（复杂指令）：
 
 <img src = ".\00_pic\03_ARM架构\P9.png" style = "zoom:100%">
 
-### 3.3 ARM汇编
+### 3.3 ARM 汇编
+
+#### 3.3.1 指令集
+
+* Thumb 指令集：16位，节省空间
+* ARM 指令集：32位，高效，太占空间
+* Thumb-2 指令集：16位和32位混合
+
+> 程序可能部分使用16位指令，部分使用32位指令。
+
+1. ARM/cortex-A7：使用 Thumb 和 ARM 混合
+
+   * CODE16：BX A_addr -> CODE32
+
+   * CODE32：BX B_addr+1 -> CODE16
+
+     > 通过函数地址的第 0 位来区分，在 ARM 指令集和 Thumb 指令集之间来回切换
+
+2. cortex-M3/M4：使用 Thumb-2
+
+   > Thumb-2 指令集：16 位和 32 位混合，CPU自动区分
+
+#### 3.3.2 统一的汇编语言：UAL
+
+> 参考书籍：
+>
+> 《DEN0013D_cortex_a_series_PG》P70
+>
+> 《ARM Cortex-M3与Cortex-M4权威指南》第5章
+
+1. 以“数据处理”指令为例，UAL汇编格式为：
+
+   ``````C
+   Operation{cond}{S} Rd, Rn, Operand2
+   ``````
+
+   * Operation：表示各类汇编指令，如：ADD、MOV
+
+   * cond：表示 condtion，即该指令执行的条件
+
+     * ``````assembly
+       CMP R1, R3
+       MOV EQ R1, R2
+       ``````
+
+     * EQ：为 cond，如果 CMP 指令成立，才会执行 MOV 语句
+
+   * S：表示该指令执行后，会区修改程序状态寄存器
+
+   * Rd：表示目的寄存器
+
+   * Rn、Operand2：两个源操作函数
+
+2. 立即数
+
+   ``````assembly
+   MOV R0, #VAL
+   ``````
+
+   * VAL 必须是立即数
+
+3. 伪指令
+
+   ``````assembly
+   LDR R0, =VAL
+   ``````
+
+   * = 表示该指令为伪指令
+   * VAL 可以是任意值
+   * 编译器会将其转换为真爽的指令
+     * 若 VAL 为立即数：MOV R0, #VAL
+     * 若不是立即数：LDR R0, [PC, #offset]，从内存中读出该值
+
+   ``````assembly
+   ADR R0, Loop
+   Loop
+   	ADD R0, R0, #1
+   ``````
+
+   * `ADR R0, Loop` 转换成 `ADD R0, PC, #val`，val 在链接时确定
+
+### 3.4 ARM 汇编模拟器
