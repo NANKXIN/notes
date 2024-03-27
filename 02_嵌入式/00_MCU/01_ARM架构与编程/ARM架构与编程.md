@@ -138,6 +138,7 @@ CISC指令（复杂指令）：
    ``````
 
    * VAL 必须是立即数
+   * 立即数 = 某个8位数，循环移位某个偶位数
 
 3. 伪指令
 
@@ -159,4 +160,123 @@ CISC指令（复杂指令）：
 
    * `ADR R0, Loop` 转换成 `ADD R0, PC, #val`，val 在链接时确定
 
-### 3.4 ARM 汇编模拟器
+### 3.4 ARM 汇编模拟器：VisUAL
+
+#### 3.4.1 使用教程
+
+> 官网：https://salmanarif.bitbucket.io/visual/downloads.html
+>
+> 使用方法：https://salmanarif.bitbucket.io/visual/user_guide/index.html
+
+``````assembly
+MOV		R0, #0x20000  	; 将 0x20000 写入到 R0
+LDR		R1, =0x1234   	; 将 0x1234 写入到 R1
+LDR		R2, =0x3456		; 将 0x3456 写入到 R2
+CMP		R1, R2			; 比较 R1 和 R2 的值
+STRLE	R1, [R0]		; 若 R1<=R2，执行该指令，将 R1 的数据写入 R0 所指向的地址
+STRGT	R2, [R0]		; 若 R1>R2，执行该指令，将 R2 的数据写入 R0 所指向的地址
+``````
+
+#### 3.4.2 内存访问指令
+
+1. **LDR：Load Register，读内存，从内存中将一个 32 位的数据写入到目的寄存器中**
+* LDRB：将存储器中的 1 字节数据写入到目的寄存器中，同时将寄存器的高 24 位清零
+   
+* LDRH：将存储器中的 2 字节数据写入到目的寄存器中，同时将寄存器的高 16 位清零
+
+<img src = ".\00_pic\03_ARM架构\P10.png" style = "zoom:100%">
+
+2. **STR：Store Register，写内存，从源寄存器中将一个32位的数据写入到目的内存中**
+
+   * STRB：从源寄存器中将 1 字节数据写入到内存中，该字节数据为源寄存器中的低 8 位
+
+   * STRH：从源寄存器中将 2 字节数据写入到内存中，该半字数据为源寄存器中的低 16 位
+
+<img src = ".\00_pic\03_ARM架构\P11.png" style = "zoom:110%">
+
+3. **LDM：Load Multiple Register，读多个内存**
+
+4. **STM：Store Multiple Register，写多个内存**
+
+   <img src = ".\00_pic\03_ARM架构\P12.png" style = "zoom:100%">
+
+   * reglist：低标号的寄存器对应低地址
+   * IA, IB, DA, DB 的区别
+
+   <img src = ".\00_pic\03_ARM架构\P13.png" style = "zoom:100%">
+
+   例1：
+
+    ``````assembly
+    ldr		r0, =0x20000	; 将 0x20000 写入到 r0
+    ldr		r1, =0x12345678	; 将 0x12345678 写入到 r1
+    str		r1, [r0]		; 将 r1 的数据写到 r0 所指地址
+    ldrb	r3, [r0]		; 从 r0 所指地址读数据到 r3
+    ``````
+
+    例2：
+
+    ``````assembly
+    MOV		R0, #0x20000
+    MOV		R1, #0x10
+    MOV		R2, #0x12
+    STR		R2, [R0]              ; R2 的值存到 R0 所示地址
+    STR		R2, [R0, #4]          ; R2 的值存到 R0+4 所示地址
+    STR		R2, [R0, #8]!         ; R2 的值存到 R0+8 所示地址, R0=R0+8
+    STR		R2, [R0, R1]          ; R2 的值存到 R0+R1 所示地址
+    STR		R2, [R0, R1, LSL #4]  ; R2 的值存到 R0+(R1<<4) 所示地址
+    STR		R2, [R0], #0X20       ; R2 的值存到 R0 所示地址, R0=R0+0x20
+    MOV		R2, #0x34
+    STR		R2, [R0]              ; R2 的值存到 R0 所示地址
+    LDR		R3, [R0], +R1, LSL #1 ; R3 的值等于 R0+(R1<<1) 所示地址上的值，R0=R0+(R1<<1)
+    ``````
+
+    例3：
+
+    ``````assembly
+    MOV		R1, #1
+    MOV		R2, #2
+    MOV		R3, #3
+    MOV		R0, #0x20000
+    STMIA	R0,	{R1-R3} 	; 入栈：R1,R2,R3 分别存入 R0,R0+4,R0+8 地址处
+    ADD		R0, R0, #0x10
+    STMIA	R0!, {R1-R3} 	; 出栈：R1,R2,R3 分别存入 R0,R0+4,R0+8 地址处, R0=R0+3*4
+    ``````
+
+
+
+#### 3.4.3 栈的4种方式
+
+1. 满/空
+
+   * 满 SP：指向最后一个入栈的数据地址，先修改 SP 在入栈
+   * 空 SP：指向下一个空地址，先入栈再修改 SP
+
+2. 增/减
+
+   * 增：SP 变大
+   * 减：SP 变小
+
+3. 满增、满减、空增、空减
+
+   * 满减：SP 指向 0x1004，内有数据，数据入栈时，SP 先指向 0x1000，再写入数据（先减后写）
+
+   * 满增：SP 指向 0x1000，内有数据，数据出栈时，先读取数据，SP 再指向 0x1004（先读后加）
+
+     <img src = ".\00_pic\03_ARM架构\P14.png" style = "zoom:100%">
+
+     <img src = ".\00_pic\03_ARM架构\P15.png" style = "zoom:70%">
+
+     ``````assembly
+     MOV		R1, #1
+     MOV		R2, #2
+     MOV		R3, #3
+     MOV		SP, #0x20000 ; SP 指向 0x20000
+     STMFD	SP!, {R1-R3} ; R3,R2,R1 分别存入 SP-4,SP-8,SP-12 地址处, SP=SP-12
+     MOV		R1, #0
+     MOV		R2, #0
+     MOV		R3, #0
+     LDMFD	SP!, {R1-R3} ; R1,R2,R3 分别得到 SP,SP+4,SP+8 地址处的值, SP=SP+12
+     ``````
+
+     
