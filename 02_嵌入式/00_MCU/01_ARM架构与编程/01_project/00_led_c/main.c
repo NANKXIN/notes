@@ -8,7 +8,7 @@ void delay(unsigned int cnt)
 	}
 }
 
-int main()
+int mymain()
 {
 	unsigned int *pReg;
 	

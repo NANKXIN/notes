@@ -12,10 +12,10 @@ __Vectors       DCD     0
 ; Reset handler
 Reset_Handler   PROC
 				EXPORT  Reset_Handler             [WEAK]
-                IMPORT  main					; 调用外部函数 main
+                IMPORT  mymain					; 调用外部函数 main
 				
 				LDR SP,= (0x20000000+0x10000)  	; 设置栈
-				BL main							; 跳转到 main
+				BL mymain							; 跳转到 main
 				
                 ENDP
 

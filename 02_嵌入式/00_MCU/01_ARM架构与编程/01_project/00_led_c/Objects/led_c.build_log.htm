@@ -22,7 +22,7 @@ Dialog DLL:      TCM.DLL V1.46.0.0
  
 <h2>Project:</h2>
 E:\Workspace\notes\02_嵌入式\00_MCU\01_ARM架构与编程\01_project\00_led_c\led_c.uvprojx
-Project File Date:  03/11/2024
+Project File Date:  04/09/2024
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'D:\SoftWare\Keil\MDK\ARM\ARMCC\Bin'
@@ -30,8 +30,13 @@ Build target 'led_c'
 assembling start.s...
 compiling main.c...
 linking...
-Program Size: Code=384 RO-data=24 RW-data=0 ZI-data=96  
-".\Objects\led_c.axf" - 0 Error(s), 0 Warning(s).
+.\Objects\led_c.axf: Warning: L6305W: Image does not have an entry point. (Not specified or not set due to multiple choices.)
+.\Objects\led_c.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=92 RO-data=8 RW-data=0 ZI-data=0  
+Finished: 0 information, 2 warning and 0 error messages.
+After Build - User command #1: fromelf  --bin  --output=led.bin  Objects\led_c.axf
+After Build - User command #2: fromelf  --text  -a -c  --output=led.dis  Objects\led_c.axf
+".\Objects\led_c.axf" - 0 Error(s), 2 Warning(s).
 
 <h2>Software Packages used:</h2>
 

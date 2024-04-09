@@ -22,12 +22,12 @@ ARM Macro Assembler    Page 1
                                PROC
    14 00000000                 EXPORT           Reset_Handler             [WEAK
 ]
-   15 00000000                 IMPORT           main        ; 调用外部函数 main
+   15 00000000                 IMPORT           mymain      ; 调用外部函数 main
                                                             
    16 00000000         
    17 00000000 F8DF D004       LDR              SP,= (0x20000000+0x10000) 
                                                             ; 设置栈
-   18 00000004 F7FF FFFE       BL               main
+   18 00000004 F7FF FFFE       BL               mymain      ; 跳转到 main
    19 00000008         
    20 00000008                 ENDP
    21 00000008         
@@ -91,13 +91,13 @@ Symbol: Reset_Handler
 ARM Macro Assembler    Page 1 Alphabetic symbol ordering
 External symbols
 
-main 00000000
+mymain 00000000
 
-Symbol: main
+Symbol: mymain
    Definitions
       At line 15 in file start.s
    Uses
       At line 18 in file start.s
-Comment: main used once
+Comment: mymain used once
 1 symbol
 339 symbols in table

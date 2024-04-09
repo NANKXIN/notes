@@ -10,7 +10,7 @@
 
 * 片内ROM（read only memory）：只读，用于执行CPU启动程序
 * 片内RAM（random access memory）：可读可写，用于处理变量
-* <img src = ".\00_pic\01_嵌入式概念及硬件组成\P1.png" style = "zoom:100%">  
+* <img src = ".\00_pic\01_嵌入式概念及硬件组成\P1.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%">  
 
 
 
@@ -19,52 +19,51 @@
 程序运行栈（程序目录：01_project\01_led_c）：
 
 ``````assembly
-                PRESERVE8
-                THUMB
-                AREA    RESET, DATA, READONLY
-				; 前三行为语法规定
-				
-				EXPORT  __Vectors
+PRESERVE8
+THUMB
+AREA    RESET, DATA, READONLY
+; 前三行为语法规定
+
+EXPORT  __Vectors
 __Vectors       DCD     0
-                DCD     Reset_Handler              ; Reset Handler
-				
-                AREA    |.text|, CODE, READONLY
+DCD     Reset_Handler              ; Reset Handler
+
+AREA    |.text|, CODE, READONLY
 
 ; Reset handler
 Reset_Handler   PROC
-				EXPORT  Reset_Handler             [WEAK]
-                IMPORT  main					; 调用外部函数 main
-				
-				LDR SP,= (0x20000000+0x10000)  	; 设置栈
-				BL main							; 跳转到 main
-				
-                ENDP
+EXPORT  Reset_Handler             [WEAK]
+IMPORT  main					; 调用外部函数 main
 
-				END
-					 
+LDR SP,= (0x20000000+0x10000)  	; 设置栈
+BL main							; 跳转到 main
+
+ENDP
+
+END		 
 ``````
 
-<img src = ".\00_pic\02_第一个程序（手写start.S）\P1.png" style = "zoom:80%"> 
+<img src = ".\00_pic\02_第一个程序（手写start.S）\P1.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
 
 # 三. ARM 架构
 
-### 3.1 地址空间
+## 3.1 地址空间
 
 1. **X86架构地址：内存和IO分开**
-   * <img src = ".\00_pic\03_ARM架构\P1.png" style = "zoom:80%"> 
+   * <img src = ".\00_pic\03_ARM架构\P1.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
 
 2. **ARM架构地址：内存和IO一样**
-   * <img src = ".\00_pic\03_ARM架构\P2.png" style = "zoom:80%"> 
+   * <img src = ".\00_pic\03_ARM架构\P2.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
 
 3. **RISC指令（精简指令）**
-   * <img src = ".\00_pic\03_ARM架构\P3.png" style = "zoom:100%"> 
+   * <img src = ".\00_pic\03_ARM架构\P3.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%"> 
 
 4. **CISC指令（复杂指令）**
-   * <img src = ".\00_pic\03_ARM架构\P4.png" style = "zoom:100%"> 
+   * <img src = ".\00_pic\03_ARM架构\P4.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%"> 
 
-### 3.2 ARM 内部寄存器
+## 3.2 ARM 内部寄存器
 
-<img src = ".\00_pic\03_ARM架构\P5.png" style = "zoom:100%"> 
+<img src = ".\00_pic\03_ARM架构\P5.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%"> 
 
 1. **不同芯片内部寄存器**
 
@@ -77,33 +76,34 @@ Reset_Handler   PROC
 
 
    * CPSR：当前程序状态寄存器
-   * <img src = ".\00_pic\03_ARM架构\P6.png" style = "zoom:100%"> 
+   * <img src = ".\00_pic\03_ARM架构\P6.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%"> 
 
 
 2. **xPSR（M3/M4）**
    * 重点关注：N、Z、C、V、Q
-   * <img src = ".\00_pic\03_ARM架构\P7.png" style = "zoom:100%"> 
+   * <img src = ".\00_pic\03_ARM架构\P7.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%"> 
 
 
 3. **CPSR（A7）：**
    * 重点关注：N、Z、C、V、Q
-   * <img src = ".\00_pic\03_ARM架构\P8.png" style = "zoom:100%"> 
+   * <img src = ".\00_pic\03_ARM架构\P8.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%"> 
 
 
 4. **A7内部寄存器：**
    * 不同模式寄存器不一样
-   * <img src = ".\00_pic\03_ARM架构\P9.png" style = "zoom:100%"> 
+   * <img src = ".\00_pic\03_ARM架构\P9.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%"> 
 
+## 3.3 ARM 汇编
 
-### 3.3 ARM 汇编
-
-#### 3.3.1 指令集
+### 3.3.1 指令集
 
 * Thumb 指令集：16位，节省空间
+
 * ARM 指令集：32位，高效，太占空间
+
 * Thumb-2 指令集：16位和32位混合
 
-> 程序可能部分使用16位指令，部分使用32位指令。
+  > 程序可能部分使用16位指令，部分使用32位指令。
 
 1. **ARM/cortex-A7：使用 Thumb 和 ARM 混合**
 
@@ -115,9 +115,9 @@ Reset_Handler   PROC
 
 2. **cortex-M3/M4：使用 Thumb-2**
 
-   > Thumb-2 指令集：16 位和 32 位混合，CPU自动区分
+   <blockquote alt = 'red'>Thumb-2 指令集：16 位和 32 位混合，CPU自动区分</blockquote>
 
-#### 3.3.2 UAL
+### 3.3.2 UAL
 
 * **ARM 统一的汇编语言**
 
@@ -179,11 +179,11 @@ Reset_Handler   PROC
 
    * `ADR R0, Loop` 转换成 `ADD R0, PC, #val`，val 在链接时确定
 
-### 3.4 ARM 汇编模拟器：VisUAL
+## 3.4 ARM 汇编模拟器：VisUAL
 
 > 官网：https://salmanarif.bitbucket.io/visual/downloads.html
 >
-> 使用方法：https://salmanarif.bitbucket.io/visual/user_guide/index.html
+> 使用方法：[https://salmanarif.bitbucket.io/visual/user_guide/index.html](https://salmanarif.bitbucket.io/visual/user_guide/index.html)
 
 ``````assembly
 MOV		R0, #0x20000  	; 将 0x20000 写入到 R0
@@ -194,16 +194,15 @@ STRLE	R1, [R0]		; 若 R1<=R2，执行该指令，将 R1 的数据写入 R0 所�
 STRGT	R2, [R0]		; 若 R1>R2，执行该指令，将 R2 的数据写入 R0 所指向的地址
 ``````
 
-### 3.5 内存访问指令
+## 3.5 内存访问指令
 
-#### 3.5.1 指令详解
+### 3.5.1 指令详解
 
 1. **LDR：Load Register，读内存，从内存中将一个 32 位的数据写入到目的寄存器中**
-
    * LDRB：将存储器中的 1 字节数据写入到目的寄存器中，同时将寄存器的高 24 位清零
      
    * LDRH：将存储器中的 2 字节数据写入到目的寄存器中，同时将寄存器的高 16 位清零
-   * <img src = ".\00_pic\03_ARM架构\P10.png" style = "zoom:100%"> 
+   * <img src = ".\00_pic\03_ARM架构\P10.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%"> 
 
 
 2. **STR：Store Register，写内存，从源寄存器中将一个32位的数据写入到目的内存中**
@@ -212,17 +211,17 @@ STRGT	R2, [R0]		; 若 R1>R2，执行该指令，将 R2 的数据写入 R0 所指
 
    * STRH：从源寄存器中将 2 字节数据写入到内存中，该半字数据为源寄存器中的低 16 位
    
-   * <img src = ".\00_pic\03_ARM架构\P11.png" style = "zoom:110%">  
+   * <img src = ".\00_pic\03_ARM架构\P11.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:110%">  
 
 3. **LDM：Load Multiple Register，读多个内存**
 
 4. **STM：Store Multiple Register，写多个内存**
 
-   <img src = ".\00_pic\03_ARM架构\P12.png" style = "zoom:100%"> 
+   <img src = ".\00_pic\03_ARM架构\P12.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%"> 
 
    * **reglist：低标号的寄存器对应低地址**
    * IA, IB, DA, DB 的区别
-     * <img src = ".\00_pic\03_ARM架构\P13.png" style = "zoom:100%">  
+     * <img src = ".\00_pic\03_ARM架构\P13.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%">  
    
 
    例1：
@@ -265,7 +264,7 @@ STRGT	R2, [R0]		; 若 R1>R2，执行该指令，将 R2 的数据写入 R0 所指
 
 
 
-#### 3.5.2 栈的4种方式
+### 3.5.2 栈的4种方式
 
 1. **满/空**
 
@@ -283,9 +282,9 @@ STRGT	R2, [R0]		; 若 R1>R2，执行该指令，将 R2 的数据写入 R0 所指
 
    * 满增：SP 指向 0x1000，内有数据，数据出栈时，先读取数据，SP 再指向 0x1004（先读后加）
 
-     <img src = ".\00_pic\03_ARM架构\P14.png" style = "zoom:100%"> 
+     <img src = ".\00_pic\03_ARM架构\P14.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%" > 
 
-     <img src = ".\00_pic\03_ARM架构\P15.png" style = "zoom:70%"> 
+     <img src = ".\00_pic\03_ARM架构\P15.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:70%"> 
 
      ``````assembly
      MOV		R1, #1
@@ -301,11 +300,11 @@ STRGT	R2, [R0]		; 若 R1>R2，执行该指令，将 R2 的数据写入 R0 所指
 
 
 
-### 3.6 数据处理指令
+## 3.6 数据处理指令
 
-#### 3.6.1 指令详解
+### 3.6.1 指令详解
 
-<img src = ".\00_pic\03_ARM架构\P16.png" style = "zoom:100%"> 
+<img src = ".\00_pic\03_ARM架构\P16.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%"> 
 
 1. **加法 ADD**
 
@@ -338,9 +337,9 @@ STRGT	R2, [R0]		; 若 R1>R2，执行该指令，将 R2 的数据写入 R0 所指
 3. **位操作**
 
    ``````assembly
-   AND R1, R2, #(1<<4)   	; 位与，R1 = R2 & (1<<4)
+   AND R1, R2, #(1<<4)	; 位与，R1 = R2 & (1<<4)
    AND R1, R2, R3			; 位与，R1 = R2 & R3
-   BIC R1, R2, #(1<<4)    	; 清除某位，R1 = R2 & ~(1<<4)
+   BIC R1, R2, #(1<<4)	; 清除某位，R1 = R2 & ~(1<<4)
    BIC R1, R2, R3			; 清除某位，R1 = R2 & ~R3
    ORR R1, R2, R3			; 位或，R1 = R2 | R3
    ``````
@@ -348,28 +347,30 @@ STRGT	R2, [R0]		; 若 R1>R2，执行该指令，将 R2 的数据写入 R0 所指
 4. **比较**（比较结果会影响程序状态寄存器）
 
    ``````assembly
-   CMP R0, R1			; 比较 R0 - R1 的结果
-   CMP R0, #0x12		; 比较 R0 - 0x12 的结果
-   TST R0, R1			; 测试 R0 & R1 的结果
+   CMP R0, R1				; 比较 R0 - R1 的结果
+   CMP R0, #0x12			; 比较 R0 - 0x12 的结果
+   TST R0, R1				; 测试 R0 & R1 的结果
    TST R0, #(1<<4)		; 测试 R0 & (1<<4) 的结果
    ``````
 
-#### 3.6.2 程序状态寄存器 和 指令 condition
+### 3.6.2 程序状态寄存器 和 指令 condition
 
-   * <img src = ".\00_pic\03_ARM架构\P17.png" style = "zoom:100%"> 
-   * <img src = ".\00_pic\03_ARM架构\P18.png" style = "zoom:150%"> 
+   * <img src = ".\00_pic\03_ARM架构\P17.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%"> 
+   * <img src = ".\00_pic\03_ARM架构\P18.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:150%"> 
 
    * 例：
 
-   <img src = ".\00_pic\03_ARM架构\P19.png" style = "zoom:60%"> 
+   <img src = ".\00_pic\03_ARM架构\P19.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:60%"> 
 
-   <img src = ".\00_pic\03_ARM架构\P20.png" style = "zoom:60%"> 
+   <img src = ".\00_pic\03_ARM架构\P20.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:60%"> 
 
-   > R0 和 R1 相等，Z 和 C 位置 1，则可使用 EQ (Z=1) 条件将 2 写入 R0
+> R0 和 R1 相等，Z 和 C 位置 1，则可使用 EQ (Z=1) 条件将 2 写入 R0
 
-### 3.7 跳转指令
 
-#### 3.7.1 指令详解
+
+## 3.7 跳转指令
+
+### 3.7.1 指令详解
 
 1. **B：Branch，跳转**
 
@@ -379,73 +380,254 @@ STRGT	R2, [R0]		; 若 R1>R2，执行该指令，将 R2 的数据写入 R0 所指
 
 4. **BLX：Branch with Link and eXchange，根据跳转地址的 BIT0 切换为 ARM 或 Thumb 状态（0：ARM状态，1：Thumb状态）**
 
-   <img src = ".\00_pic\03_ARM架构\P21.png" style = "zoom:100%"> 
+   <img src = ".\00_pic\03_ARM架构\P21.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
 
 例1：
 
-* <img src = ".\00_pic\03_ARM架构\P31.png" style = "zoom:100%"> 
+* <img src = ".\00_pic\03_ARM架构\P31.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%"> 
 
 * **注意：BEN Loop，状态寄存器 Z 位为 0 时执行，为 1 时跳过**
 
-  * <img src = ".\00_pic\03_ARM架构\P22.png" style = "zoom:100%">
+  * <img src = ".\00_pic\03_ARM架构\P22.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
 
-  * <img src = ".\00_pic\03_ARM架构\P23.png" style = "zoom:100%">
+  * <img src = ".\00_pic\03_ARM架构\P23.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
 
-  * <img src = ".\00_pic\03_ARM架构\P24.png" style = "zoom:100%">
+  * <img src = ".\00_pic\03_ARM架构\P24.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
 
-  * <img src = ".\00_pic\03_ARM架构\P25.png" style = "zoom:100%">
+  * <img src = ".\00_pic\03_ARM架构\P25.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
 
-  * <img src = ".\00_pic\03_ARM架构\P26.png" style = "zoom:100%">
+  * <img src = ".\00_pic\03_ARM架构\P26.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
 
-  * <img src = ".\00_pic\03_ARM架构\P27.png" style = "zoom:100%">
+  * <img src = ".\00_pic\03_ARM架构\P27.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
 
-  * <img src = ".\00_pic\03_ARM架构\P28.png" style = "zoom:100%">
+  * <img src = ".\00_pic\03_ARM架构\P28.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
 
-  * <img src = ".\00_pic\03_ARM架构\P29.png" style = "zoom:100%">
+  * <img src = ".\00_pic\03_ARM架构\P29.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
 
   * LR 的值为 0，返回第一条指令
 
-  * <img src = ".\00_pic\03_ARM架构\P30.png" style = "zoom:100%">
+  * <img src = ".\00_pic\03_ARM架构\P30.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
 
 例2：
 
 * **执行完 BL 后，LR 寄存器值为 0x04，也就是下一条指令的地址，即返回地址**
 
-* <img src = ".\00_pic\03_ARM架构\P32.png" style = "zoom:100%">
+* <img src = ".\00_pic\03_ARM架构\P32.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
 
-* <img src = ".\00_pic\03_ARM架构\P33.png" style = "zoom:100%">
+* <img src = ".\00_pic\03_ARM架构\P33.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
 
 例3：
 
 * **直接设置 LR（返回指令地址） 和 PC（下一条指令地址）**
 
-* <img src = ".\00_pic\03_ARM架构\P34.png" style = "zoom:100%">
+* <img src = ".\00_pic\03_ARM架构\P34.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
 
-* <img src = ".\00_pic\03_ARM架构\P35.png" style = "zoom:100%">
+* <img src = ".\00_pic\03_ARM架构\P35.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
 
-* <img src = ".\00_pic\03_ARM架构\P36.png" style = "zoom:100%">
-
-
-
-## 四. 启动程序深度解析
+* <img src = ".\00_pic\03_ARM架构\P36.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
 
 
 
-## 五. 使用按键控制LED
+# 四. 启动程序深度解析
+
+## 4.1 字节序、位操作
+
+* **高位存低地址，大端字节序；低位存低地址，小端字节序（ARM 一般默认小端）**
+
+1. a << n = a * 2 ^ n（所有数值的权重都增加 2^n）
+2. a >> n = a / 2 ^ n（同理）
+3. a & ~( (1<<7) | (1<<8) )，a 第 7 位和第 8 位清 0
+
+## 4.2 汇编、反汇编、机器码
+
+> keil 下反汇编：
+>
+> `fromelf  --bin  --output=led.bin  Objects\led_c.axf`
+>
+> `fromelf  --text  -a -c  --output=led.dis  Objects\led_c.axf`
+
+<img src = ".\00_pic\04_第一个程序深度解析\P1.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%">
+
+伪指令转换为真实指令：
+
+- <img src = ".\00_pic\04_第一个程序深度解析\P2.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%">
+
+- <img src = ".\00_pic\04_第一个程序深度解析\P3.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%">
+- Cortex A7：==PC = CUR ADDR + 8==；ARM 指令
+- Cortex M3/M4：==PC = CUR ADDR + 4==，Thumb 指令（不管 16 位还是 32 位）
+- 处理器指令处理：执行当前指令，处理下一条，读取下下条
+
+## 4.3 C与汇编深入分析
+
+### 4.3.1 ATPCS
+
+ATPCS规则（ARM-Thumnb过程调用标准）：
+
+1. R0-R3：调用者和被调用者之间传参数
+
+2. R4-R11（V1-V8）：函数可能被使用，所以在函数的入口保存它们，在函数的出口恢复它们
+
+   <img src = ".\00_pic\04_第一个程序深度解析\P4.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%">
+
+### 4.3.2 反汇编代码解析
+
+main.c
+
+``````c
+void delay(unsigned int cnt)
+{
+	while (cnt--)
+	{
+	}
+}
+
+int mymain()
+{
+	unsigned int *pReg;
+	
+	// 使能GPIO
+	pReg = (unsigned int *)(0x40021000U + 0x18U);
+	*pReg |= (1UL << 3U);
+	// 设置GPIOB0为输出引脚
+	pReg = (unsigned int *)(0x40010C00U + 0x00U);
+	*pReg |= (1UL << 0U);
+	
+	pReg = (unsigned int *)(0x40010C00U + 0x0CU);
+	
+	while (1)
+	{
+		// 设置GPIOB0为输出1
+		*pReg |= (1UL << 0U);
+		
+		delay(10000U);
+		
+		// 设置GPIOB0为输出0
+		*pReg &= ~(1UL << 0U);
+		
+		delay(10000U);
+	}
+}
+``````
+
+
+led.dis（反汇编）
+
+``````assembly
+i.delay
+delay
+	
+	0x08000014:    bf00        ..      NOP      
+	; r1 = r0 - 0
+	0x08000016:    1e01        ..      SUBS     r1,r0,#0
+	; r0 = r0 - 1
+	0x08000018:    f1a00001    ....    SUB      r0,r0,#1
+	; 不为 0，跳转到 0x8000016
+	0x0800001c:    d1fb        ..      BNE      0x8000016 ; delay + 2
+	; 为 0，返回
+	0x0800001e:    4770        pG      BX       lr
+
+i.mymain
+mymain
+
+	; pReg = (unsigned int *)(0x40021000U + 0x18U);
+	; r3 = [pc + 56] = [0x800005c] = 0x40021018
+		; pc = 0x08000020 + 4 = 0x08000024 + 56 = 0x800005c
+		; 从地址 pc+56 读数据(0x40021018)到 r3
+	0x08000020:    4b0e        .K      LDR      r3,[pc,#56]
+	
+	; *pReg |= (1UL << 3U);
+	; r0 = [r3 + 0]						从 r3 存储的地址(0x40021018)读数据到 r0
+	; r0 = r0 | 8
+	; [r3 + 0] = r0						将 r0 写入 r3 存储的地址(0x40021018)
+	0x08000022:    6818        .h      LDR      r0,[r3,#0]
+	0x08000024:    f0400008    @...    ORR      r0,r0,#8
+	0x08000028:    6018        .`      STR      r0,[r3,#0]
+	
+	; pReg = (unsigned int *)(0x40010C00U + 0x00U);
+	; r3 = [pc + 0x52] = [0x8000060] = 0x40010c00
+	; 从地址 pc+52 读数据(0x40010c00)到 r3
+	0x0800002a:    4b0d        .K      LDR      r3,[pc,#52]
+	
+	; *pReg |= (1UL << 0U);
+	; r0 = [r3 + 0]					从 r3 存储的地址(0x40010c00)读数据到 r0
+	; r0 = r0 | 1
+	; [r3 + 0] = r0					将 r0 写入 r3 存储的地址(0x40010c00)
+	0x0800002c:    6818        .h      LDR      r0,[r3,#0]
+	0x0800002e:    f0400001    @...    ORR      r0,r0,#1
+	0x08000032:    6018        .`      STR      r0,[r3,#0]
+	
+	; pReg = (unsigned int *)(0x40010C00U + 0x0CU);
+	; r3 = [pc + 40] = [0x8000060] = 0x40010c00
+	; r3 = r3 + 0x0c
+	0x08000034:    4b0a        .K      LDR      r3,[pc,#40]
+	0x08000036:    330c        .3      ADDS     r3,r3,#0xc
+	
+	; 跳转到 0x800005a = mymain + 58
+	; 再跳转到 0x800003a = mymain + 26
+	; 应该是 while 循环
+	0x08000038:    e00f        ..      B        0x800005a
+	
+	; *pReg |= (1UL << 0U);
+	; r0 = [r3 + 0]				从 r3 存储的地址读数据到 r0
+	; r0 = r0 | 1
+	; [r3 + 0] = r0				将 r0 写入 r3 存储的地址
+	0x0800003a:    6818        .h      LDR      r0,[r3,#0]
+	0x0800003c:    f0400001    @...    ORR      r0,r0,#1
+	0x08000040:    6018        .`      STR      r0,[r3,#0]
+	
+	; delay(10000U);
+	; r0 = 0x2710 = 10000
+	; 跳转到 delay (0x8000014)
+	0x08000042:    f2427010    B..p    MOV      r0,#0x2710
+	0x08000046:    f7ffffe5    ....    BL       delay
+	
+	; *pReg &= ~(1UL << 0U);
+	; r0 = [r3 + 0]				从 r3 存储的地址读数据到 r0
+	; r0 &= ~(r0 | 1)
+	; [r3 + 0] = r0				将 r0 写入 r3 存储的地址
+	0x0800004a:    6818        .h      LDR      r0,[r3,#0]
+	0x0800004c:    f0200001     ...    BIC      r0,r0,#1
+	0x08000050:    6018        .`      STR      r0,[r3,#0]
+	
+	; delay(10000U);
+	; r0 = 0x2710 = 10000
+	; 跳转到 delay (0x8000014)
+	0x08000052:    f2427010    B..p    MOV      r0,#0x2710
+	0x08000056:    f7ffffdd    ....    BL       delay
+	
+	; 跳转回 0x0800003a
+	0x0800005a:    e7ee        ..      B        0x800003a
+	
+$d
+	0x0800005c:    40021018    ...@    DCD    1073877016
+	0x08000060:    40010c00    ...@    DCD    1073810432
+``````
 
 
 
-## 六. 串口编程
 
 
 
-## 七. keil_gcc_Makefile
 
 
 
-## 八. 代码重定位
+# 五. 使用按键控制LED
 
 
 
-## 九. 异常和中断
+# 六. 串口编程
+
+
+
+# 七. keil_gcc_Makefile
+
+
+
+# 八. 代码重定位
+
+
+
+# 九. 异常和中断
+
+
 
