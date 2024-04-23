@@ -7,7 +7,7 @@ int delay(volatile int cnt)
 	{
 	}
 	
-	return 55;
+	return 0x55;
 }
 
 int mymain()

@@ -603,15 +603,200 @@ $d
 	0x08000060:    40010c00    ...@    DCD    1073810432
 ``````
 
+修改源码：
 
+```c
+int delay(volatile int cnt)
+{
+	while (cnt--)
+	{
+	}
+	
+	return 55;
+}
+```
 
+反汇编：
 
+```assembly
+i.delay
+delay
+	
+	; 将 r0 和 lr 存入栈内	  r0 为形参 cnt
+	0x08000014:    b501        ..      PUSH     {r0,lr}
+	0x08000016:    bf00        ..      NOP      
+	
+	; ==========> while
+	; r0 = [sp + 0]    			从 sp 指向的地址读数据到 r0, 即 r0 = cnt
+	0x08000018:    9800        ..      LDR      r0,[sp,#0]
+	; r1 = r0 - 1
+	0x0800001a:    1e41        A.      SUBS     r1,r0,#1
+	; 将 r1 写入 sp + 0 所指地址
+	0x0800001c:    9100        ..      STR      r1,[sp,#0]
+	; 比较 r0 和 0
+	0x0800001e:    2800        .(      CMP      r0,#0
+	; 不为0 跳到 0x08000018
+	; while <==========
+	
+	0x08000020:    d1fa        ..      BNE      0x8000018 ; delay + 4
+	; 为0 r0 = 0x37 (返回值)
+	0x08000022:    2037        7       MOVS     r0,#0x37
+	; 从栈中把之前的 lr 赋给 pc
+	0x08000024:    bd08        ..      POP      {r3,pc}
+	; 该指令无作用, 可能是用于对齐
+	0x08000026:    0000        ..      MOVS     r0,r0
+```
 
+- Flash 上存放的是第2列的机器码
 
+## 4.4 纯汇编点灯
 
 
 
 # 五. 使用按键控制LED
+
+C语言代码：
+
+```assembly
+                PRESERVE8
+                THUMB
+                AREA    RESET, DATA, READONLY
+							; 前三行为语法规定
+				
+							EXPORT  __Vectors
+__Vectors       DCD     0
+                DCD     Reset_Handler              ; Reset Handler
+				
+                AREA    |.text|, CODE, READONLY
+
+; Reset handler
+Reset_Handler   PROC
+				EXPORT  Reset_Handler             [WEAK]
+         IMPORT  mymain					; 调用外部函数 main
+				
+				LDR SP,= (0x20000000+0x10000)  	; 设置栈
+				BL mymain							; 跳转到 main
+				
+         ENDP
+
+				END
+					 
+
+```
+
+
+
+```C
+
+int delay(volatile int cnt)
+{
+	while (cnt--)
+	{
+	}
+	
+	return 0x55;
+}
+
+int mymain()
+{
+	unsigned int *pReg;
+	
+	// 使能GPIO
+	pReg = (unsigned int *)(0x40021000U + 0x18U);
+	*pReg |= (1UL << 3U);
+	// 设置GPIOB0为输出引脚
+	pReg = (unsigned int *)(0x40010C00U + 0x00U);
+	*pReg |= (1UL << 0U);
+	
+	pReg = (unsigned int *)(0x40010C00U + 0x0CU);
+	
+	while (1)
+	{
+		// 设置GPIOB0为输出1
+		*pReg |= (1UL << 0U);
+		
+		delay(10000U);
+		
+		// 设置GPIOB0为输出0
+		*pReg &= ~(1UL << 0U);
+		
+		delay(10000U);
+	}
+}
+
+```
+
+纯汇编：
+
+```assembly
+                PRESERVE8
+                THUMB
+                AREA    RESET, DATA, READONLY
+							; 前三行为语法规定
+				
+							EXPORT  __Vectors
+__Vectors       DCD     0
+                DCD     Reset_Handler              ; Reset Handler
+				
+                AREA    |.text|, CODE, READONLY
+
+Reset_Handler   PROC  ; 子程序开始
+							EXPORT  Reset_Handler             [WEAK]			
+							
+							; enable GPIOB
+							; pReg = (unsigned int *)(0x40021000U + 0x18U);
+							; *pReg |= (1UL << 3U);
+							LDR R0, = (0x40021000 + 0x18)
+							LDR R1, [R0]
+							ORR R1, R1, #(1<<3)
+							STR R1, [R0]
+				
+							; set GPIOB0 as output
+							; pReg = (unsigned int *)(0x40010C00U + 0x00U);
+							; *pReg |= (1UL << 0U);
+							LDR R0, = (0x40010C00 + 0x00)
+							LDR R1, [R0]
+							ORR R1, R1, #(1<<0)
+							STR R1, [R0]
+				
+							LDR R2, = (0x40010C00 + 0x0C) ; 防止被 delay 函数内的 R0 覆盖
+		Loop
+							; set GPIOB0 output high
+							; *pReg |= (1UL << 0U);
+							LDR R1, [R2]
+							ORR R1, R1, #(1<<0)
+							STR R1, [R2]
+				
+							; delay
+							LDR R0, = 10000
+							BL delay
+				
+							; set GPIOB0 output low
+							LDR R1, [R2]
+							BIC R1, R1, #(1<<0)
+							STR R1, [R2]
+				
+							; delay
+							LDR R0, = 10000
+							BL delay
+				
+							B Loop
+				
+							ENDP  ; 结束子程序
+
+delay
+							SUBS R0, R0, #1		; R0--
+							BNE delay			; 不为0
+							MOV PC, LR
+
+							END
+					 
+
+```
+
+
+
+
 
 
 
