@@ -282,7 +282,7 @@ STRGT	R2, [R0]		; 若 R1>R2，执行该指令，将 R2 的数据写入 R0 所指
 
    * 满增：SP 指向 0x1000，内有数据，数据出栈时，先读取数据，SP 再指向 0x1004（先读后加）
 
-     <img src = ".\00_pic\03_ARM架构\P14.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%" > 
+     ![](./00_pic/03_ARM架构/P14.png)  
 
      <img src = ".\00_pic\03_ARM架构\P15.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:70%"> 
 
@@ -651,10 +651,6 @@ delay
 
 ## 4.4 纯汇编点灯
 
-
-
-# 五. 使用按键控制LED
-
 C语言代码：
 
 ```assembly
@@ -795,8 +791,52 @@ delay
 ```
 
 
+# 五. 使用按键控制LED
 
+``````C
 
+int mymain()
+{
+	unsigned int *pReg;
+	unsigned int *pRegA;
+	unsigned int *pRegB;
+	
+	// 使能GPIOA、GPIOB
+	pReg = (unsigned int *)(0x40021000U + 0x18U);
+	*pReg |= (1UL << 2U) | (1UL << 3U);
+	
+	// 设置GPIOB0为输出引脚
+	pRegB = (unsigned int *)(0x40010C00U + 0x00U);
+	*pRegB |= (1UL << 0U);
+	
+	// 设置GPIOA0为输入引脚
+	pRegA = (unsigned int *)(0x40010800U + 0x00U);
+	*pRegA &= ~(3U);		// mode0 = 0b00
+	*pRegA &= ~(3UL << 2U);	// conf0 = 0b00
+	*pRegA |= (1UL << 2U);	// conf0 = 0b01
+	
+	// GPIOB输出寄存器
+	pRegB = (unsigned int *)(0x40010C00U + 0x0CU);
+	// GPIOA输入寄存器
+	pRegA = (unsigned int *)(0x40010800U + 0x08U);
+	
+	while (1)
+	{
+		// 读取GPIOA输入
+		if ((*pRegA & (1UL << 0U)) == 0U)
+		{
+			// 设置GPIOB0为输出0
+			*pReg &= ~(1UL << 0U);
+		}
+		else
+		{
+			// 设置GPIOB0为输出1
+			*pReg |= (1UL << 0U);
+		}
+	}
+}
+
+``````
 
 
 
@@ -805,6 +845,546 @@ delay
 
 
 # 七. keil_gcc_Makefile
+
+## 7.1 Keil IDE 背后的命令
+
+* armcc
+
+  * ARM公司的编译器
+  * keil使用的就是armcc
+* gcc
+
+  * GNU工具链
+  * Linux等开源软件经常使用gcc
+
+
+
+## 7.2 windows-gcc
+
+安装 code::black
+
+
+
+## 7.3 gcc 编译过程
+
+### 7.3.1 gcc 编译步骤
+
+![](./00_pic/06_keil_gcc_makefile/p1.png)
+
+示例
+
+``````c
+gcc hello.c                   // 输出一个名为a.out的可执行程序，然后可以执行./a.out
+gcc -o hello hello.c          // 输出名为hello的可执行程序，然后可以执行./hello
+gcc -o hello hello.c -static  // 静态链接
+
+gcc -c -o hello.o hello.c  // 先编译(不链接)
+gcc -o hello hello.o       // 再链接
+``````
+
+### 7.3.2 常用选项
+
+|   选项    |                       功能                       |
+| :-------: | :----------------------------------------------: |
+|    -v     |   查看gcc编译器的版本，显示gcc执行时的详细过程   |
+| -o <file> | 指定输出文件名为file，这个名称不能跟源文件名同名 |
+|    -E     |         只预处理，不会编译、汇编、链接t          |
+|    -S     |              只编译，不会汇编、链接              |
+|    -c     |               编译和汇编，不会链接               |
+
+一个c/c++文件要经过预处理、编译、汇编和链接才能变成可执行文件。
+
+1. 预处理
+   C/C++源文件中，以“#”开头的命令被称为预处理命令，如包含命令“#include”、宏定义命令“#define”、条件编译命令“#if”、“#ifdef”等。预处理就是将要包含(include)的文件插入原文件中、将宏定义展开、根据条件编译命令选择要使用的代码，最后将这些东西输出到一个“.i”文件中等待进一步处理。
+2. 编译
+   编译就是把C/C++代码(比如上述的“.i”文件)“翻译”成汇编代码。
+3. 汇编
+   汇编就是将第二步输出的汇编代码翻译成符合一定格式的机器代码，在Linux系统上一般表现为ELF目标文件(OBJ文件)。“反汇编”是指将机器代码转换为汇编代码，这在调试程序时常常用到。
+4. 链接
+   链接就是将上步生成的OBJ文件和系统库的OBJ文件、库文件链接起来，最终生成了可以在特定平台运行的可执行文件。
+
+hello.c(预处理) -> hello.i(编译) -> hello.s(汇编) -> hello.o(链接) -> hello
+详细的每一步命令如下：
+
+```c
+gcc -E -o hello.i hello.c
+gcc -S -o hello.s hello.i
+gcc -c -o hello.o hello.s
+gcc -o hello hello.o
+```
+
+
+
+上面一连串命令比较麻烦，gcc会对.c文件默认进行预处理操作，使用-c再来指明了编译、汇编，从而得到.o文件,
+再将.o文件进行链接，得到可执行应用程序。简化如下：
+
+```c
+gcc -c -o hello.o hello.c	 // 先编译（不链接）
+gcc -o hello hello.o			// 再链接
+```
+
+> 优点：无需全部编译，只需编译修改过的文件
+
+### 7.3.3 后缀名决定编译过程
+
+![](./00_pic/06_keil_gcc_makefile/p2.png)
+
+>* **输入文件的后缀名**和**选项**共同决定 gcc 到底执行那些操作
+>* 在编译过程中，最后的步骤都是链接
+>  * 除非使用了-E、-S、-c选项
+>  * 或者编译出错阻止了完整的编译过程
+
+
+
+### 7.3.4 指定头文件目录
+
+头文件在系统目标
+
+```c
+echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY_PATH)
+```
+
+手动指定头文件目标
+
+```c
+-I <头文件目录>
+```
+
+
+
+### 7.3.5 指定库文件目标
+
+库文件目录
+
+```c
+echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY_PATH)
+```
+
+手动指定库文件目录
+
+```c
+-L <库文件目录>
+```
+
+手动指定库文件
+
+```c
+-l  <abc>   // 链接 libabc.so 或 lib.a
+```
+
+
+
+## 7.4 Makefile 引入和规则
+
+```makefile
+目标 : 依赖1 依赖2 ...
+[TAB]命令
+```
+
+> 1. <font color='red'>目标文件不存在，执行命令 </font>
+> 2. <font color='red'> 当 依赖文件 比 目标文件 新（无依赖文件、依赖文件被修改），执行命令 </font>
+
+示例：
+
+- a.c:
+
+  ```c
+  #include <stdio.h>
+  
+  int main(void)
+  {
+  	func_b();
+  	
+  	return 0;
+  }
+  ```
+
+- b.c:
+
+  ```c
+  void func_b(void)
+  {
+  	printf("This is B\n");
+  }
+  ```
+
+- Makefile:
+
+  ```makefile
+  test: a.o b.o						// test 依赖 a.o 和 b.o，若依赖比目标新，执行命令
+  	gcc -o test a.o b.o		 // 链接生成 test
+  a.o: a.c								// a.o 依赖 a.c，同上
+  	gcc -c -o a.o a.c			 // 编译生成 a.o
+  b.o: b.c								// b.o 依赖 b.c，同上
+  	gcc -c -o b.o b.c			 // 编译生成 b.o
+  ```
+
+  
+
+## 7.5 Makefile 语法
+
+### 7.5.1 通配符
+
+- a.c:
+
+  ```c
+  #include <stdio.h>
+  
+  int main(void)
+  {
+  	func_b();
+  	
+  	return 0;
+  }
+  ```
+
+- b.c:
+
+  ```c
+  void func_b(void)
+  {
+  	printf("This is B\n");
+  }
+  ```
+
+- c.c
+
+  ```c
+  void func_b(void)
+  {
+  	printf("This is C\n");
+  }
+  ```
+
+- Makefile:
+
+  ```makefile
+  test: a.o b.o c.o
+  	gcc -o test $^
+  %.o: %.c
+  	gcc -c -o $@ $<
+  ```
+
+> - %: 匹配文件名
+> - $@: 目标文件
+>
+> - $<: 第一个依赖
+>
+> - $^: 所有依赖
+
+### 7.5.2 假想目标
+
+1. 不使用假想目标
+
+   ```makefile
+   test: a.o b.o c.o
+   	gcc -o test $^
+   %.o: %.c
+   	gcc -c -o $@ $<
+   
+   clean:	// 目录里面无 clean 文件，规则成立，执行命令，且执行命令并不会生成 clean 文件
+   	rm *.o test
+   ```
+
+   ![](./00_pic/06_keil_gcc_makefile/p3.png) 
+   
+   > - make 不带目标名：默认第一个目标
+   > - make 目标：执行对应目标，例：`make clean`
+   > - 若目录内有 clean 文件，则无法执行该命令
+
+2. 使用假想目标
+
+   ```makefile
+   test: a.o b.o c.o
+   	gcc -o test $^
+   %.o: %.c
+   	gcc -c -o $@ $<
+   
+   clean:
+   	rm *.o test
+   
+   .PHONY: clean  // 将目标定义为假想目标
+   ```
+
+![](./00_pic/06_keil_gcc_makefile/p4.png)
+
+### 7.5.3 变量
+
+1. 即时变量（简单变量）
+
+   ```makefile
+   A := xxx	// A 的值即刻确定，在定义时即确定
+   ```
+
+2. 即时变量
+
+   ```
+   A ?= xxx  // 第一次定义有效，若前面该变量已定义，则忽略该行
+   ```
+
+3. 延时变量
+
+   ```makefile
+   B = xxx		// B 的值只使用到时才确定
+   ```
+
+4. 附加
+
+   ```
+   B += xxx		// 是即时变量还是延时变量取决于前面的定义
+   ```
+
+5. 使用变量（获取变量）
+
+   ```
+   $(A)
+   ```
+
+
+
+- 例1：打印变量
+
+  ```makefile
+  A := abc
+  B = 123
+  
+  all:
+  	@echo $(A)
+  	@echo $(B)
+  ```
+
+  ![](./00_pic/06_keil_gcc_makefile/p5.png) 
+  
+  > 1. 使用变量（获取变量）：$(变量)
+  > 2. @命令：不打印命令语句
+
+- 例2：即使变量
+  ```makefile
+  A := $(C)
+  B = $(C)
+  C = abc
+	
+	all:
+	  @echo A = $(A)
+    @echo B = $(B)
+    @echo C = $(C)
+  ```
+
+  ![](./00_pic/06_keil_gcc_makefile/p6.png) 
+
+  > A 在定义时即确定值，但此时 C 未确定值，所以 A 为空
+
+- 例3：延时变量
+  
+  ```makefile
+  A := $(C)
+  B = $(C)
+	
+	all:
+	  @echo A = $(A)
+    @echo B = $(B)
+    @echo C = $(C)
+  
+  C = abc
+  ```
+  
+  ![](./00_pic/06_keil_gcc_makefile/p7.png) 
+  
+  > 延时变量 C 定义在何处都不影响使用，因为 make 会将整个 Makefile 文件读进去分析
+
+- 例4：延时变量全局检查
+
+  ```makefile
+  A := $(C)
+  B = $(C)
+  C = abc
+  
+  all:
+  	@echo A = $(A)
+  	@echo B = $(B)
+  	@echo C = $(C)
+  
+  C = 123
+  ```
+
+  ![](./00_pic/06_keil_gcc_makefile/p8.png) 
+
+  > 同例3
+
+- 例5：附加
+
+  ```makefile
+  A := $(C)
+  B = $(C)
+  C = abc
+  
+  all:
+  	@echo A = $(A)
+  	@echo B = $(B)
+  	@echo C = $(C)
+  
+  C += 123
+  ```
+
+  ![](./00_pic/06_keil_gcc_makefile/p9.png) 
+
+- 例6：第一次定义才有效
+
+  ```makefile
+  A := $(C)
+  B = $(C)
+  C = abc
+  D = huangxin
+  D ?= hello
+  
+  all:
+  	@echo A = $(A)
+  	@echo B = $(B)
+  	@echo C = $(C)
+  	@echo D = $(D)
+  	
+  C += 123
+  ```
+
+  ![](./00_pic/06_keil_gcc_makefile/p10.png) 
+
+### 7.5.4 函数
+
+1. foreach
+
+   ```makefile
+   $(foreach var, list, text)
+   ```
+
+   > 把 list 中使用空格分隔的字符串依次赋值给 var，然后执行 text 表达式，重复直到 list 的最后一个字符串。类似于 Linux Shell 中的 for 语句。
+
+   - 例
+
+     ```makefile
+     A = a b c
+     B = $(foreach f, $(A), $(f).o)  // 将 A 的值分别赋值给 f，依次执行 $(f).o
+     
+     all:
+     	@echo B = $(B)
+     ```
+
+     ![](./00_pic/06_keil_gcc_makefile/p11.png)  
+
+2. filter
+
+   ```
+   $(filter pattern..., text)
+   $(filter-out pattern..., text)
+   ```
+
+   > 1. 从 text 中取出符合 pattern 格式的值
+   >
+   > 2. 从 text 中取出不符合 pattern 格式的值
+
+   - 例：
+
+     ```makefile
+     C = a b c d/
+     
+     D = $(filter %/, $(C))  		// 从 C 中取出符合 / 格式的值
+     E = $(filter-out %/, $(C))	// 从 C 中取出不符合 / 格式的值
+     
+     all:
+     	@echo B = $(B)
+     	@echo D = $(D)
+     	@echo E = $(E)
+     ```
+
+     ![](./00_pic/06_keil_gcc_makefile/p12.png) 
+
+3. wildcard
+
+   ```makefile
+   $(wildcard pattern)
+   ```
+
+   > pattern 定义了文件名的格式，wildcard 取出其中存在的文件
+   >
+   > <font color='red'>*是应用在系统中的，%是应用在这个 Makefile 文件中的</font>
+
+   - 例1：
+
+     ```makefile
+     C = a b c d/
+     
+     D = $(filter %/, $(C))
+     E = $(filter-out %/, $(C))
+     
+     files = $(wildcard *.c)  // 以 *.c 格式寻址存在的文件，赋值给 files
+     
+     all:
+     	@echo B = $(B)
+     	@echo D = $(D)
+     	@echo E = $(E)
+     	@echo files = $(files)
+     ```
+     
+     ![](./00_pic/06_keil_gcc_makefile/p14.png) 
+     
+     ![](./00_pic/06_keil_gcc_makefile/p13.png) 
+     
+   - 例2：
+
+     ```makefile
+     C = a b c d/
+     
+     D = $(filter %/, $(C))
+     E = $(filter-out %/, $(C))
+     
+     files1 = a.c b.c c.c d.c e.c
+     files2 = $(wildcard $(files1))  // 从 files1 中寻找真实存在的文件
+     
+     all:
+     	@echo B = $(B)
+     	@echo D = $(D)
+     	@echo E = $(E)
+     	@echo files2 = $(files2)
+     ```
+
+     ![](./00_pic/06_keil_gcc_makefile/p15.png) 
+
+4. patsubst
+
+   ```makefile
+   $(patsubst pattern, replacement, $(ver))
+   ```
+
+   > ver 中符合 pattern 格式的值替换成 replacement 格式
+
+   - 例：
+
+     ```makefile
+     C = a b c d/
+     
+     D = $(filter %/, $(C))
+     E = $(filter-out %/, $(C))
+     
+     
+     files0 = $(wildcard *.c)
+     files1 = a.c b.c c.c d.c e.c
+     files2 = $(wildcard $(files1))
+     // 将 files1 中符合 %.c 格式的替换为 %.d
+     dep_files = $(patsubst %.c, %.d, $(files1))
+     
+     all:
+     	@echo B = $(B)
+     	@echo D = $(D)
+     	@echo E = $(E)
+     	@echo files0 = $(files0)
+     	@echo files2 = $(files2)
+     	@echo dep_files = $(dep_files)
+     ```
+
+     ![](./00_pic/06_keil_gcc_makefile/p16.png) 
+
+### 7.5.5 实例
+
+
 
 
 
