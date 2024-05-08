@@ -983,6 +983,7 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
 
 > 1. <font color='red'>目标文件不存在，执行命令 </font>
 > 2. <font color='red'> 当 依赖文件 比 目标文件 新（无依赖文件、依赖文件被修改），执行命令 </font>
+> 3. <font color='red'> 注意：TAB 键后面不带语句也被认为是一条命令 </font>
 
 示例：
 
@@ -1011,12 +1012,12 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
 - Makefile:
 
   ```makefile
-  test: a.o b.o						// test 依赖 a.o 和 b.o，若依赖比目标新，执行命令
-  	gcc -o test a.o b.o		 // 链接生成 test
-  a.o: a.c								// a.o 依赖 a.c，同上
-  	gcc -c -o a.o a.c			 // 编译生成 a.o
-  b.o: b.c								// b.o 依赖 b.c，同上
-  	gcc -c -o b.o b.c			 // 编译生成 b.o
+  test: a.o b.o						# test 依赖 a.o 和 b.o，若依赖比目标新，执行命令
+  	gcc -o test a.o b.o		 # 链接生成 test
+  a.o: a.c								# a.o 依赖 a.c，同上
+  	gcc -c -o a.o a.c			 # 编译生成 a.o
+  b.o: b.c								# b.o 依赖 b.c，同上
+  	gcc -c -o b.o b.c			 # 编译生成 b.o
   ```
 
   
@@ -1082,7 +1083,7 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
    %.o: %.c
    	gcc -c -o $@ $<
    
-   clean:	// 目录里面无 clean 文件，规则成立，执行命令，且执行命令并不会生成 clean 文件
+   clean:	# 目录里面无 clean 文件，规则成立，执行命令，且执行命令并不会生成 clean 文件
    	rm *.o test
    ```
 
@@ -1103,7 +1104,7 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
    clean:
    	rm *.o test
    
-   .PHONY: clean  // 将目标定义为假想目标
+   .PHONY: clean  # 将目标定义为假想目标，即和实际文件无关
    ```
 
 ![](./00_pic/06_keil_gcc_makefile/p4.png)
@@ -1113,34 +1114,34 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
 1. 即时变量（简单变量）
 
    ```makefile
-   A := xxx	// A 的值即刻确定，在定义时即确定
+   A := xxx	# A 的值即刻确定，在定义时即确定
    ```
 
 2. 即时变量
 
-   ```
-   A ?= xxx  // 第一次定义有效，若前面该变量已定义，则忽略该行
+   ```makefile
+   A ?= xxx  # 第一次定义有效，若前面该变量已定义，则忽略该行
    ```
 
 3. 延时变量
 
    ```makefile
-   B = xxx		// B 的值只使用到时才确定
+   B = xxx		# B 的值只使用到时才确定
    ```
 
 4. 附加
 
-   ```
-   B += xxx		// 是即时变量还是延时变量取决于前面的定义
+   ```makefile
+   B += xxx	# 是即时变量还是延时变量取决于前面的定义
    ```
 
 5. 使用变量（获取变量）
 
-   ```
+   ```makefile
    $(A)
    ```
 
-
+> <font color='red'>注意：变量只是 Makefile 内的变量，并非文件，即使变量的名称和文件名称一样，想要调用变量对应的文件要包含（include 文件名） </font>
 
 - 例1：打印变量
 
@@ -1250,7 +1251,7 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
 
 ### 7.5.4 函数
 
-1. foreach
+1. **foreach**
 
    ```makefile
    $(foreach var, list, text)
@@ -1262,7 +1263,7 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
 
      ```makefile
      A = a b c
-     B = $(foreach f, $(A), $(f).o)  // 将 A 的值分别赋值给 f，依次执行 $(f).o
+     B = $(foreach f, $(A), $(f).o)  # 将 A 的值分别赋值给 f，依次执行 $(f).o
      
      all:
      	@echo B = $(B)
@@ -1270,7 +1271,7 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
 
      ![](./00_pic/06_keil_gcc_makefile/p11.png)  
 
-2. filter
+2. **filter**
 
    ```
    $(filter pattern..., text)
@@ -1286,8 +1287,8 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
      ```makefile
      C = a b c d/
      
-     D = $(filter %/, $(C))  		// 从 C 中取出符合 / 格式的值
-     E = $(filter-out %/, $(C))	// 从 C 中取出不符合 / 格式的值
+     D = $(filter %/, $(C))  		# 从 C 中取出符合 / 格式的值
+     E = $(filter-out %/, $(C))	# 从 C 中取出不符合 / 格式的值
      
      all:
      	@echo B = $(B)
@@ -1297,7 +1298,7 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
 
      ![](./00_pic/06_keil_gcc_makefile/p12.png) 
 
-3. wildcard
+3. **wildcard**
 
    ```makefile
    $(wildcard pattern)
@@ -1305,7 +1306,7 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
 
    > pattern 定义了文件名的格式，wildcard 取出其中存在的文件
    >
-   > <font color='red'>*是应用在系统中的，%是应用在这个 Makefile 文件中的</font>
+   > <font color='red'>*是应用在系统中的，对应的是文件；%是应用在这个 Makefile 文件中的，对应的是变量 </font>
 
    - 例1：
 
@@ -1315,7 +1316,7 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
      D = $(filter %/, $(C))
      E = $(filter-out %/, $(C))
      
-     files = $(wildcard *.c)  // 以 *.c 格式寻址存在的文件，赋值给 files
+     files = $(wildcard *.c)  # 以 *.c 格式寻址存在的文件，赋值给 files
      
      all:
      	@echo B = $(B)
@@ -1337,7 +1338,7 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
      E = $(filter-out %/, $(C))
      
      files1 = a.c b.c c.c d.c e.c
-     files2 = $(wildcard $(files1))  // 从 files1 中寻找真实存在的文件
+     files2 = $(wildcard $(files1))  # 从 files1 中寻找真实存在的文件
      
      all:
      	@echo B = $(B)
@@ -1368,7 +1369,7 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
      files0 = $(wildcard *.c)
      files1 = a.c b.c c.c d.c e.c
      files2 = $(wildcard $(files1))
-     // 将 files1 中符合 %.c 格式的替换为 %.d
+     # 将 files1 中符合 %.c 格式的替换为 %.d
      dep_files = $(patsubst %.c, %.d, $(files1))
      
      all:
@@ -1384,11 +1385,253 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
 
 ### 7.5.5 实例
 
+Makefile 问题：
 
+```makefile
+test: a.o b.o c.o
+	gcc -o test $^
 
+%.o: %.c
+	gcc -c -o $@ $<
 
+clean:
+	rm *.o test
+
+.PHONY: clean
+```
+
+> 缺少头文件依赖关系，若有文件依赖头文件，该 Makefile 并不会执行编译命令
+
+改进：
+
+```makefile
+test: a.o b.o c.o
+	gcc -o test $^
+
+c.o: c.c c.h
+
+%.o: %.c
+	gcc -c -o $@ $<
+
+clean:
+	rm *.o test
+
+.PHONY: clean
+```
+
+> 增加依赖文件 c.h，则会执行 `gcc -c -o $@ $<`
+
+#### 7.5.5.1 获取文件依赖目录
+
+```shell
+gcc -M c.c
+```
+
+![](./00_pic/06_keil_gcc_makefile/p17.png) 
+
+#### 7.5.5.2 将依赖目录写入到文件
+
+```shell
+gcc -M -MF c.d c.c
+```
+
+![](./00_pic/06_keil_gcc_makefile/p18.png) 
+
+![](./00_pic/06_keil_gcc_makefile/p19.png) 
+
+#### 7.5.5.3 编译的同时生成依赖文件
+
+```shell
+gcc -c -o c.o c.c -MD -MF c.d
+```
+
+#### 7.5.5.4 优化 Makefile
+
+1. 优化
+
+   ```makefile
+   objs = a.o b.o c.o
+   
+   # 符合 % 的变量都变成 .%.d，赋值给 dep_files（即时变量）
+   dep_files := $(patsubst %, .%.d, $(objs))
+   # 取出真实存在的文件，赋值给 dep_files（即时变量）
+   dep_files := $(wildcard $(dep_files))
+   
+   test: $(objs)
+   	gcc -o test $^
+   
+   # 在下面包含，确保 make 执行的第一条命令为 test
+   ifneq ($(dep_files),)  # 如果 dep_files 不为空
+   include $(dep_files)   # 包含 dep_files 变量对应的文件
+   endif
+   
+   %.o: %.c
+   	gcc -c -o $@ $< -MD -MF .$@.d  # 只会编译 依赖/目标 不存在/有变化的
+   
+   clean:
+   	rm *.o test
+   distclean:
+   	rm $(dep_files)  #删除所有依赖文件
+   
+   .PHONY: clean
+   ```
+
+   ![](./00_pic/06_keil_gcc_makefile/p22.png)修改 c.h 文件后，只重新编译生成了 c.o![](./00_pic/06_keil_gcc_makefile/p23.png)
+
+2. CFLAGS：
+
+   ```makefile
+   objs = a.o b.o c.o
+   
+   dep_files := $(patsubst %, .%.d, $(objs)) # 符合 % 的变量都变成 .%.d（即时变量）
+   dep_files := $(wildcard $(dep_files))  		# 取出真实存在的文件（即时变量）
+   
+   CFLAGS = -Werror  # 将警告修改为错误
+   
+   test: $(objs)
+   	gcc -o test $^
+   
+   ifneq ($(dep_files),)  # 如果 dep_files 不为空
+   include $(dep_files)   # 包含 dep_files
+   endif
+   
+   %.o: %.c
+   	gcc $(CFLAGS) -c -o $@ $< -MD -MF .$@.d
+   
+   clean:
+   	rm *.o test
+   distclean:
+   	rm $(dep_files)  #删除所有依赖文件
+   
+   .PHONY: clean
+   ```
+
+   ![](./00_pic/06_keil_gcc_makefile/p24.png) **修改完所有错误，完整代码：**
+
+   ```c
+   // a.c
+   #include <stdio.h>
+   #include "b.h"
+   #include "c.h"
+   
+   int main(void)
+   {
+   	func_b();
+   	func_c();
+   	
+   	return 0;
+   }
+   
+   // b.c
+   #include <stdio.h>
+   #include "b.h"
+   
+   void func_b(void)
+   {
+   	printf("This is B\n");
+   }
+   
+   // b.h
+   #ifndef __B_H__
+   #define __B_H__
+   
+   void func_b(void);
+   
+   #endif
+   
+   // c.c
+   #include <stdio.h>
+   #include "c.h"
+   
+   void func_c(void)
+   {
+   	printf("This is C = %d\n", C);
+   }
+   
+   // c.h
+   #ifndef __C_H__
+   #define __C_H__
+   
+   #define C 3
+   
+   void func_c(void);
+   
+   #endif
+   ```
+
+   ```makefile
+   objs = a.o b.o c.o
+   
+   dep_files := $(patsubst %, .%.d, $(objs)) # 符合 % 的变量都变成 .%.d（即时变量）
+   dep_files := $(wildcard $(dep_files))  		# 取出真实存在的文件（即时变量）
+   
+   CFLAGS = -Werror
+   
+   test: $(objs)
+   	gcc -o test $^
+   
+   ifneq ($(dep_files),)  # 如果 dep_files 不为空
+   include $(dep_files)   # 包含 dep_files
+   endif
+   
+   %.o: %.c
+   	gcc $(CFLAGS) -c -o $@ $< -MD -MF .$@.d
+   
+   clean:
+   	rm *.o test
+   distclean:
+   	rm $(dep_files)  #删除所有依赖文件
+   
+   .PHONY: clean
+   ```
+
+   ![](./00_pic/06_keil_gcc_makefile/p25.png)
+
+   图片最后一行：`gcc -o test a.o b.o c.o`
+
+3. 修改头文件目录
+
+   ![](./00_pic/06_keil_gcc_makefile/p26.png)
+
+   修改默认搜索的头文件目录
+
+   ```makefile
+   objs = a.o b.o c.o
+   
+   dep_files := $(patsubst %, .%.d, $(objs)) # 符合 % 的变量都变成 .%.d（即时变量）
+   dep_files := $(wildcard $(dep_files))  		# 取出真实存在的文件（即时变量）
+   
+   CFLAGS = -Werror -Iinclude  # 修改默认搜索的头文件目录为 include
+   
+   test: $(objs)
+   	gcc -o test $^
+   
+   ifneq ($(dep_files),)  # 如果 dep_files 不为空
+   include $(dep_files)   # 包含 dep_files
+   endif
+   
+   %.o: %.c
+   	gcc $(CFLAGS) -c -o $@ $< -MD -MF .$@.d
+   
+   clean:
+   	rm *.o test
+   distclean:
+   	rm $(dep_files)  #删除所有依赖文件
+   
+   .PHONY: clean
+   ```
+
+   ![](./00_pic/06_keil_gcc_makefile/p27.png)
+
+   
 
 # 八. 代码重定位
+
+## 8.1 段的概念
+
+
+
+
 
 
 
