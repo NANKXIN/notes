@@ -977,58 +977,77 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
 ## 7.4 Makefile 引入和规则
 
 ```makefile
-目标 : 依赖1 依赖2 ...
+目标文件 : 依赖文件1 依赖文件2 ...
 [TAB]命令
 ```
 
-> 1. <font color='red'>目标文件不存在，执行命令 </font>
-> 2. <font color='red'> 当 依赖文件 比 目标文件 新（无依赖文件、依赖文件被修改），执行命令 </font>
-> 3. <font color='red'> 注意：TAB 键后面不带语句也被认为是一条命令 </font>
+> - make 会找到当前目录下名为 Makeflie 或 makefile 的文件
+> - 寻找第一个目标文件
+> - 如果第一个目标文件不存在，或某个依赖文件修改时间更新，执行后面的命令
+> - 如果第一个目标文件和依赖文件修改时间一致，则寻找依赖文件的依赖，以此类推
+>
+> <font color='red'>注意：TAB 键后面不带语句也被认为是一条命令 </font>
 
-示例：
+- 例：
 
-- a.c:
+  - C代码：
 
-  ```c
-  #include <stdio.h>
-  
-  int main(void)
-  {
-  	func_b();
-  	
-  	return 0;
-  }
-  ```
+    ```c
+    // a.c
+    #include <stdio.h>
+    
+    int main(void)
+    {
+    	func_b();
+    	
+    	return 0;
+    }
+    
+    /* b.c */
+    void func_b(void)
+    {
+    	printf("This is B\n");
+    }
+    ```
 
-- b.c:
+  - Makefile:
 
-  ```c
-  void func_b(void)
-  {
-  	printf("This is B\n");
-  }
-  ```
+    ```makefile
+    test: a.o b.o						# test 依赖 a.o 和 b.o，若依赖比目标新，执行命令
+    	gcc -o test a.o b.o		 # 链接生成 test
+    a.o: a.c								# a.o 依赖 a.c，同上
+    	gcc -c -o a.o a.c			 # 编译生成 a.o
+    b.o: b.c								# b.o 依赖 b.c，同上
+    	gcc -c -o b.o b.c			 # 编译生成 b.o
+    ```
 
-- Makefile:
+    
 
-  ```makefile
-  test: a.o b.o						# test 依赖 a.o 和 b.o，若依赖比目标新，执行命令
-  	gcc -o test a.o b.o		 # 链接生成 test
-  a.o: a.c								# a.o 依赖 a.c，同上
-  	gcc -c -o a.o a.c			 # 编译生成 a.o
-  b.o: b.c								# b.o 依赖 b.c，同上
-  	gcc -c -o b.o b.c			 # 编译生成 b.o
-  ```
-
-  
 
 ## 7.5 Makefile 语法
 
 ### 7.5.1 通配符
 
-- a.c:
+<font color='red'>注意：通配符配的是变量的值</font>
+
+<font color='red'>*是应用在系统中，对应的是文件；%是应用在 Makefile 中，对应的是变量 </font>
+
+```makefile
+*.c # 目录里所有真实存在的.c文件
+
+%.o # 所有.o文件 - 变量里所有符合 .o 格式的字符串
+%.c # 所有.c文件 - 变量里所有符合 .c 格式的字符串
+$@  # 目标文件
+$<  # 第一个依赖文件
+$^  # 所有依赖文件
+```
+
+例：
+
+- C代码：
 
   ```c
+  /* a.c */
   #include <stdio.h>
   
   int main(void)
@@ -1037,20 +1056,14 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
   	
   	return 0;
   }
-  ```
-
-- b.c:
-
-  ```c
+  
+  /* b.c */
   void func_b(void)
   {
   	printf("This is B\n");
   }
-  ```
-
-- c.c
-
-  ```c
+  
+  /* c.c */
   void func_b(void)
   {
   	printf("This is C\n");
@@ -1066,107 +1079,196 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
   	gcc -c -o $@ $<
   ```
 
-> - %: 匹配文件名
-> - $@: 目标文件
->
-> - $<: 第一个依赖
->
-> - $^: 所有依赖
-
 ### 7.5.2 假想目标
 
 1. 不使用假想目标
 
-   ```makefile
-   test: a.o b.o c.o
-   	gcc -o test $^
-   %.o: %.c
-   	gcc -c -o $@ $<
-   
-   clean:	# 目录里面无 clean 文件，规则成立，执行命令，且执行命令并不会生成 clean 文件
-   	rm *.o test
-   ```
+   > - make：默认执行第一个目标的命令
+   > - make + 目标：执行对应目标，例：`make clean`
+   >   - 目录里面无 clean 文件，规则成立，执行命令
+   >   - 若目录内有 clean 文件，且未被修改，则无法执行该命令
 
-   ![](./00_pic/06_keil_gcc_makefile/p3.png) 
-   
-   > - make 不带目标名：默认第一个目标
-   > - make 目标：执行对应目标，例：`make clean`
-   > - 若目录内有 clean 文件，则无法执行该命令
+   - 例：
+
+     ```makefile
+     test: a.o b.o c.o
+     	gcc -o test $^
+     %.o: %.c
+     	gcc -c -o $@ $<
+     
+     clean:
+     	rm *.o test
+     ```
+
+     ![](./00_pic/06_keil_gcc_makefile/p3.png) 
 
 2. 使用假想目标
 
    ```makefile
-   test: a.o b.o c.o
-   	gcc -o test $^
-   %.o: %.c
-   	gcc -c -o $@ $<
-   
-   clean:
-   	rm *.o test
-   
-   .PHONY: clean  # 将目标定义为假想目标，即和实际文件无关
+   .PHONY : 目录 # 将目标定义为假想目标，即和实际文件无关
    ```
 
-![](./00_pic/06_keil_gcc_makefile/p4.png)
+   - 例：
+
+     ```makefile
+     test: a.o b.o c.o
+     	gcc -o test $^
+     %.o: %.c
+     	gcc -c -o $@ $<
+     
+     clean:
+     	rm *.o test
+     
+     .PHONY: clean
+     ```
+
+     ![](./00_pic/06_keil_gcc_makefile/p4.png)
 
 ### 7.5.3 变量
 
-1. 即时变量（简单变量）
+1. 即时变量（简单变量）：==不会使用后面定义的变量==
 
    ```makefile
-   A := xxx	# A 的值即刻确定，在定义时即确定
+   A := xxx	# A 的值即刻确定，在定义时即确定，不会使用后面定义的变量
    ```
 
-2. 即时变量
+2. 延时变量：==会使用后面定义的变量==
 
    ```makefile
-   A ?= xxx  # 第一次定义有效，若前面该变量已定义，则忽略该行
+   B = xxx		# B 的值为最后一次赋值时的值，会使用后面定义的变量
    ```
 
-3. 延时变量
+3. 首次有效：==延时变量==
 
    ```makefile
-   B = xxx		# B 的值只使用到时才确定
+   A ?= xxx   # 首次定义有效，前面已经赋值或后续有非?=赋值，该行无效
    ```
 
-4. 附加
+4. 附加：==是即时变量还是延时变量取决于前面的定义==
 
    ```makefile
-   B += xxx	# 是即时变量还是延时变量取决于前面的定义
+   B += xxx
    ```
 
-5. 使用变量（获取变量）
+5. 打印变量：==变量的值和打印命令的位置无关，即时变量在打印命令后面刷新也有效==
 
    ```makefile
-   $(A)
+   @echo $(A)
    ```
 
-> <font color='red'>注意：变量只是 Makefile 内的变量，并非文件，即使变量的名称和文件名称一样，想要调用变量对应的文件要包含（include 文件名） </font>
-
-- 例1：打印变量
+- 例:
 
   ```makefile
-  A := abc
-  B = 123
+  # 即时变量1 ==================================
+  A := 123
+  A := 456
+  test:
+  	@echo A = $(A)
+  结果：A = 456
   
-  all:
-  	@echo $(A)
-  	@echo $(B)
+  # 即时变量2 ==================================
+  A := 123
+  test:
+  	@echo A = $(A)
+  A := 456
+  结果：A = 456
+  
+  # 即时变量3 ==================================
+  A := $(B) # 此时 B 未知
+  B := 123
+  test:
+  	@echo A = $(A)
+  结果：A = 
+  
+  # 延时变量 ==================================
+  A = $(B)  # 全局搜索
+  B := 123
+  test:
+  	@echo A = $(A)
+  结果：A = 123
+  
+  # 首次有效：为延时变量 ==================================
+  A ?= $(B)
+  B := 123
+  test:
+  	@echo A = $(A)
+  结果：A = 123
+  
+  # 首次有效+延时变量 ==================================
+  A = 123
+  A ?= 456
+  test:
+  	@echo A = $(A)
+  结果：A = 123
+  
+  # 首次有效+延时变量 ==================================
+  A ?= 123
+  A = 456
+  test:
+  	@echo A = $(A)
+  结果：A = 456
+  
+  # 首次有效+即时变量 ==================================
+  A := 123
+  A ?= 456
+  test:
+  	@echo A = $(A)
+  结果：A = 123
+  
+  # 首次有效+即时变量 ==================================
+  A ?= 123
+  A := 456
+  test:
+  	@echo A = $(A)
+  结果：A = 456
+  
+  # 首次有效+首次有效 ==================================
+  A ?= 123
+  A ?= 456
+  test:
+  	@echo A = $(A)
+  结果：A = 456
+  
+  # 附加+即时 ==================================
+  A := 123
+  A += $(B)
+  B = 456
+  test:
+  	@echo A = $(A)
+  结果：A = 123
+  
+  A := 123
+  test:
+  	@echo A = $(A)
+  A += 456
+  结果：A = 123 456
+  
+  # 附加+延时 ==================================
+  A = 123
+  A += $(B)
+  B = 456
+  test:
+  	@echo A = $(A)
+  结果：A = 123 456
+  
+  A = 123
+  test:
+  	@echo A = $(A)
+  A += 456
+  结果：A = 123 456
+  
   ```
 
-  ![](./00_pic/06_keil_gcc_makefile/p5.png) 
-  
-  > 1. 使用变量（获取变量）：$(变量)
-  > 2. @命令：不打印命令语句
+> <font color='red'>注意：变量只是 Makefile 内的数据，并非文件本身，即使变量的内容和文件名称一样，想要调用文件需先包含文件（include 文件名）</font>
 
-- 例2：即使变量
+- 例1：即时变量
   ```makefile
   A := $(C)
   B = $(C)
   C = abc
-	
-	all:
-	  @echo A = $(A)
+  
+  all:
+    @echo A = $(A)
     @echo B = $(B)
     @echo C = $(C)
   ```
@@ -1175,25 +1277,25 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
 
   > A 在定义时即确定值，但此时 C 未确定值，所以 A 为空
 
-- 例3：延时变量
-  
+- 例2：延时变量
+
   ```makefile
   A := $(C)
   B = $(C)
-	
-	all:
-	  @echo A = $(A)
+  
+  all:
+    @echo A = $(A)
     @echo B = $(B)
     @echo C = $(C)
   
   C = abc
   ```
-  
-  ![](./00_pic/06_keil_gcc_makefile/p7.png) 
-  
-  > 延时变量 C 定义在何处都不影响使用，因为 make 会将整个 Makefile 文件读进去分析
 
-- 例4：延时变量全局检查
+  ![](./00_pic/06_keil_gcc_makefile/p7.png) 
+
+  > 延时变量 C 定义在何处都不影响使用，因为 make 会将整个 Makefile 文件读进去分析，取==最后一次的赋值==
+
+- 例3：延时变量全局检查
 
   ```makefile
   A := $(C)
@@ -1210,9 +1312,7 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
 
   ![](./00_pic/06_keil_gcc_makefile/p8.png) 
 
-  > 同例3
-
-- 例5：附加
+- 例4：附加
 
   ```makefile
   A := $(C)
@@ -1229,7 +1329,7 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
 
   ![](./00_pic/06_keil_gcc_makefile/p9.png) 
 
-- 例6：第一次定义才有效
+- 例6：首次有效
 
   ```makefile
   A := $(C)
@@ -1257,13 +1357,13 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
    $(foreach var, list, text)
    ```
 
-   > 把 list 中使用空格分隔的字符串依次赋值给 var，然后执行 text 表达式，重复直到 list 的最后一个字符串。类似于 Linux Shell 中的 for 语句。
+   > 把变量 list 中使用空格分隔的字符串依次赋值给 var，然后执行 text 表达式，重复直到变量 list 的最后一个字符串。类似于 Linux Shell 中的 for 语句。
 
-   - 例
+   - 例：
 
      ```makefile
      A = a b c
-     B = $(foreach f, $(A), $(f).o)  # 将 A 的值分别赋值给 f，依次执行 $(f).o
+     B = $(foreach f, $(A), $(f).o)  # 将变量 A 的值分别赋值给 f，依次执行 $(f).o
      
      all:
      	@echo B = $(B)
@@ -1278,17 +1378,17 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
    $(filter-out pattern..., text)
    ```
 
-   > 1. 从 text 中取出符合 pattern 格式的值
+   > 1. 从变量 text 中取出符合 pattern 格式的值
    >
-   > 2. 从 text 中取出不符合 pattern 格式的值
+   > 2. 从变量 text 中取出不符合 pattern 格式的值
 
    - 例：
 
      ```makefile
      C = a b c d/
      
-     D = $(filter %/, $(C))  		# 从 C 中取出符合 / 格式的值
-     E = $(filter-out %/, $(C))	# 从 C 中取出不符合 / 格式的值
+     D = $(filter %/, $(C))  		# 从变量 C 中取出符合 / 格式的值
+     E = $(filter-out %/, $(C))	# 从变量 C 中取出不符合 / 格式的值
      
      all:
      	@echo B = $(B)
@@ -1306,7 +1406,7 @@ echo 'main(){}'| gcc -E -v -  // 它会列出头文件目录、库目录(LIBRARY
 
    > pattern 定义了文件名的格式，wildcard 取出其中存在的文件
    >
-   > <font color='red'>*是应用在系统中的，对应的是文件；%是应用在这个 Makefile 文件中的，对应的是变量 </font>
+   > <font color='red'>*是应用在系统中，对应的是文件；%是应用在 Makefile 中，对应的是变量 </font>
 
    - 例1：
 
@@ -1400,7 +1500,7 @@ clean:
 .PHONY: clean
 ```
 
-> 缺少头文件依赖关系，若有文件依赖头文件，该 Makefile 并不会执行编译命令
+> 缺少头文件依赖关系，若有文件依赖头文件，且头文件被修改，但该 Makefile 并不会执行编译命令
 
 改进：
 
