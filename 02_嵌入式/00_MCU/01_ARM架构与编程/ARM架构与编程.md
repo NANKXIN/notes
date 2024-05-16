@@ -1649,9 +1649,11 @@ gcc -c -o c.o c.c -MD -MF c.d
 
 ## 8.1 ROM 和 RAM 内的数据
 
-![](./00_pic/07_代码重定位/p1.png) 
+测试代码：01_project\05_relocate\00_uart_question
 
-![](./00_pic/07_代码重定位/p3.png) 
+<img src="./00_pic/07_代码重定位/p1.png" style="zoom:80%;" /> 
+
+<img src="./00_pic/07_代码重定位/p3.png" style="zoom:80%;" /> 
 
 ![](./00_pic/07_代码重定位/p2.png)  
 
@@ -1674,8 +1676,8 @@ gcc -c -o c.o c.c -MD -MF c.d
   * RO-DATA - 只读数据段：存在 ROM 里，不需要复制到 RAM
   * RW-DATA - 可读可写数据段：初始化不为 0 的全局变量、静态变量，需要从 ROM 上复制到 RAM
   * ZI-DATA - BSS段：
-    * 初始值为 0 的全局变量、静态变量，不存在 ROM 里，使用前清零对应的 RAM 区域
-    * 未初始化的全局变量、静态变量，不存在 ROM 里，使用前清零对应的 RAM 区域
+    * 初始值为 0 的全局变量、静态变量，**不存在 ROM 里，使用前清零对应的 RAM 区域**
+    * 未初始化的全局变量、静态变量，**不存在 ROM 里，使用前清零对应的 RAM 区域**
   * 局部变量：保存在栈中，运行时生成
   * 堆：一块空闲空间，使用 malloc 函数来管理它，malloc 函数可以自己写
 
@@ -1688,12 +1690,11 @@ gcc -c -o c.o c.c -MD -MF c.d
 
 
 2. **谁做重定位：**
-
    - 程序本身：将程序从**加载地址**复制到**链接地址**
-
+   
    - 程序刚开始并不在链接地址上，如何重定位
      - 使用**位置无关码**写
-
+   
    - 位置无关码（在任何位置都可以运行）
      - 不使用字符串（需链接地址才能使用）
      - 不访问全局变量、静态变量（需链接地址才能使用）
@@ -1707,6 +1708,197 @@ gcc -c -o c.o c.c -MD -MF c.d
 > - 链接地址：程序运行地址，RAM上
 >   - 使用函数地址，用的是函数的链接地址 - 代码段
 >   - 访问全局变量、静态变量时，用的是变量的链接地址 - 数据段
+
+## 8.4 散列文件
+
+### 8.4.1 基本语法
+
+> 手册：Keil - Help- Open Books Window - ARM Linker - 第8章 Scatter File Syntax（散列文件语法）
+
+- 散列文件语法
+
+  一个散列文件由一个或多个`Load region`
+
+  `Load region` - 加载域
+
+  `Execution region` - 可执行域
+
+  `Iput section` - 输入段
+
+  ![](./00_pic/07_代码重定位/p4.png)
+
+- 加载域语法
+
+  加载域中有一个或多个`Execution region`
+
+  ![](./00_pic/07_代码重定位/p5.png)
+
+  ```assembly
+  load_region_description ::=
+  load_region_name (base_address | ("+" offset)) [attribute_list] [max_size]
+  "{"
+  execution_region_description+
+  "}
+  ```
+
+- 可执行域语法
+
+  `Execution region`中含有一个或多个`Input section`
+
+  ![](./00_pic/07_代码重定位/p6.png)
+
+  ```assembly
+  execution_region_description ::=
+  exec_region_name (base_address | "+" offset) [attribute_list] [max_size | length]
+  "{"
+  input_section_description*
+  "}
+  ```
+
+- 输入语法
+
+  ```assembly
+  input_section_description ::=
+  module_select_pattern [ "(" input_section_selector ( ","
+  input_section_selector )* ")" ]
+  input_section_selector ::=
+  "+" input_section_attr |
+  input_section_pattern |
+  input_section_type |
+  input_symbol_pattern |
+  section_properties
+  ```
+  
+- 分析
+  
+  ![](./00_pic/07_代码重定位/p13.png)
+  
+  - `LR_IROM1`：加载域
+    - `0x08000000`：加载地址
+    - `0x00080000`：长度
+  - `ER_IROM1`：可执行域1
+    - `0x08000000`：链接地址，加载地址 = 链接地址，不需要重定位
+    - `0x00080000`：长度
+    - `*.o (RESET, +First)`：所有 .o 文件内的 RESET 段（start.S-中断向量表）最先加载到本域的起始地址，即 RESET 段的起始的为 0
+    - `*(InRoot$$Sections)`：表示将所有用到的库段放到root区，如：\_\_main.o、\_\_scatter*.o、\_\_dc*.o等
+    - `.ANY (+RO)`：加载所有匹配目标文件的 RO-DATA
+    - `.ANY (+XO)`：加载所有匹配目标文件的 XO-DATA（只执行段）
+  - `RW_IRAM1`：可执行域2
+    - `0x20000000`：加载地址，加载地址 != 链接地址，需要重定位
+    - `0x00010000`：长度
+    - `.ANY (+RW +ZI)`：加载所有匹配目标文件的 RW-DATA + ZI-DATA
+
+### 8.4.2 获取域信息
+
+> 手册：Keil - Help- Open Books Window - ARM Linker - 第6.3 Region-related symbols（域内相关符号）
+
+- 加载域信息
+
+  ![](./00_pic/07_代码重定位/p9.png)
+
+  ![](./00_pic/07_代码重定位/p10.png)
+
+- 可执行域信息
+
+  ![](./00_pic/07_代码重定位/p7.png)
+
+  ![](./00_pic/07_代码重定位/p8.png)
+
+- 示例-汇编
+
+  ![](./00_pic/07_代码重定位/p11.png)
+
+  ```assembly
+  IMPORT |Image$$RW_IRAM1$$Base|
+  IMPORT |Image$$RW_IRAM1$$Length|
+  IMPORT |Load$$RW_IRAM1$$Base|
+  
+  LDR R0, = |Image$$RW_IRAM1$$Base|    ; DEST
+  LDR R1, = |Load$$RW_IRAM1$$Base|     ; SORUCE
+  LDR R2, = |Image$$RW_IRAM1$$Length|  ; LENGTH
+  ```
+
+- 示例-C
+
+  ```c
+  // 方法1：声明为外部变量
+  // 注意：使用时需要使用取址符
+  extern int Image$$RW_IRAM1$$Base;
+  extern int Load$$RW_IRAM1$$Base;
+  extern int Image$$RW_IRAM1$$Length;
+  
+  memcpy(&Image$$RW_IRAM1$$Base, &Image$$RW_IRAM1$$Length, &Load$$RW_IRAM1$$Base);
+  
+  // 方法1：声明为外部数组
+  // 注意：使用时不需要使用取址符
+  extern char Image$$RW_IRAM1$$Base[];
+  extern char Load$$RW_IRAM1$$Base[];
+  extern int Image$$RW_IRAM1$$Length;
+  
+  memcpy(Image$$RW_IRAM1$$Base, Image$$RW_IRAM1$$Length, &Load$$RW_IRAM1$$Base);
+  ```
+
+- 测试代码：01_project\05_relocate\01_uart_sct
+
+  ```c
+  void memcpy(void *dest, void *src, unsigned int len)
+  {
+  	unsigned char *pcDest;
+  	unsigned char *pcSrc;
+  	
+  	while (len--)
+  	{
+  		*pcDest = *pcSrc;
+  		pcSrc++;
+  		pcDest++;
+  	}
+  }
+  ```
+
+  ```assembly
+  
+                  PRESERVE8
+                  THUMB
+  
+  
+  ; Vector Table Mapped to Address 0 at Reset
+                  AREA    RESET, DATA, READONLY
+  							EXPORT  __Vectors
+  					
+  __Vectors       DCD     0                  
+                  DCD     Reset_Handler
+  
+  							AREA    |.text|, CODE, READONLY
+  
+  ; Reset handler
+  Reset_Handler   PROC
+  							 EXPORT  Reset_Handler             [WEAK]
+                 	IMPORT  main
+  				
+  				LDR SP, =(0x20000000+0x10000)
+  				
+  				; relocate data section
+  				IMPORT |Image$$RW_IRAM1$$Base|		; Execution address of the region.
+  				IMPORT |Image$$RW_IRAM1$$Length|	; Execution region length in bytes excluding ZI length.
+  				IMPORT |Load$$RW_IRAM1$$Base|		; Load address of the region.
+  				IMPORT memcpy
+  				LDR R0 ,= |Image$$RW_IRAM1$$Base|	; 加载地址
+  				LDR R1 ,= |Load$$RW_IRAM1$$Base|	; 目标地址
+  				LDR R2 ,= |Image$$RW_IRAM1$$Length|	; 加载长度
+  				BL memcpy  ; 自己实现内存复制函数
+  				
+  				BL main
+  
+           			ENDP
+                  
+          			END
+  ```
+
+  对应8.1程序结果：A可正常打印
+
+  ![](./00_pic/07_代码重定位/p12.png) 
+
+
 
 
 

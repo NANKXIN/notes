@@ -1,0 +1,37 @@
+
+                PRESERVE8
+                THUMB
+
+
+; Vector Table Mapped to Address 0 at Reset
+                AREA    RESET, DATA, READONLY
+				EXPORT  __Vectors
+					
+__Vectors       DCD     0                  
+                DCD     Reset_Handler              ; Reset Handler
+
+				AREA    |.text|, CODE, READONLY
+
+; Reset handler
+Reset_Handler   PROC
+				EXPORT  Reset_Handler             [WEAK]
+                IMPORT  main
+				
+				LDR SP, =(0x20000000+0x10000)
+				
+				; relocate data section
+				IMPORT |Image$$RW_IRAM1$$Base|		; Execution address of the region.
+				IMPORT |Image$$RW_IRAM1$$Length|	; Execution region length in bytes excluding ZI length.
+				IMPORT |Load$$RW_IRAM1$$Base|		; Load address of the region.
+				IMPORT memcpy
+				LDR R0 ,= |Image$$RW_IRAM1$$Base|	; 加载地址
+				LDR R1 ,= |Load$$RW_IRAM1$$Base|	; 目标地址
+				LDR R2 ,= |Image$$RW_IRAM1$$Length|	; 加载长度
+				BL memcpy
+				
+				BL main
+
+                ENDP
+                
+                 END
+
