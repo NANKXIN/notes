@@ -1690,7 +1690,7 @@ gcc -c -o c.o c.c -MD -MF c.d
 
 
 2. **谁做重定位：**
-   - 程序本身：将程序从**加载地址**复制到**链接地址**
+   - 程序本身：将程序从**加载地址**复制到**链接地址（基地址）**
    
    - 程序刚开始并不在链接地址上，如何重定位
      - 使用**位置无关码**写
@@ -1705,7 +1705,7 @@ gcc -c -o c.o c.c -MD -MF c.d
 > gcc：链接脚本 - Link Script 描述
 
 > - 加载地址：程序存储地址，ROM上
-> - 链接地址：程序运行地址，RAM上
+> - 链接地址（基地址）：程序运行地址，RAM上
 >   - 使用函数地址，用的是函数的链接地址 - 代码段
 >   - 访问全局变量、静态变量时，用的是变量的链接地址 - 数据段
 
@@ -1714,6 +1714,8 @@ gcc -c -o c.o c.c -MD -MF c.d
 ### 8.4.1 基本语法
 
 > 手册：Keil - Help- Open Books Window - ARM Linker - 第8章 Scatter File Syntax（散列文件语法）
+
+<img src="./00_pic/07_代码重定位/p21.png" style="zoom:80%;" /> 
 
 - 散列文件语法
 
@@ -1768,11 +1770,11 @@ gcc -c -o c.o c.c -MD -MF c.d
   input_symbol_pattern |
   section_properties
   ```
-  
+
 - 分析
-  
+
   ![](./00_pic/07_代码重定位/p13.png)
-  
+
   - `LR_IROM1`：加载域
     - `0x08000000`：加载地址
     - `0x00080000`：长度
@@ -1781,24 +1783,24 @@ gcc -c -o c.o c.c -MD -MF c.d
     - `0x00080000`：长度
     - `*.o (RESET, +First)`：所有 .o 文件内的 RESET 段（start.S-中断向量表）最先加载到本域的起始地址，即 RESET 段的起始的为 0
     - `*(InRoot$$Sections)`：表示将所有用到的库段放到root区，如：\_\_main.o、\_\_scatter*.o、\_\_dc*.o等
-    - `.ANY (+RO)`：加载所有匹配目标文件的 RO-DATA
-    - `.ANY (+XO)`：加载所有匹配目标文件的 XO-DATA（只执行段）
+    - `.ANY (+RO)`：（.ANY表示所有）加载所有匹配目标文件的 RO-DATA
+    - `.ANY (+XO)`：（.ANY表示所有）加载所有匹配目标文件的 XO-DATA（只执行段）
   - `RW_IRAM1`：可执行域2
     - `0x20000000`：加载地址，加载地址 != 链接地址，需要重定位
     - `0x00010000`：长度
-    - `.ANY (+RW +ZI)`：加载所有匹配目标文件的 RW-DATA + ZI-DATA
+    - `.ANY (+RW +ZI)`：（.ANY表示所有）加载所有匹配目标文件的 RW-DATA + ZI-DATA
 
 ### 8.4.2 获取域信息
 
 > 手册：Keil - Help- Open Books Window - ARM Linker - 第6.3 Region-related symbols（域内相关符号）
 
-- 加载域信息
+- 加载域信息（包括 RO/RW/XO/ZI）
 
   ![](./00_pic/07_代码重定位/p9.png)
 
   ![](./00_pic/07_代码重定位/p10.png)
 
-- 可执行域信息
+- 可执行域信息（包括 RO/RW/XO/ZI）
 
   ![](./00_pic/07_代码重定位/p7.png)
 
@@ -1838,13 +1840,31 @@ gcc -c -o c.o c.c -MD -MF c.d
   memcpy(Image$$RW_IRAM1$$Base, Image$$RW_IRAM1$$Length, &Load$$RW_IRAM1$$Base);
   ```
 
-- 测试代码：01_project\05_relocate\01_uart_sct
+## 8.5 重定位数据段
+
+### 8.5.1 重定位 ZW 段（DATA段）
+
+代码目录：`01_project\05_relocate\01_uart_sct`
+
+```assembly
+LR_IROM1 0x08000000 0x00080000  {    ; load region size_region
+  ER_IROM1 0x08000000 0x00080000  {  ; load address = execution address
+   *.o (RESET, +First)
+   *(InRoot$$Sections)
+   .ANY (+RO)
+   .ANY (+XO)
+  }
+  RW_IRAM1 0x20000000 0x00010000  {  ; RW data
+   .ANY (+RW +ZI)
+  }
+}
+```
 
   ```c
   void memcpy(void *dest, void *src, unsigned int len)
   {
-  	unsigned char *pcDest;
-  	unsigned char *pcSrc;
+  	unsigned char *pcDest = dest;
+  	unsigned char *pcSrc = src;
   	
   	while (len--)
   	{
@@ -1874,31 +1894,379 @@ gcc -c -o c.o c.c -MD -MF c.d
   Reset_Handler   PROC
   							 EXPORT  Reset_Handler             [WEAK]
                  	IMPORT  main
+  							 IMPORT |Image$$RW_IRAM1$$Base|		; Execution address of the region.
+  							 IMPORT |Image$$RW_IRAM1$$Length|	; Execution region length in bytes excluding ZI length.
+  							 IMPORT |Load$$RW_IRAM1$$Base|		; Load address of the region.
+  							 IMPORT memcpy
   				
   				LDR SP, =(0x20000000+0x10000)
   				
   				; relocate data section
-  				IMPORT |Image$$RW_IRAM1$$Base|		; Execution address of the region.
-  				IMPORT |Image$$RW_IRAM1$$Length|	; Execution region length in bytes excluding ZI length.
-  				IMPORT |Load$$RW_IRAM1$$Base|		; Load address of the region.
-  				IMPORT memcpy
-  				LDR R0 ,= |Image$$RW_IRAM1$$Base|	; 加载地址
-  				LDR R1 ,= |Load$$RW_IRAM1$$Base|	; 目标地址
-  				LDR R2 ,= |Image$$RW_IRAM1$$Length|	; 加载长度
+  				LDR R0, = |Image$$RW_IRAM1$$Base|	; 链接地址
+  				LDR R1, = |Load$$RW_IRAM1$$Base|	; 加载地址
+  				LDR R2, = |Image$$RW_IRAM1$$Length|	; 链接长度
   				BL memcpy  ; 自己实现内存复制函数
   				
   				BL main
   
-           			ENDP
+           ENDP
                   
-          			END
+           END
   ```
 
   对应8.1程序结果：A可正常打印
 
   ![](./00_pic/07_代码重定位/p12.png) 
 
+### 8.5.2 清除 BSS 段（ZI段）
 
+> BSS段的链接地址、长度见 8.4.1-基本语法
+
+1. \<= 8字节（keil 优化）
+
+   ```c
+   #include "uart.h"
+   #include "string.h"
+   
+   char g_char1 = 'A';
+   const char g_char2 = 'B';
+   int g_A = 0;
+   int g_B;
+   
+   int main()
+   {
+   	char c;
+   	static int s_C = 0;
+   	
+   	uart_init();
+   	
+   	while (1)
+   	{
+   		c = getchar();
+   		putchar(g_char1);
+   		putchar(g_char2);
+   		putchar('\n');
+   		put_s_hex("g_char1 addr = ", &g_char1);
+   		put_s_hex("g_char2 addr = ", &g_char2);
+   		put_s_hex("g_A val = ", g_A);
+   		put_s_hex("g_B val = ", g_B);
+   		put_s_hex("s_C val = ", s_C);
+   	}
+   	
+   	return 0;
+   }
+   ```
+   
+   结果：
+   
+   ![](./00_pic/07_代码重定位/p14.png) 
+   
+   原因：keil 优化，g_A、g_C、s_C 被存在 data 段内
+
+   ![](./00_pic/07_代码重定位/p15.png) 
+
+   ![](./00_pic/07_代码重定位/p16.png) 
+
+2. \> 8 字节（keil 优化）
+
+   ```c
+   #include "uart.h"
+   #include "string.h"
+   
+   char g_char1 = 'A';
+   const char g_char2 = 'B';
+   int g_A[16] = { 0 };
+   int g_B[16];
+   
+   int main()
+   {
+   	char c;
+   	static int s_C[16] = { 0 };
+   	
+   	uart_init();
+   	
+   	while (1)
+   	{
+   		c = getchar();
+   		putchar(g_char1);
+   		putchar(g_char2);
+   		putchar('\n');
+   		put_s_hex("g_char1 addr = ", &g_char1);
+   		put_s_hex("g_char2 addr = ", &g_char2);
+   		put_s_hex("g_A val = ", g_A);
+   		put_s_hex("g_B val = ", g_B);
+   		put_s_hex("s_C val = ", s_C);
+   	}
+   	
+   	return 0;
+   }
+   ```
+
+   结果：
+
+   ![](./00_pic/07_代码重定位/p17.png) 
+
+   ![](./00_pic/07_代码重定位/p18.png) 
+
+   ![](./00_pic/07_代码重定位/p19.png) 
+
+3. 清除 BSS/ZI
+
+   代码目录：`01_project\05_relocate\02_uart_clear_bss`
+
+   ```assembly
+   LR_IROM1 0x08000000 0x00080000  {    ; load region size_region
+     ER_IROM1 0x08000000 0x00080000  {  ; load address = execution address
+      *.o (RESET, +First)
+      *(InRoot$$Sections)
+      .ANY (+RO)
+      .ANY (+XO)
+     }
+     RW_IRAM1 0x20000000 0x00010000  {  ; RW data
+      .ANY (+RW +ZI)
+     }
+   }
+   ```
+
+   ```c
+   void memset(void *dest, unsigned char val, unsigned int len)
+   {
+   	unsigned char *pcDest = dest;
+   	unsigned char *pcSrc;
+   	
+   	while (len--)
+   	{
+   		*pcDest = val;
+   		pcDest++;
+   	}
+   }
+   ```
+
+   ```assembly
+                   PRESERVE8
+                   THUMB
+   
+   
+   ; Vector Table Mapped to Address 0 at Reset
+                   AREA    RESET, DATA, READONLY
+   				EXPORT  __Vectors
+   					
+   __Vectors       DCD     0                  
+                   DCD     Reset_Handler              ; Reset Handler
+   
+   				AREA    |.text|, CODE, READONLY
+   
+   ; Reset handler
+   Reset_Handler   PROC
+   				EXPORT  Reset_Handler             [WEAK]
+                   IMPORT  main
+   				IMPORT |Image$$RW_IRAM1$$Base|		; Execution address of the region.
+   				IMPORT |Image$$RW_IRAM1$$Length|	; Execution region length in bytes excluding ZI length.
+   				IMPORT |Load$$RW_IRAM1$$Base|		; Load address of the region.
+   				IMPORT memcpy
+   				IMPORT |Image$$RW_IRAM1$$ZI$$Base|
+   				IMPORT |Image$$RW_IRAM1$$ZI$$Length|
+   				IMPORT memset
+   				
+   				LDR SP, =(0x20000000+0x10000)
+   				
+   				; relocate data section
+   				LDR R0, = |Image$$RW_IRAM1$$Base|	; 链接地址
+   				LDR R1, = |Load$$RW_IRAM1$$Base|	; 加载地址
+   				LDR R2, = |Image$$RW_IRAM1$$Length|	; 链接长度
+   				BL memcpy
+   				
+   				; clear bss/zi
+   				LDR R0, = |Image$$RW_IRAM1$$ZI$$Base|	; 链接地址
+   				MOV R1, #0								; 清0
+   				LDR R2, = |Image$$RW_IRAM1$$ZI$$Length|	; 链接长度
+   				BL memset
+   				
+   				BL main
+   
+                   ENDP
+                   
+                   END
+   
+   ```
+
+   结果：
+
+   ![](./00_pic/07_代码重定位/p20.png) 
+
+## 8.6 重定位代码段
+
+代码目录：`01_project\05_relocate\03_uart_code`
+
+源代码默认散列文件：
+
+```assembly
+LR_IROM1 0x08000000 0x00080000  {    ; load region size_region
+  ER_IROM1 0x08000000 0x00080000  {  ; load address = execution address
+   *.o (RESET, +First)
+   *(InRoot$$Sections)
+   .ANY (+RO)
+   .ANY (+XO)
+  }
+  RW_IRAM1 0x20000000 0x00010000  {  ; RW data
+   .ANY (+RW +ZI)
+  }
+}
+```
+
+> 可执行域的 加载地址 = 链接地址，无需重定位
+
+修改散列文件
+
+<img src="./00_pic/07_代码重定位/p22.png" style="zoom:80%;" /> 
+
+``` assembly
+LR_IROM1 0x08000000 0x00080000  {    ; load region size_region
+  ER_IROM1 0x20000000 {  ; load address != execution address
+   *.o (RESET, +First)
+   .ANY (+RO)
+   .ANY (+XO)
+  }
+  RW_IRAM1 + 0 {  ; RW data  +0: 地址紧跟上一个可执行域
+   .ANY (+RW +ZI)
+  }
+}
+```
+
+程序从此开始运行：
+
+<img src="./00_pic/07_代码重定位/p23.png" style="zoom:100%;" /> 
+
+反汇编：
+
+<img src="./00_pic/07_代码重定位/p24.png" style="zoom:100%;" />
+
+修改：因为此时 0x20000008 内无代码，需手动定位到 Reset_Handler**（3.3.1 bit0 = 1 为 Thumb 指令集）**
+
+<img src="./00_pic/07_代码重定位/p27.png" style="zoom:100%;" />
+
+<img src="./00_pic/07_代码重定位/p25.png" style="zoom:100%;" />
+
+增加函数操作：
+
+```c
+#include "uart.h"
+#include "string.h"
+
+char g_char1 = 'A';
+const char g_char2 = 'B';
+int g_A[16] = { 0 };
+int g_B[16];
+
+int mymain()
+{
+	char c;
+	static int s_C[16] = { 0 };
+	void (*func)(const char *s, unsigned int val);
+	
+	func = put_s_hex;  // 使用了 put_s_hex 的链接地址
+	uart_init();
+	
+	while (1)
+	{
+		c = getchar();
+		putchar(g_char1);
+		putchar(g_char2);
+		putchar('\n');
+		put_s_hex("g_char1 addr = ", &g_char1);
+		put_s_hex("g_char2 addr = ", &g_char2);
+		put_s_hex("g_A val = ", g_A[0]);
+		put_s_hex("g_B val = ", g_B[0]);
+		put_s_hex("s_C val = ", s_C[0]);
+		putchar('\n');
+		func("Test.", 1);
+	}
+	
+	return 0;
+}
+```
+
+结果：
+<img src="./00_pic/07_代码重定位/p26.png" style="zoom:100%;" />
+
+**原因：此时 put_s_hex 的链接地址内无代码**
+
+<img src="./00_pic/07_代码重定位/p28.png" style="zoom:100%;" /> 
+
+增加代码重定位：
+
+```assembly
+                PRESERVE8
+                THUMB
+
+
+; Vector Table Mapped to Address 0 at Reset
+                AREA    RESET, DATA, READONLY
+				EXPORT  __Vectors
+					
+__Vectors       DCD     0                  
+                DCD     0x08000009	;Reset_Handler	; Reset Handler
+
+				AREA    |.text|, CODE, READONLY
+
+; Reset handler
+Reset_Handler   PROC
+				EXPORT  Reset_Handler             [WEAK]
+                IMPORT  mymain
+				IMPORT memcpy
+				IMPORT memset
+				
+				IMPORT |Image$$ER_IROM1$$Base|
+				IMPORT |Image$$ER_IROM1$$Length|
+				IMPORT |Load$$ER_IROM1$$Base|
+				
+				IMPORT |Image$$RW_IRAM1$$Base|		; Execution address of the region.
+				IMPORT |Image$$RW_IRAM1$$Length|	; Execution region length in bytes excluding ZI length.
+				IMPORT |Load$$RW_IRAM1$$Base|		; Load address of the region.
+				
+				IMPORT |Image$$RW_IRAM1$$ZI$$Base|
+				IMPORT |Image$$RW_IRAM1$$ZI$$Length|
+				
+				LDR SP, =(0x20000000+0x10000)
+				
+				; relocate code section
+				LDR R0, = |Image$$ER_IROM1$$Base|	; 链接地址
+				LDR R1, = |Load$$ER_IROM1$$Base|	; 加载地址
+				LDR R2, = |Image$$ER_IROM1$$Length|	; 链接长度
+				BL memcpy		; 相对跳转
+				
+				; relocate data section
+				LDR R0, = |Image$$RW_IRAM1$$Base|	; 链接地址
+				LDR R1, = |Load$$RW_IRAM1$$Base|	; 加载地址
+				LDR R2, = |Image$$RW_IRAM1$$Length|	; 链接长度
+				BL memcpy		; 相对跳转
+				
+				; clear bss/zi
+				LDR R0, = |Image$$RW_IRAM1$$ZI$$Base|	; 链接地址
+				MOV R1, #0								; 清0
+				LDR R2, = |Image$$RW_IRAM1$$ZI$$Length|	; 链接长度
+				BL memset		; 相对跳转
+				
+				BL mymain		; 相对跳转
+
+                ENDP
+                
+                END
+```
+
+结果：
+
+<img src="./00_pic/07_代码重定位/p29.png" style="zoom:100%;" /> 
+
+**相对跳转的实质：无论在 Flash 上还是 内存 里，都可正常执行**
+
+<img src="./00_pic/07_代码重定位/p30.png" style="zoom:100%;" />
+
+**若绝对跳转：跳转到链接地址** 
+
+> 若一直使用 相对跳转，则程序全程在 Flash 内执行
+
+## 8.7 纯C语言重定位
 
 
 

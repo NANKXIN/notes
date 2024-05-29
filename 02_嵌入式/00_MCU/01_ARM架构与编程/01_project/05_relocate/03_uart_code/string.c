@@ -45,5 +45,15 @@ void memcpy(void *dest, void *src, unsigned int len)
 	}
 }
 
-
+void memset(void *dest, unsigned char val, unsigned int len)
+{
+	unsigned char *pcDest = dest;
+	unsigned char *pcSrc;
+	
+	while (len--)
+	{
+		*pcDest = val;
+		pcDest++;
+	}
+}
 
