@@ -14,6 +14,8 @@
 
 
 
+---
+
 # 二. 启动程序
 
 程序运行栈（程序目录：01_project\01_led_c）：
@@ -45,15 +47,19 @@ END
 
 <img src = ".\00_pic\02_第一个程序（手写start.S）\P1.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
 
+
+
+---
+
 # 三. ARM 架构
 
 ## 3.1 地址空间
 
 1. **X86架构地址：内存和IO分开**
-   * <img src = ".\00_pic\03_ARM架构\P1.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
+   * <img src = ".\00_pic\03_ARM架构\P1.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%">  
 
 2. **ARM架构地址：内存和IO一样**
-   * <img src = ".\00_pic\03_ARM架构\P2.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
+   * <img src = ".\00_pic\03_ARM架构\P2.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%">  
 
 3. **RISC指令（精简指令）**
    * <img src = ".\00_pic\03_ARM架构\P3.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%"> 
@@ -202,7 +208,7 @@ STRGT	R2, [R0]		; 若 R1>R2，执行该指令，将 R2 的数据写入 R0 所指
    * LDRB：将存储器中的 1 字节数据写入到目的寄存器中，同时将寄存器的高 24 位清零
      
    * LDRH：将存储器中的 2 字节数据写入到目的寄存器中，同时将寄存器的高 16 位清零
-   * <img src = ".\00_pic\03_ARM架构\P10.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%"> 
+   * <img src = ".\00_pic\03_ARM架构\P10.png" style = "zoom:100%"> 
 
 
 2. **STR：Store Register，写内存，从源寄存器中将一个32位的数据写入到目的内存中**
@@ -211,17 +217,17 @@ STRGT	R2, [R0]		; 若 R1>R2，执行该指令，将 R2 的数据写入 R0 所指
 
    * STRH：从源寄存器中将 2 字节数据写入到内存中，该半字数据为源寄存器中的低 16 位
    
-   * <img src = ".\00_pic\03_ARM架构\P11.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:110%">  
+   * <img src = ".\00_pic\03_ARM架构\P11.png" style = "zoom:110%">  
 
 3. **LDM：Load Multiple Register，读多个内存**
 
 4. **STM：Store Multiple Register，写多个内存**
 
-   <img src = ".\00_pic\03_ARM架构\P12.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%"> 
+   <img src = ".\00_pic\03_ARM架构\P12.png" style = "zoom:100%"> 
 
    * **reglist：低标号的寄存器对应低地址**
    * IA, IB, DA, DB 的区别
-     * <img src = ".\00_pic\03_ARM架构\P13.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%">  
+     * <img src = ".\00_pic\03_ARM架构\P13.png" style = "zoom:100%">  
    
 
    例1：
@@ -284,7 +290,7 @@ STRGT	R2, [R0]		; 若 R1>R2，执行该指令，将 R2 的数据写入 R0 所指
 
      ![](./00_pic/03_ARM架构/P14.png)  
 
-     <img src = ".\00_pic\03_ARM架构\P15.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:70%"> 
+     <img src = ".\00_pic\03_ARM架构\P15.png" style = "zoom:70%"> 
 
      ``````assembly
      MOV		R1, #1
@@ -304,7 +310,7 @@ STRGT	R2, [R0]		; 若 R1>R2，执行该指令，将 R2 的数据写入 R0 所指
 
 ### 3.6.1 指令详解
 
-<img src = ".\00_pic\03_ARM架构\P16.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%"> 
+<img src = ".\00_pic\03_ARM架构\P16.png" style = "zoom:100%"> 
 
 1. **加法 ADD**
 
@@ -355,14 +361,14 @@ STRGT	R2, [R0]		; 若 R1>R2，执行该指令，将 R2 的数据写入 R0 所指
 
 ### 3.6.2 程序状态寄存器 和 指令 condition
 
-   * <img src = ".\00_pic\03_ARM架构\P17.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%"> 
-   * <img src = ".\00_pic\03_ARM架构\P18.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:150%"> 
+   * <img src = ".\00_pic\03_ARM架构\P17.png" style = "zoom:100%"> 
+   * <img src = ".\00_pic\03_ARM架构\P18.png" style = "zoom:150%"> 
 
    * 例：
 
-   <img src = ".\00_pic\03_ARM架构\P19.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:60%"> 
+   <img src = ".\00_pic\03_ARM架构\P19.png" style = "zoom:60%"> 
 
-   <img src = ".\00_pic\03_ARM架构\P20.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:60%"> 
+   <img src = ".\00_pic\03_ARM架构\P20.png" style = "zoom:60%"> 
 
 > R0 和 R1 相等，Z 和 C 位置 1，则可使用 EQ (Z=1) 条件将 2 写入 R0
 
@@ -380,53 +386,55 @@ STRGT	R2, [R0]		; 若 R1>R2，执行该指令，将 R2 的数据写入 R0 所指
 
 4. **BLX：Branch with Link and eXchange，根据跳转地址的 BIT0 切换为 ARM 或 Thumb 状态（0：ARM状态，1：Thumb状态）**
 
-   <img src = ".\00_pic\03_ARM架构\P21.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
+   <img src = ".\00_pic\03_ARM架构\P21.png" style = "zoom:80%"> 
 
 例1：
 
-* <img src = ".\00_pic\03_ARM架构\P31.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%"> 
+* <img src = ".\00_pic\03_ARM架构\P31.png" style = "zoom:100%"> 
 
 * **注意：BEN Loop，状态寄存器 Z 位为 0 时执行，为 1 时跳过**
 
-  * <img src = ".\00_pic\03_ARM架构\P22.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
+  * <img src = ".\00_pic\03_ARM架构\P22.png" style = "zoom:80%"> 
 
-  * <img src = ".\00_pic\03_ARM架构\P23.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
+  * <img src = ".\00_pic\03_ARM架构\P23.png" style = "zoom:80%"> 
 
-  * <img src = ".\00_pic\03_ARM架构\P24.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
+  * <img src = ".\00_pic\03_ARM架构\P24.png" style = "zoom:80%"> 
 
-  * <img src = ".\00_pic\03_ARM架构\P25.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
+  * <img src = ".\00_pic\03_ARM架构\P25.png" style = "zoom:80%"> 
 
-  * <img src = ".\00_pic\03_ARM架构\P26.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
+  * <img src = ".\00_pic\03_ARM架构\P26.png" style = "zoom:80%"> 
 
-  * <img src = ".\00_pic\03_ARM架构\P27.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
+  * <img src = ".\00_pic\03_ARM架构\P27.png" style = "zoom:80%"> 
 
-  * <img src = ".\00_pic\03_ARM架构\P28.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
+  * <img src = ".\00_pic\03_ARM架构\P28.png" style = "zoom:80%"> 
 
-  * <img src = ".\00_pic\03_ARM架构\P29.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
+  * <img src = ".\00_pic\03_ARM架构\P29.png" style = "zoom:80%"> 
 
   * LR 的值为 0，返回第一条指令
 
-  * <img src = ".\00_pic\03_ARM架构\P30.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
+  * <img src = ".\00_pic\03_ARM架构\P30.png" style = "zoom:80%"> 
 
 例2：
 
 * **执行完 BL 后，LR 寄存器值为 0x04，也就是下一条指令的地址，即返回地址**
 
-* <img src = ".\00_pic\03_ARM架构\P32.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
+* <img src = ".\00_pic\03_ARM架构\P32.png" style = "zoom:80%"> 
 
-* <img src = ".\00_pic\03_ARM架构\P33.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
+* <img src = ".\00_pic\03_ARM架构\P33.png" style = "zoom:80%"> 
 
 例3：
 
 * **直接设置 LR（返回指令地址） 和 PC（下一条指令地址）**
 
-* <img src = ".\00_pic\03_ARM架构\P34.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
+* <img src = ".\00_pic\03_ARM架构\P34.png" style = "zoom:80%"> 
 
-* <img src = ".\00_pic\03_ARM架构\P35.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
+* <img src = ".\00_pic\03_ARM架构\P35.png" style = "zoom:80%"> 
 
-* <img src = ".\00_pic\03_ARM架构\P36.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:80%"> 
+* <img src = ".\00_pic\03_ARM架构\P36.png" style = "zoom:80%"> 
 
 
+
+---
 
 # 四. 启动程序深度解析
 
@@ -446,13 +454,13 @@ STRGT	R2, [R0]		; 若 R1>R2，执行该指令，将 R2 的数据写入 R0 所指
 >
 > `fromelf  --text  -a -c  --output=led.dis  Objects\led_c.axf`
 
-<img src = ".\00_pic\04_第一个程序深度解析\P1.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%">
+<img src = ".\00_pic\04_第一个程序深度解析\P1.png" style = "zoom:100%">
 
 伪指令转换为真实指令：
 
-- <img src = ".\00_pic\04_第一个程序深度解析\P2.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%">
+- <img src = ".\00_pic\04_第一个程序深度解析\P2.png" style = "zoom:100%">  
 
-- <img src = ".\00_pic\04_第一个程序深度解析\P3.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%">
+- <img src = ".\00_pic\04_第一个程序深度解析\P3.png" style = "zoom:100%">  
 - Cortex A7：==PC = CUR ADDR + 8==；ARM 指令
 - Cortex M3/M4：==PC = CUR ADDR + 4==，Thumb 指令（不管 16 位还是 32 位）
 - 处理器指令处理：执行当前指令，处理下一条，读取下下条
@@ -467,7 +475,7 @@ ATPCS规则（ARM-Thumnb过程调用标准）：
 
 2. R4-R11（V1-V8）：函数可能被使用，所以在函数的入口保存它们，在函数的出口恢复它们
 
-   <img src = ".\00_pic\04_第一个程序深度解析\P4.png" style = "box-shadow: 0px 0px 3px 1px #888888; zoom:100%">
+   <img src = ".\00_pic\04_第一个程序深度解析\P4.png" style = "zoom:100%"> 
 
 ### 4.3.2 反汇编代码解析
 
@@ -654,30 +662,28 @@ delay
 C语言代码：
 
 ```assembly
-                PRESERVE8
-                THUMB
-                AREA    RESET, DATA, READONLY
-							; 前三行为语法规定
+PRESERVE8
+THUMB
+AREA    RESET, DATA, READONLY
+; 前三行为语法规定
 				
-							EXPORT  __Vectors
+EXPORT  __Vectors
 __Vectors       DCD     0
-                DCD     Reset_Handler              ; Reset Handler
+DCD     Reset_Handler              ; Reset Handler
 				
-                AREA    |.text|, CODE, READONLY
+AREA    |.text|, CODE, READONLY
 
 ; Reset handler
 Reset_Handler   PROC
-				EXPORT  Reset_Handler             [WEAK]
-         IMPORT  mymain					; 调用外部函数 main
+EXPORT  Reset_Handler             [WEAK]
+IMPORT  mymain					; 调用外部函数 main
 				
-				LDR SP,= (0x20000000+0x10000)  	; 设置栈
-				BL mymain							; 跳转到 main
+LDR SP,= (0x20000000+0x10000)  	; 设置栈
+BL mymain							; 跳转到 main
 				
-         ENDP
+ENDP
 
-				END
-					 
-
+END
 ```
 
 
@@ -725,71 +731,72 @@ int mymain()
 纯汇编：
 
 ```assembly
-                PRESERVE8
-                THUMB
-                AREA    RESET, DATA, READONLY
-							; 前三行为语法规定
+PRESERVE8
+THUMB
+AREA    RESET, DATA, READONLY
+; 前三行为语法规定
 				
-							EXPORT  __Vectors
+EXPORT  __Vectors
 __Vectors       DCD     0
-                DCD     Reset_Handler              ; Reset Handler
+DCD     Reset_Handler              ; Reset Handler
 				
-                AREA    |.text|, CODE, READONLY
+AREA    |.text|, CODE, READONLY
 
 Reset_Handler   PROC  ; 子程序开始
-							EXPORT  Reset_Handler             [WEAK]			
+EXPORT  Reset_Handler             [WEAK]			
 							
-							; enable GPIOB
-							; pReg = (unsigned int *)(0x40021000U + 0x18U);
-							; *pReg |= (1UL << 3U);
-							LDR R0, = (0x40021000 + 0x18)
-							LDR R1, [R0]
-							ORR R1, R1, #(1<<3)
-							STR R1, [R0]
+; enable GPIOB
+; pReg = (unsigned int *)(0x40021000U + 0x18U);
+; *pReg |= (1UL << 3U);
+LDR R0, = (0x40021000 + 0x18)
+LDR R1, [R0]
+ORR R1, R1, #(1<<3)
+STR R1, [R0]
 				
-							; set GPIOB0 as output
-							; pReg = (unsigned int *)(0x40010C00U + 0x00U);
-							; *pReg |= (1UL << 0U);
-							LDR R0, = (0x40010C00 + 0x00)
-							LDR R1, [R0]
-							ORR R1, R1, #(1<<0)
-							STR R1, [R0]
+; set GPIOB0 as output
+; pReg = (unsigned int *)(0x40010C00U + 0x00U);
+; *pReg |= (1UL << 0U);
+LDR R0, = (0x40010C00 + 0x00)
+LDR R1, [R0]
+ORR R1, R1, #(1<<0)
+STR R1, [R0]
 				
-							LDR R2, = (0x40010C00 + 0x0C) ; 防止被 delay 函数内的 R0 覆盖
-		Loop
-							; set GPIOB0 output high
-							; *pReg |= (1UL << 0U);
-							LDR R1, [R2]
-							ORR R1, R1, #(1<<0)
-							STR R1, [R2]
+LDR R2, = (0x40010C00 + 0x0C) ; 防止被 delay 函数内的 R0 覆盖
+Loop
+; set GPIOB0 output high
+; *pReg |= (1UL << 0U);
+LDR R1, [R2]
+ORR R1, R1, #(1<<0)
+STR R1, [R2]
 				
-							; delay
-							LDR R0, = 10000
-							BL delay
+; delay
+LDR R0, = 10000
+BL delay
 				
-							; set GPIOB0 output low
-							LDR R1, [R2]
-							BIC R1, R1, #(1<<0)
-							STR R1, [R2]
+; set GPIOB0 output low
+LDR R1, [R2]
+BIC R1, R1, #(1<<0)
+STR R1, [R2]
 				
-							; delay
-							LDR R0, = 10000
-							BL delay
+; delay
+LDR R0, = 10000
+BL delay
 				
-							B Loop
+B Loop
 				
-							ENDP  ; 结束子程序
+ENDP  ; 结束子程序
 
 delay
-							SUBS R0, R0, #1		; R0--
-							BNE delay			; 不为0
-							MOV PC, LR
+SUBS R0, R0, #1		 ; R0--
+BNE delay					; 不为0
+MOV PC, LR
 
-							END
-					 
-
+END
 ```
 
+
+
+---
 
 # 五. 使用按键控制LED
 
@@ -840,9 +847,11 @@ int mymain()
 
 
 
+---
+
 # 六. 串口编程
 
-
+---
 
 # 七. keil_gcc_Makefile
 
@@ -878,8 +887,8 @@ gcc hello.c                   // 输出一个名为a.out的可执行程序，然
 gcc -o hello hello.c          // 输出名为hello的可执行程序，然后可以执行./hello
 gcc -o hello hello.c -static  // 静态链接
 
-gcc -c -o hello.o hello.c  // 先编译(不链接)
-gcc -o hello hello.o       // 再链接
+gcc -c -o hello.o hello.c     // 先编译(不链接)
+gcc -o hello hello.o          // 再链接
 ``````
 
 ### 7.3.2 常用选项
@@ -1643,7 +1652,10 @@ gcc -c -o c.o c.c -MD -MF c.d
 
    ![](./00_pic/06_keil_gcc_makefile/p27.png)
 
-   
+
+
+
+---
 
 # 八. 代码重定位
 
@@ -1876,42 +1888,41 @@ LR_IROM1 0x08000000 0x00080000  {    ; load region size_region
   ```
 
   ```assembly
-  
-                  PRESERVE8
-                  THUMB
+  PRESERVE8
+  THUMB
   
   
   ; Vector Table Mapped to Address 0 at Reset
-                  AREA    RESET, DATA, READONLY
-  							EXPORT  __Vectors
+  AREA    RESET, DATA, READONLY
+  EXPORT  __Vectors
   					
   __Vectors       DCD     0                  
-                  DCD     Reset_Handler
+  DCD     Reset_Handler
   
-  							AREA    |.text|, CODE, READONLY
+  AREA    |.text|, CODE, READONLY
   
   ; Reset handler
   Reset_Handler   PROC
-  							 EXPORT  Reset_Handler             [WEAK]
-                 	IMPORT  main
-  							 IMPORT |Image$$RW_IRAM1$$Base|		; Execution address of the region.
-  							 IMPORT |Image$$RW_IRAM1$$Length|	; Execution region length in bytes excluding ZI length.
-  							 IMPORT |Load$$RW_IRAM1$$Base|		; Load address of the region.
-  							 IMPORT memcpy
+  EXPORT  Reset_Handler             [WEAK]
+  IMPORT  main
+  IMPORT |Image$$RW_IRAM1$$Base|		; Execution address of the region.
+  IMPORT |Image$$RW_IRAM1$$Length|	; Execution region length in bytes excluding ZI length.
+  IMPORT |Load$$RW_IRAM1$$Base|		  ; Load address of the region.
+  IMPORT memcpy
   				
-  				LDR SP, =(0x20000000+0x10000)
+  LDR SP, =(0x20000000+0x10000)
   				
-  				; relocate data section
-  				LDR R0, = |Image$$RW_IRAM1$$Base|	; 链接地址
-  				LDR R1, = |Load$$RW_IRAM1$$Base|	; 加载地址
-  				LDR R2, = |Image$$RW_IRAM1$$Length|	; 链接长度
-  				BL memcpy  ; 自己实现内存复制函数
+  ; relocate data section
+  LDR R0, = |Image$$RW_IRAM1$$Base|	  ; 链接地址
+  LDR R1, = |Load$$RW_IRAM1$$Base|	  ; 加载地址
+  LDR R2, = |Image$$RW_IRAM1$$Length|	; 链接长度
+  BL memcpy  												; 自己实现内存复制函数
   				
-  				BL main
+  BL main
   
-           ENDP
+  ENDP
                   
-           END
+  END
   ```
 
   对应8.1程序结果：A可正常打印
@@ -2043,53 +2054,51 @@ LR_IROM1 0x08000000 0x00080000  {    ; load region size_region
    ```
 
    ```assembly
-                   PRESERVE8
-                   THUMB
-   
+   PRESERVE8
+   THUMB
    
    ; Vector Table Mapped to Address 0 at Reset
-                   AREA    RESET, DATA, READONLY
-   				EXPORT  __Vectors
+   AREA    RESET, DATA, READONLY
+   EXPORT  __Vectors
    					
    __Vectors       DCD     0                  
-                   DCD     Reset_Handler              ; Reset Handler
+   DCD     Reset_Handler              ; Reset Handler
    
-   				AREA    |.text|, CODE, READONLY
+   AREA    |.text|, CODE, READONLY
    
    ; Reset handler
    Reset_Handler   PROC
-   				EXPORT  Reset_Handler             [WEAK]
-                   IMPORT  main
-   				IMPORT |Image$$RW_IRAM1$$Base|		; Execution address of the region.
-   				IMPORT |Image$$RW_IRAM1$$Length|	; Execution region length in bytes excluding ZI length.
-   				IMPORT |Load$$RW_IRAM1$$Base|		; Load address of the region.
-   				IMPORT memcpy
-   				IMPORT |Image$$RW_IRAM1$$ZI$$Base|
-   				IMPORT |Image$$RW_IRAM1$$ZI$$Length|
-   				IMPORT memset
+   EXPORT  Reset_Handler             [WEAK]
+   IMPORT  main
+   IMPORT |Image$$RW_IRAM1$$Base|		; Execution address of the region.
+   IMPORT |Image$$RW_IRAM1$$Length|	; Execution region length in bytes excluding ZI length.
+   IMPORT |Load$$RW_IRAM1$$Base|		  ; Load address of the region.
+   IMPORT memcpy
+   IMPORT |Image$$RW_IRAM1$$ZI$$Base|
+   IMPORT |Image$$RW_IRAM1$$ZI$$Length|
+   IMPORT memset
    				
-   				LDR SP, =(0x20000000+0x10000)
+   LDR SP, =(0x20000000+0x10000)
    				
-   				; relocate data section
-   				LDR R0, = |Image$$RW_IRAM1$$Base|	; 链接地址
-   				LDR R1, = |Load$$RW_IRAM1$$Base|	; 加载地址
-   				LDR R2, = |Image$$RW_IRAM1$$Length|	; 链接长度
-   				BL memcpy
+   ; relocate data section
+   LDR R0, = |Image$$RW_IRAM1$$Base|	  ; 链接地址
+   LDR R1, = |Load$$RW_IRAM1$$Base|	  ; 加载地址
+   LDR R2, = |Image$$RW_IRAM1$$Length|	; 链接长度
+   BL memcpy
    				
-   				; clear bss/zi
-   				LDR R0, = |Image$$RW_IRAM1$$ZI$$Base|	; 链接地址
-   				MOV R1, #0								; 清0
-   				LDR R2, = |Image$$RW_IRAM1$$ZI$$Length|	; 链接长度
-   				BL memset
+   ; clear bss/zi
+   LDR R0, = |Image$$RW_IRAM1$$ZI$$Base|	  ; 链接地址
+   MOV R1, #0													  ; 清0
+   LDR R2, = |Image$$RW_IRAM1$$ZI$$Length|	; 链接长度
+   BL memset
    				
-   				BL main
+   BL main
    
-                   ENDP
+   ENDP
                    
-                   END
-   
+   END
    ```
-
+   
    结果：
 
    ![](./00_pic/07_代码重定位/p20.png) 
@@ -2143,7 +2152,7 @@ LR_IROM1 0x08000000 0x00080000  {    ; load region size_region
 
 修改：因为此时 0x20000008 内无代码，需手动定位到 Reset_Handler**（3.3.1 bit0 = 1 为 Thumb 指令集）**
 
-<img src="./00_pic/07_代码重定位/p27.png" style="zoom:100%;" />
+<img src="./00_pic/07_代码重定位/p27.png" style="zoom:80%;" />
 
 <img src="./00_pic/07_代码重定位/p25.png" style="zoom:100%;" />
 
@@ -2191,67 +2200,66 @@ int mymain()
 
 **原因：此时 put_s_hex 的链接地址内无代码**
 
-<img src="./00_pic/07_代码重定位/p28.png" style="zoom:100%;" /> 
+<img src="./00_pic/07_代码重定位/p28.png" style="zoom:80%;" /> 
 
 增加代码重定位：
 
 ```assembly
-                PRESERVE8
-                THUMB
-
+PRESERVE8
+THUMB
 
 ; Vector Table Mapped to Address 0 at Reset
-                AREA    RESET, DATA, READONLY
-				EXPORT  __Vectors
+AREA    RESET, DATA, READONLY
+EXPORT  __Vectors
 					
 __Vectors       DCD     0                  
-                DCD     0x08000009	;Reset_Handler	; Reset Handler
+DCD     0x08000009	;Reset_Handler	; Reset Handler
 
-				AREA    |.text|, CODE, READONLY
+AREA    |.text|, CODE, READONLY
 
 ; Reset handler
 Reset_Handler   PROC
-				EXPORT  Reset_Handler             [WEAK]
-                IMPORT  mymain
-				IMPORT memcpy
-				IMPORT memset
+EXPORT  Reset_Handler             [WEAK]
+IMPORT  mymain
+IMPORT memcpy
+IMPORT memset
 				
-				IMPORT |Image$$ER_IROM1$$Base|
-				IMPORT |Image$$ER_IROM1$$Length|
-				IMPORT |Load$$ER_IROM1$$Base|
+IMPORT |Image$$ER_IROM1$$Base|
+IMPORT |Image$$ER_IROM1$$Length|
+IMPORT |Load$$ER_IROM1$$Base|
 				
-				IMPORT |Image$$RW_IRAM1$$Base|		; Execution address of the region.
-				IMPORT |Image$$RW_IRAM1$$Length|	; Execution region length in bytes excluding ZI length.
-				IMPORT |Load$$RW_IRAM1$$Base|		; Load address of the region.
+IMPORT |Image$$RW_IRAM1$$Base|		; Execution address of the region.
+IMPORT |Image$$RW_IRAM1$$Length|	; Execution region length in bytes excluding ZI length.
+IMPORT |Load$$RW_IRAM1$$Base|		  ; Load address of the region.
 				
-				IMPORT |Image$$RW_IRAM1$$ZI$$Base|
-				IMPORT |Image$$RW_IRAM1$$ZI$$Length|
+IMPORT |Image$$RW_IRAM1$$ZI$$Base|
+IMPORT |Image$$RW_IRAM1$$ZI$$Length|
 				
-				LDR SP, =(0x20000000+0x10000)
+LDR SP, =(0x20000000+0x10000)
 				
-				; relocate code section
-				LDR R0, = |Image$$ER_IROM1$$Base|	; 链接地址
-				LDR R1, = |Load$$ER_IROM1$$Base|	; 加载地址
-				LDR R2, = |Image$$ER_IROM1$$Length|	; 链接长度
-				BL memcpy		; 相对跳转
+; relocate code section
+LDR R0, = |Image$$ER_IROM1$$Base|	  ; 链接地址
+LDR R1, = |Load$$ER_IROM1$$Base|	  ; 加载地址
+LDR R2, = |Image$$ER_IROM1$$Length|	; 链接长度
+BL memcpy													; 相对跳转
 				
-				; relocate data section
-				LDR R0, = |Image$$RW_IRAM1$$Base|	; 链接地址
-				LDR R1, = |Load$$RW_IRAM1$$Base|	; 加载地址
-				LDR R2, = |Image$$RW_IRAM1$$Length|	; 链接长度
-				BL memcpy		; 相对跳转
+; relocate data section
+LDR R0, = |Image$$RW_IRAM1$$Base|		; 链接地址
+LDR R1, = |Load$$RW_IRAM1$$Base|		; 加载地址
+LDR R2, = |Image$$RW_IRAM1$$Length|	; 链接长度
+BL memcpy													; 相对跳转
 				
-				; clear bss/zi
-				LDR R0, = |Image$$RW_IRAM1$$ZI$$Base|	; 链接地址
-				MOV R1, #0								; 清0
-				LDR R2, = |Image$$RW_IRAM1$$ZI$$Length|	; 链接长度
-				BL memset		; 相对跳转
+; clear bss/zi
+LDR R0, = |Image$$RW_IRAM1$$ZI$$Base|		; 链接地址
+MOV R1, #0														; 清0
+LDR R2, = |Image$$RW_IRAM1$$ZI$$Length|	 ; 链接长度
+BL memset															; 相对跳转
 				
-				BL mymain		; 相对跳转
+BL mymain															; 相对跳转
 
-                ENDP
+ENDP
                 
-                END
+END
 ```
 
 结果：
@@ -2268,9 +2276,163 @@ Reset_Handler   PROC
 
 ## 8.7 纯C语言重定位
 
+代码目录：`01_project\05_relocate\03_uart_code`
 
+1. 方法1
+
+   ```c
+   void SystemInit(void)
+   {
+   	extern int Image$$ER_IROM1$$Base;
+   	extern int Image$$ER_IROM1$$Length;
+   	extern int Load$$ER_IROM1$$Base;
+   					
+   	extern int Image$$RW_IRAM1$$Base;
+   	extern int Image$$RW_IRAM1$$Length;
+   	extern int Load$$RW_IRAM1$$Base;
+   					
+   	extern int Image$$RW_IRAM1$$ZI$$Base;
+   	extern int Image$$RW_IRAM1$$ZI$$Length;
+   	
+   	// 代码重定位
+   	memcpy(&Image$$ER_IROM1$$Base, &Load$$ER_IROM1$$Base, &Image$$ER_IROM1$$Length);
+   	// 数据段重定位
+   	memcpy(&Image$$RW_IRAM1$$Base, &Load$$RW_IRAM1$$Base, &Image$$RW_IRAM1$$Length);
+   	// 清除BSS段
+   	memset(&Image$$RW_IRAM1$$ZI$$Base, 0, &Image$$RW_IRAM1$$ZI$$Length);
+   }
+   ```
+
+   ```assembly
+   PRESERVE8
+   THUMB
+   
+   ; Vector Table Mapped to Address 0 at Reset
+   AREA    RESET, DATA, READONLY
+   EXPORT  __Vectors
+   					
+   __Vectors       DCD     0                  
+   DCD     0x08000009	;Reset_Handler	; Reset Handler
+   
+   AREA    |.text|, CODE, READONLY
+   
+   ; Reset handler
+   Reset_Handler   PROC
+   EXPORT  Reset_Handler             [WEAK]
+   IMPORT  mymain
+   IMPORT  SystemInit
+   				
+   LDR SP, =(0x20000000+0x10000)
+   				
+   BL SystemInit
+   BL mymain
+   
+   ENDP
+                   
+   END
+   ```
+
+2. 方法2
+
+   ```c
+   void SystemInit(void)
+   {
+   	extern char Image$$ER_IROM1$$Base[];
+   	extern char Image$$ER_IROM1$$Length[];
+   	extern char Load$$ER_IROM1$$Base[];
+   					
+   	extern char Image$$RW_IRAM1$$Base[];
+   	extern char Image$$RW_IRAM1$$Length[];
+   	extern char Load$$RW_IRAM1$$Base[];
+   					
+   	extern char Image$$RW_IRAM1$$ZI$$Base[];
+   	extern char Image$$RW_IRAM1$$ZI$$Length[];
+   	
+   	// 代码重定位
+   	memcpy(Image$$ER_IROM1$$Base, Load$$ER_IROM1$$Base, Image$$ER_IROM1$$Length);
+   	// 数据段重定位
+   	memcpy(Image$$RW_IRAM1$$Base, Load$$RW_IRAM1$$Base, Image$$RW_IRAM1$$Length);
+   	// 清除BSS段
+   	memset(Image$$RW_IRAM1$$ZI$$Base, 0, Image$$RW_IRAM1$$ZI$$Length);
+   }
+   ```
+
+   汇编同上
+
+原理：
+
+对于这样的C变量：
+
+```c
+int g_a;
+```
+
+编译的时候会有一个符号表（symbol table），如下：
+
+| Name | Address  |
+| ---- | -------- |
+| g_a  | xxxxxxxx |
+
+对于散列文件中的各类 Symbol，有2种声明方式：
+
+```c
+extern int Image$$ER_IROM1$$Base;     // 声明为一般变量
+extern char Image$$ER_IROM1$$Base[];  // 声明为数组
+```
+
+不管是哪种方式，它们都会保存在符号表里，比如：
+
+| Name                  | Address  |
+| --------------------- | -------- |
+| g_a                   | xxxxxxxx |
+| Image$$ER_IROM1$$Base | yyyyyyyy |
+
+* 对于`int g_a`变量
+  * 使用`&g_a`得到符号表里的地址。
+* 对于`extern int Image$$ER_IROM1$$Base`变量
+  * 要得到符号表中的地址，也是使用`&Image$$ER_IROM1$$Base`。
+* 对于`extern char Image$$ER_IROM1$$Base[]`变量
+  * 要得到符号表中的地址，直接使用`Image$$ER_IROM1$$Base`
+
+
+
+---
 
 # 九. 异常和中断
 
+## 9.1 异常与中断的概念
 
+![](./00_pic/08_异常与中断/p1.png)
+
+异常处理过程：
+
+1. 保存现场
+2. 处理异常
+3. 恢复现场
+
+> - 中断属于一种异常
+>
+> - 现场为各类寄存器
+
+ARM对中断的使用过程：
+
+1. 初始化
+   1. 设置中断源：允许产生中断
+   2. 设置中断控制器：屏蔽、优先级等
+   3. 设置CPU总开关：使能中断
+2. 执行程序
+3. 产生中断：某个动作 -> 中断控制器 -> CPU
+4. CPU每执行完一条指令，都会检查有无异常/中断产生
+5. 有异常/中断产生处理，开始处理
+   1. 对于不同的异常/中断，跳去不同的地址执行程序
+   2. 不同ARM架构的芯片，处理方式不一样
+
+> * 保存/恢复现场：
+>   * cortex M3/M4 硬件实现
+>   * cortex A7 软件实现的
+> * CPU中止当前执行，跳转去执行处理异常的代码：
+>   * cortex M3/M4 在向量表上放置函数地址
+>   * cortex A7 在向量表上放置跳转指令
+
+## 9.2 ARM 架构中异常与中断的处理
 

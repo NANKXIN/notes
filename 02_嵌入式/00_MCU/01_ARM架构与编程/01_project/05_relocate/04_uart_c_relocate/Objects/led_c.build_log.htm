@@ -1,0 +1,67 @@
+<html>
+<body>
+<pre>
+<h1>礦ision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: μVision V5.32.0.0
+Copyright (C) 2020 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: 112 21, asd, LIC=WHYH9-4H72M-QD1KD-8HYGQ-AINF8-Y35F0
+ 
+Tool Versions:
+Toolchain:       MDK-ARM Plus  Version: 5.32.0.0
+Toolchain Path:  D:\SoftWare\Keil\MDK\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.06 update 7 (build 960)
+Assembler:       Armasm.exe V5.06 update 7 (build 960)
+Linker/Locator:  ArmLink.exe V5.06 update 7 (build 960)
+Library Manager: ArmAr.exe V5.06 update 7 (build 960)
+Hex Converter:   FromElf.exe V5.06 update 7 (build 960)
+CPU DLL:         SARMCM3.DLL V5.32.0.0
+Dialog DLL:      DCM.DLL V1.17.3.0
+Target DLL:      Segger\JL2CM3.dll V2.99.38.0
+Dialog DLL:      TCM.DLL V1.46.0.0
+ 
+<h2>Project:</h2>
+E:\Workspace\notes\02_嵌入式\00_MCU\01_ARM架构与编程\01_project\05_relocate\04_uart_c_relocate\led_c.uvprojx
+Project File Date:  05/29/2024
+
+<h2>Output:</h2>
+*** Using Compiler 'V5.06 update 7 (build 960)', folder: 'D:\SoftWare\Keil\MDK\ARM\ARMCC\Bin'
+Build target 'led_c'
+compiling main.c...
+main.c(30): warning:  #223-D: function "memcpy" declared implicitly
+  	memcpy(&Image$$ER_IROM1$$Base, &Load$$ER_IROM1$$Base, &Image$$ER_IROM1$$Length);
+main.c(34): warning:  #223-D: function "memset" declared implicitly
+  	memset(&Image$$RW_IRAM1$$ZI$$Base, 0, &Image$$RW_IRAM1$$ZI$$Length);
+main.c(53): warning:  #167-D: argument of type "char *" is incompatible with parameter of type "unsigned int"
+  		put_s_hex("g_char1 addr = ", &g_char1);
+main.c(54): warning:  #167-D: argument of type "const char *" is incompatible with parameter of type "unsigned int"
+  		put_s_hex("g_char2 addr = ", &g_char2);
+main.c(62): warning:  #111-D: statement is unreachable
+  	return 0;
+main.c(40): warning:  #550-D: variable "c"  was set but never used
+  	char c;
+main.c: 6 warnings, 0 errors
+linking...
+.\Objects\led_c.axf: Warning: L6305W: Image does not have an entry point. (Not specified or not set due to multiple choices.)
+Program Size: Code=772 RO-data=12 RW-data=4 ZI-data=192  
+Finished: 0 information, 1 warning and 0 error messages.
+FromELF: creating hex file...
+After Build - User command #1: fromelf  --bin  --output=led.bin  Objects\led_c.axf
+After Build - User command #2: fromelf  --text  -a -c  --output=led.dis  Objects\led_c.axf
+".\Objects\led_c.axf" - 0 Error(s), 7 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: Keil
+                http://www.keil.com/pack/Keil.STM32F1xx_DFP.2.3.0.pack
+                Keil.STM32F1xx_DFP.2.3.0
+                STMicroelectronics STM32F1 Series Device Support, Drivers and Examples
+
+<h2>Collection of Component include folders:</h2>
+  D:\SoftWare\Keil\PACKS\Keil\STM32F1xx_DFP\2.3.0\Device\Include
+
+<h2>Collection of Component Files used:</h2>
+Build Time Elapsed:  00:00:01
+</pre>
+</body>
+</html>
