@@ -2409,6 +2409,8 @@ extern char Image$$ER_IROM1$$Base[];  // 声明为数组
 
 # 九. 异常和中断
 
+> 参考：ARM Cortex-M3与Cortex-M4权威指南.pdf、DDI0403E_B_armv7m_arm.pdf、PM0056.pdf
+
 ## 9.1 异常与中断的概念
 
 ![](./00_pic/08_异常与中断/p1.png)
@@ -2493,15 +2495,15 @@ ARM对中断的使用过程：
 
 - 寄存器如何保存
 
-  - 调用者保存的寄存器：R0~R3、R12、LR、PSR
+  - **调用者**保存的寄存器：**R0~R3、R12、LR、PC(返回地址)、PSR**
     - 调用函数前保存
     - 执行完函数后恢复
 
-  - 被调用者保存的寄存器：R4~R11
+  - **被调用者**保存的寄存器：**R4~R11**
     - 函数入口保存
     - 函数返回前恢复
 
-- 硬件保存现场：
+- 硬件保存现场(调用者)：
 
   - ![](./00_pic/08_异常与中断/p8.png) 
 
@@ -2539,3 +2541,600 @@ ARM对中断的使用过程：
       - SP_process：部分 RTOS 在运行用户程序时使用
 
 - Cortex - A7：先不学
+
+## 9.4 实战
+
+> 参考：
+>
+> - ARM Cortex-M3与Cortex-M4权威指南.pdf - 第7、12章
+>
+> - PM0056 - 4.4
+
+![](./00_pic/08_异常与中断/p11.png)
+
+![](./00_pic/08_异常与中断/p12.png)
+
+![](./00_pic/08_异常与中断/p13.png)
+
+![](./00_pic/08_异常与中断/p14.png)
+
+- SCB 基地址：
+
+  ![](./00_pic/08_异常与中断/p15.png)
+
+- SCB_SHCSR 寄存器
+
+  ![](./00_pic/08_异常与中断/p16.png)
+
+- SCB_CFSR 寄存器
+
+  ![](./00_pic/08_异常与中断/p17.png)
+
+  **若产生未定义指令错误，PC 指向未定义的指令，重复执行，则无法跳出异常函数**![](./00_pic/08_异常与中断/p18.png)
+
+  保存的现场：==sp[6] 为返回地址==![](./00_pic/08_异常与中断/p8.png)
+
+### 9.4.1 未定义指令异常
+
+代码目录：`01_project\06_exception_irq\00_undefined`
+
+```assembly
+DCD 0xFFFFFFFF
+```
+
+> 调用函数前，PC = 异常指令
+
+1. 异常类型#3 - 硬件错误异常：
+
+   ```assembly
+   PRESERVE8
+   THUMB
+   
+   ; Vector Table Mapped to Address 0 at Reset
+   AREA    RESET, DATA, READONLY
+   EXPORT  __Vectors
+   IMPORT HardFault_Handler
+   				
+   __Vectors       
+   DCD     0                  
+   DCD     Reset_Handler       ; Reset Handler
+   DCD     0                		; NMI Handler
+   DCD     HardFault_Handler    ; Hard Fault Handler
+   DCD     0          					; MPU Fault Handler
+   DCD     0           				; Bus Fault Handler
+   DCD     0									 ; Usage Fault Handler
+   DCD     0                    ; Reserved
+   DCD     0                    ; Reserved
+   DCD     0                    ; Reserved
+   DCD     0                    ; Reserved
+   DCD     0                		 ; SVCall Handler
+   DCD     0           				; Debug Monitor Handler
+   DCD     0                    ; Reserved
+   DCD     0             			; PendSV Handler
+   DCD     0           		 		; SysTick Handler
+   AREA    |.text|, CODE, READONLY
+   
+   ; Reset handler
+   Reset_Handler   PROC
+   EXPORT  Reset_Handler             [WEAK]
+   IMPORT  mymain
+   IMPORT  SystemInit
+   IMPORT  uart_init
+   				
+   LDR SP, =(0x20000000+0x10000)
+   				
+   BL SystemInit
+   BL uart_init
+   DCD 0xFFFFFFFF	; 异常指令
+   BL mymain
+   
+   ENDP
+   
+   END
+   ```
+
+   ```c
+   #include "uart.h"
+   
+   void HardFault_Handler(void)
+   {
+   	puts("HardFault_Handler\n\r");
+   	while (1);
+   }
+   ```
+
+   结果：![](./00_pic/08_异常与中断/p10.png)
+
+2. 异常类型#6 - 使用错误异常
+
+   ```assembly
+   PRESERVE8
+   THUMB
+   
+   ; Vector Table Mapped to Address 0 at Reset
+   AREA    RESET, DATA, READONLY
+   EXPORT  __Vectors
+   IMPORT HardFault_Handler
+   IMPORT UsageFault_Handler
+   				
+   __Vectors       
+   DCD     0                  
+   DCD     Reset_Handler              	; Reset Handler
+   DCD     0                			; NMI Handler
+   DCD     HardFault_Handler          	; Hard Fault Handler
+   DCD     0          					; MPU Fault Handler
+   DCD     0           				; Bus Fault Handler
+   DCD     UsageFault_Handler_asm      ; Usage Fault Handler
+   DCD     0                          	; Reserved
+   DCD     0                          	; Reserved
+   DCD     0                          	; Reserved
+   DCD     0                          	; Reserved
+   DCD     0                			; SVCall Handler
+   DCD     0           				; Debug Monitor Handler
+   DCD     0                          	; Reserved
+   DCD     0             				; PendSV Handler
+   DCD     0           		 		; SysTick Handler
+   AREA    |.text|, CODE, READONLY
+   
+   ; Reset handler
+   Reset_Handler   PROC
+   EXPORT  Reset_Handler             [WEAK]
+   IMPORT  mymain
+   IMPORT  SystemInit
+   IMPORT  uart_init
+   IMPORT	UsageFaultInit
+   				
+   LDR SP, =(0x20000000+0x10000)
+   				
+   BL SystemInit
+   BL uart_init
+   BL UsageFaultInit
+   DCD 0xFFFFFFFF	; 异常指令
+   BL mymain
+   				
+   ENDP
+   
+   UsageFault_Handler_asm PROC
+   MOV R0, SP		; 传入栈(指向保存的现场)
+   B UsageFault_Handler
+   ENDP
+   
+   END
+   ```
+
+   ```c
+   #include "uart.h"
+   #include "exception.h"
+   
+   void HardFault_Handler(void)
+   {
+   	puts("HardFault_Handler\n\r");
+   	while (1);
+   }
+   
+   void UsageFault_Handler(unsigned int *stack)
+   {
+   	SCB_Type * SCB = (SCB_Type *)SCB_BASE_ADDR;
+   	
+   	puts("UsageFault_Handler\n\r");
+   	
+   	// 清除错误
+   	SCB->CFSR = SCB->CFSR;
+   	
+   	// 设置返回为下一条指令
+   	stack[6] += 4;
+   }
+   
+   void UsageFaultInit(void)
+   {
+   	SCB_Type * SCB = (SCB_Type *)SCB_BASE_ADDR;
+   	SCB->SHCSR |= (SCB_SHCSR_USGFAULTENA_Msk);
+   }
+   
+   ```
+
+   结果：
+
+   ![](./00_pic/08_异常与中断/p19.png) 
+
+3. 现场测试 - 调用者
+
+   ```assembly
+   PRESERVE8
+   THUMB
+   
+   ; Vector Table Mapped to Address 0 at Reset
+   AREA    RESET, DATA, READONLY
+   EXPORT  __Vectors
+   IMPORT HardFault_Handler
+   IMPORT UsageFault_Handler
+   				
+   __Vectors       
+   DCD     0                  
+   DCD     Reset_Handler              	; Reset Handler
+   DCD     0                			; NMI Handler
+   DCD     HardFault_Handler          	; Hard Fault Handler
+   DCD     0          					; MPU Fault Handler
+   DCD     0           				; Bus Fault Handler
+   DCD     UsageFault_Handler_asm      ; Usage Fault Handler
+   DCD     0                          	; Reserved
+   DCD     0                          	; Reserved
+   DCD     0                          	; Reserved
+   DCD     0                          	; Reserved
+   DCD     0                			; SVCall Handler
+   DCD     0           				; Debug Monitor Handler
+   DCD     0                          	; Reserved
+   DCD     0             				; PendSV Handler
+   DCD     0           		 		; SysTick Handler
+   AREA    |.text|, CODE, READONLY
+   
+   ; Reset handler
+   Reset_Handler   PROC
+   EXPORT  Reset_Handler             [WEAK]
+   IMPORT  mymain
+   IMPORT  SystemInit
+   IMPORT  uart_init
+   IMPORT	UsageFaultInit
+   				
+   LDR SP, =(0x20000000+0x10000)
+   				
+   BL SystemInit
+   BL uart_init
+   BL UsageFaultInit
+   
+   ; 调用者保存的现场
+   LDR R0, =0x00
+   LDR R1, =0x01
+   LDR R2, =0x02
+   LDR R3, =0x03
+   LDR R12, =0x04
+   LDR LR, =0x05
+   ; PC
+   ; xPSR
+   
+   DCD 0xFFFFFFFF	; 异常指令
+   BL mymain
+   				
+   ENDP
+   
+   UsageFault_Handler_asm PROC
+   MOV R0, SP		; 传入栈(指向保存的现场)
+   B UsageFault_Handler
+   ENDP
+   
+   END
+   ```
+
+   ```c
+   #include "uart.h"
+   #include "exception.h"
+   
+   void HardFault_Handler(void)
+   {
+   	puts("HardFault_Handler\r\n");
+   	while (1);
+   }
+   
+   void UsageFault_Handler(unsigned int *stack)
+   {
+   	SCB_Type * SCB = (SCB_Type *)SCB_BASE_ADDR;
+   	
+   	puts("UsageFault_Handler\r\n");
+   	
+     // 打印栈
+   	put_s_hex("R0 = ", stack[0]);
+   	put_s_hex("R1 = ", stack[1]);
+   	put_s_hex("R2 = ", stack[2]);
+   	put_s_hex("R3 = ", stack[3]);
+   	put_s_hex("R12 = ", stack[4]);
+   	put_s_hex("LR = ", stack[5]);
+   	put_s_hex("PC = ", stack[6]);
+   	put_s_hex("xPSR = ", stack[7]);
+   	puts("\r\n");
+   	
+   	// 清除错误
+   	SCB->CFSR = SCB->CFSR;
+   	
+   	// 设置返回为下一条指令
+   	stack[6] += 4;
+   }
+   
+   void UsageFaultInit(void)
+   {
+   	SCB_Type * SCB = (SCB_Type *)SCB_BASE_ADDR;
+   	SCB->SHCSR |= (SCB_SHCSR_USGFAULTENA_Msk);
+   }
+   ```
+
+   结果：
+
+   ![](./00_pic/08_异常与中断/p20.png)
+
+   解析：
+
+   1. 异常指令地址：0x08000064，此时 PC = 0x08000068，栈中保存的一致（0x00000068，**0x08000000 映射为 0x00000000**）
+
+   2. 在执行异常/中断函数前，LR 被硬件设置为特殊值 0xFFFFFFF9
+
+   ![](./00_pic/08_异常与中断/p21.png)
+
+### 9.4.2 SVC 异常
+
+代码目录：`01_project\06_exception_irq\01_svc`
+
+```assembly
+SVC #VAL
+```
+
+> 调用函数前，PC = 下一条指令
+>
+> 在操作系统中，比如各类RTOS或者Linux，都会使用`SVC`指令故意触发异常，从而导致内核的异常处理函数被调用，进而去使用内核的服务。
+> Linux中，各类文件操作的函数`open`、`read`、`write`，它的实质都是`SVC`指令。
+
+- 代码：
+
+  ```assembly
+  PRESERVE8
+  THUMB
+  
+  ; Vector Table Mapped to Address 0 at Reset
+  AREA    RESET, DATA, READONLY
+  EXPORT  __Vectors
+  IMPORT HardFault_Handler
+  IMPORT UsageFault_Handler
+  IMPORT SVC_Handler
+  
+  __Vectors       
+  DCD     0                  
+  DCD     Reset_Handler              	; Reset Handler
+  DCD     0                			; NMI Handler
+  DCD     HardFault_Handler          	; Hard Fault Handler
+  DCD     0          					; MPU Fault Handler
+  DCD     0           				; Bus Fault Handler
+  DCD     UsageFault_Handler_asm      ; Usage Fault Handler
+  DCD     0                          	; Reserved
+  DCD     0                          	; Reserved
+  DCD     0                          	; Reserved
+  DCD     0                          	; Reserved
+  DCD     SVC_Handler                			; SVCall Handler
+  DCD     0           				; Debug Monitor Handler
+  DCD     0                          	; Reserved
+  DCD     0             				; PendSV Handler
+  DCD     0           		 		; SysTick Handler
+  AREA    |.text|, CODE, READONLY
+  
+  ; Reset handler
+  Reset_Handler   PROC
+  EXPORT  Reset_Handler             [WEAK]
+  IMPORT  mymain
+  IMPORT  SystemInit
+  IMPORT  uart_init
+  IMPORT	UsageFaultInit
+  				
+  LDR SP, =(0x20000000+0x10000)
+  				
+  BL SystemInit
+  BL uart_init
+  BL UsageFaultInit
+  
+  ; 调用者保存的现场
+  LDR R0, =0x00
+  LDR R1, =0x01
+  LDR R2, =0x02
+  LDR R3, =0x03
+  LDR R12, =0x04
+  LDR LR, =0x05
+  ; PC
+  ; xPSR
+  
+  DCD 0xFFFFFFFF		; 未定义指令异常
+  SVC #1 					  ; SVC 异常
+  
+  BL mymain
+  
+  ENDP
+  
+  UsageFault_Handler_asm PROC
+  MOV R0, SP		; 传入栈(指向保存的现场)
+  B UsageFault_Handler
+  ENDP
+  
+  END
+  ```
+
+  ```c
+  #include "uart.h"
+  #include "exception.h"
+  
+  void HardFault_Handler(void)
+  {
+  	puts("HardFault_Handler\r\n");
+  	while (1);
+  }
+  
+  void UsageFault_Handler(unsigned int *stack)
+  {
+  	SCB_Type * SCB = (SCB_Type *)SCB_BASE_ADDR;
+  	
+  	puts("UsageFault_Handler\r\n");
+  	
+  	put_s_hex("R0 = ", stack[0]);
+  	put_s_hex("R1 = ", stack[1]);
+  	put_s_hex("R2 = ", stack[2]);
+  	put_s_hex("R3 = ", stack[3]);
+  	put_s_hex("R12 = ", stack[4]);
+  	put_s_hex("LR = ", stack[5]);
+  	put_s_hex("PC = ", stack[6]);
+  	put_s_hex("xPSR = ", stack[7]);
+  	puts("\r\n");
+  	
+  	// 清除错误
+  	SCB->CFSR = SCB->CFSR;
+  	
+  	// 设置返回为下一条指令
+  	stack[6] += 4;
+  }
+  
+  void UsageFaultInit(void)
+  {
+  	SCB_Type * SCB = (SCB_Type *)SCB_BASE_ADDR;
+  	SCB->SHCSR |= (SCB_SHCSR_USGFAULTENA_Msk);
+  }
+  
+  void SVC_Handler(void)
+  {
+  	puts("SVC_Handler\r\n");
+  }
+  ```
+
+  结果：**并不影响后续程序执行**![](./00_pic/08_异常与中断/p22.png)
+
+- 解析：![](./00_pic/08_异常与中断/p23.png)PC = 0x0800006E，为 mymain 函数地址![](./00_pic/08_异常与中断/p24.png)
+
+### 9.4.3 SysTick 异常
+
+代码目录：`01_project\06_exception_irq\02_systick`
+
+1. SysTick 定时器
+
+- Cortex-M 处理器内部集成了一个小型的、名为 SysTick 的定时器
+
+- 处理器内增加这样的定时器，是为了提高软件的可以移植性
+
+- 24 位，向下计数
+
+- 计数值到达 0 时，可触发 SysTick 异常
+
+- 框图：
+
+  ![](./00_pic/08_异常与中断/p25.png)
+
+- 基地址
+
+  ![](./00_pic/08_异常与中断/p30.png)
+
+2. 寄存器
+
+   - SysTick->CTRL
+
+     ![](./00_pic/08_异常与中断/p26.png)
+
+   - SysTick->VAL
+
+     ![](./00_pic/08_异常与中断/p27.png)
+
+   - SysTick->LOAD
+
+     ![](./00_pic/08_异常与中断/p28.png)
+
+3. 清除异常
+
+   ![](./00_pic/08_异常与中断/p29.png)
+
+4. 代码
+
+   ```assembly
+   PRESERVE8
+   THUMB
+   
+   ; Vector Table Mapped to Address 0 at Reset
+   AREA    RESET, DATA, READONLY
+   EXPORT  __Vectors
+   IMPORT HardFault_Handler
+   IMPORT UsageFault_Handler
+   IMPORT SVC_Handler
+   IMPORT SysTick_Handler
+   				
+   __Vectors
+   DCD     0                  
+   DCD     Reset_Handler              	; Reset Handler
+   DCD     0                			; NMI Handler
+   DCD     HardFault_Handler          	; Hard Fault Handler
+   DCD     0          					; MPU Fault Handler
+   DCD     0           				; Bus Fault Handler
+   DCD     UsageFault_Handler_asm      ; Usage Fault Handler
+   DCD     0                          	; Reserved
+   DCD     0                          	; Reserved
+   DCD     0                          	; Reserved
+   DCD     0                          	; Reserved
+   DCD     SVC_Handler                	; SVCall Handler
+   DCD     0           				; Debug Monitor Handler
+   DCD     0                          	; Reserved
+   DCD     0             				; PendSV Handler
+   DCD     SysTick_Handler             ; SysTick Handler
+   AREA    |.text|, CODE, READONLY
+   
+   ; Reset handler
+   Reset_Handler   PROC
+   EXPORT  Reset_Handler             [WEAK]
+   IMPORT  mymain
+   IMPORT  SystemInit
+   IMPORT  uart_init
+   IMPORT	UsageFaultInit
+   IMPORT 	SysTickInit
+   				
+   LDR SP, =(0x20000000+0x10000)
+   				
+   BL SystemInit
+   BL uart_init
+   BL UsageFaultInit
+   				
+   LDR R0, =0x00
+   LDR R1, =0x01
+   LDR R2, =0x02
+   LDR R3, =0x03
+   LDR R12, =0x04
+   LDR LR, =0x05
+   ; PC
+   ; xPSR
+   				
+   DCD 0xFFFFFFFF	; 未定义指令异常
+   SVC #1 			; SVC 异常
+   BL	SysTickInit	; SysTick 异常
+   				
+   BL mymain
+   				
+   ENDP
+   
+   UsageFault_Handler_asm PROC
+   MOV R0, SP		; 传入栈(指向保存的现场)
+   B UsageFault_Handler
+   ENDP
+   
+   END
+   ```
+
+   ```c
+   #include "uart.h"
+   #include "systick.h"
+   #include "exception.h"
+   #include "string.h"
+   
+   void SysTickInit(void)
+   {
+   	SysTick_Type *SYSTICK = (SysTick_Type *)SYSTICK_ADDR_BASE;
+   	
+   	// 设置周期
+   	SYSTICK->VAL = SYSYTICK_VAL;	// 当前值
+   	SYSTICK->LOAD = SYSYTICK_VAL;	// 重载值
+   	// 选择时钟源，使能定时器，使能异常
+   	SYSTICK->CTRL |= (1U << 2U);	// 处理器时钟
+   	SYSTICK->CTRL |= (1U << 1U);	// 使能异常
+   	SYSTICK->CTRL |= (1U << 0U);	// 使能定时器
+   }
+   
+   void SysTick_Handler(void)
+   {
+   	// 清除异常
+   	SCB_Type *SCB = (SCB_Type *)SCB_BASE_ADDR;
+   	SCB->ICSR |= SCB_ICSR_PENDSTCLR_Msk;
+   	// 测试
+   	static unsigned int cnt = 0U;
+   	put_s_hex("systick cnt = ", cnt++);
+   }
+   ```
+
+   结果：
+
+   ![](./00_pic/08_异常与中断/p31.png)
+

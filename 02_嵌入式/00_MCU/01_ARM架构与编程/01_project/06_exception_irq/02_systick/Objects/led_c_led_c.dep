@@ -1,0 +1,19 @@
+Dependencies for Project 'led_c', Target 'led_c': (DO NOT MODIFY !)
+CompilerVersion: 5060960::V5.06 update 7 (build 960)::.\ARMCC
+F (.\main.c)(0x665C2F56)(--c99 --gnu -c --cpu Cortex-M3 -g -O0 --apcs=interwork --split_sections -I ..\02_systick-ID:\SoftWare\Keil\PACKS\Keil\STM32F1xx_DFP\2.3.0\Device\Include-ID:\SoftWare\Keil\MDK\ARM\CMSIS\Include-D__UVISION_VERSION="532" -DSTM32F10X_HD-o .\objects\main.o --omf_browse .\objects\main.crf --depend .\objects\main.d)
+I (uart.h)(0x62FA6E75)
+I (string.h)(0x665C2C0D)
+F (.\start.s)(0x665C6ABF)(--cpu Cortex-M3 -g --apcs=interwork -ID:\SoftWare\Keil\PACKS\Keil\STM32F1xx_DFP\2.3.0\Device\Include-ID:\SoftWare\Keil\MDK\ARM\CMSIS\Include--pd "__UVISION_VERSION SETA 532" --pd "STM32F10X_HD SETA 1"--list .\listings\start.lst --xref -o .\objects\start.o --depend .\objects\start.d)
+F (.\uart.c)(0x665C2E61)(--c99 --gnu -c --cpu Cortex-M3 -g -O0 --apcs=interwork --split_sections -I ..\02_systick-ID:\SoftWare\Keil\PACKS\Keil\STM32F1xx_DFP\2.3.0\Device\Include-ID:\SoftWare\Keil\MDK\ARM\CMSIS\Include-D__UVISION_VERSION="532" -DSTM32F10X_HD-o .\objects\uart.o --omf_browse .\objects\uart.crf --depend .\objects\uart.d)
+I (uart.h)(0x62FA6E75)
+F (.\string.c)(0x66572F15)(--c99 --gnu -c --cpu Cortex-M3 -g -O0 --apcs=interwork --split_sections -I ..\02_systick-ID:\SoftWare\Keil\PACKS\Keil\STM32F1xx_DFP\2.3.0\Device\Include-ID:\SoftWare\Keil\MDK\ARM\CMSIS\Include-D__UVISION_VERSION="532" -DSTM32F10X_HD-o .\objects\string.o --omf_browse .\objects\string.crf --depend .\objects\string.d)
+I (uart.h)(0x62FA6E75)
+F (.\exception.c)(0x665C6B6D)(--c99 --gnu -c --cpu Cortex-M3 -g -O0 --apcs=interwork --split_sections -I ..\02_systick-ID:\SoftWare\Keil\PACKS\Keil\STM32F1xx_DFP\2.3.0\Device\Include-ID:\SoftWare\Keil\MDK\ARM\CMSIS\Include-D__UVISION_VERSION="532" -DSTM32F10X_HD-o .\objects\exception.o --omf_browse .\objects\exception.crf --depend .\objects\exception.d)
+I (uart.h)(0x62FA6E75)
+I (exception.h)(0x665C3647)
+I (string.h)(0x665C2C0D)
+F (.\systick.c)(0x665C6BA1)(--c99 --gnu -c --cpu Cortex-M3 -g -O0 --apcs=interwork --split_sections -I ..\02_systick-ID:\SoftWare\Keil\PACKS\Keil\STM32F1xx_DFP\2.3.0\Device\Include-ID:\SoftWare\Keil\MDK\ARM\CMSIS\Include-D__UVISION_VERSION="532" -DSTM32F10X_HD-o .\objects\systick.o --omf_browse .\objects\systick.crf --depend .\objects\systick.d)
+I (uart.h)(0x62FA6E75)
+I (systick.h)(0x665C6B30)
+I (exception.h)(0x665C3647)
+I (string.h)(0x665C2C0D)
