@@ -2542,7 +2542,7 @@ ARM对中断的使用过程：
 
 - Cortex - A7：先不学
 
-## 9.4 实战
+## 9.4 异常实战
 
 > 参考：
 >
@@ -3138,3 +3138,356 @@ SVC #VAL
 
    ![](./00_pic/08_异常与中断/p31.png)
 
+## 9.5 中断的硬件框架
+
+### 9.5.1 中断路径上的3个部件
+
+1. 中断源
+
+   - 种类多样，如：GPIO、定时器、UART、DMA等
+   - 都可配置：使能中断、中断状态、中断类型等
+
+2. 中断控制器
+
+   - 不同芯片的中断控制器实现方式不一样
+     - STM32F013 为 NVIC
+     - Cortex A7 为 GIC
+
+   - 各中断源发出的中断信号，汇聚到中断控制器
+
+   - 可在中断控制器中设置各中断的优先级
+
+   - 中断控制器会向 CPU 发出中断信号，CPU 可读取中断控制器的寄存器，从而判断当前处理的是哪个中断
+
+     ![](./00_pic/08_异常与中断/p32.png)
+
+     ![](./00_pic/08_异常与中断/p33.png)
+
+     > GIC 可将中断分配给不同的 CPU 核心
+
+3. CPU
+
+   - CPU 每执行完一条指令，都会检查是否有中断产生
+   - CPU 内部寄存器可使能/禁止中断，为中断处理的总开关
+
+   ![](./00_pic/08_异常与中断/p1.png)
+
+### 9.5.2 STM32F103 的 GPIO 中断
+
+> 参考资料：`STM32F103参考手册.pdf、STM32F103编程手册.pdf、Cortex-M3与Cortex-M4权威指南.pdf`
+
+1. GPIO 控制器
+
+   对于 GPIO 中断，STM32F103 引入 External interrupt/event controller (EXTI) 来设置 GPIO 的中断类型：![](./00_pic/08_异常与中断/p34.png)
+
+   > EXTI 可以给 NVIC 提供 16 个中断信号：EXTI0 ~ EXTI15
+
+2. EXTI
+
+   - 寄存器：EXTI 一共有 `AFIO_EXTICR1 ~ AFIO_EXTICR4` 4个寄存器![](./00_pic/08_异常与中断/p35.png)![](./00_pic/08_异常与中断/p36.png)
+
+   - 框图：![](./00_pic/08_异常与中断/p37.png)
+
+     1. 触发边沿：Falling trigger selection register、Rising trigger selection register
+
+     2. 是否屏蔽中断：Interrupt mask register
+     3. 获取触发的中断：Pending reqeust register
+
+   - 流程：![](./00_pic/08_异常与中断/p38.png)
+     1. 配置 EXTI_IMR：允许 EXTI 发出中断
+     2. 配置 EXTI_RTSR、EXTI_FTSR：选择中断触发方式
+     3. 配置 NVIC 寄存器：允许 NVIC 把中断发给 CPU
+
+3. NVIC
+
+   > 多个中断源汇聚到NVIC，NVIC的职责就是从多个中断源中取出优先级最高的中断，向CPU发出中断信号
+
+   - 寄存器：
+
+     ![](./00_pic/08_异常与中断/p39.png)
+
+     暂时只关注：ISER(中断设置使能寄存器)、ICPR(中断清除挂起寄存器)
+
+     ![](./00_pic/08_异常与中断/p40.png)
+
+4. CPU
+
+   内部寄存器：
+
+   1. PRIMASK
+
+      ![](./00_pic/08_异常与中断/p41.png)
+
+      > 把 PRIMASK 的 bit0 设置为 1，就可以屏蔽所有**优先级可配置**的中断
+
+      ```assembly
+      CPSIE I  ; 清除PRIMASK，使能中断
+      CPSID I  ; 设置PRIMASK，禁止中断
+      
+      或者：
+      MOV R0, #1
+      MSR  PRIMASK R0  ; 将1写入PRIMASK禁止所有中断
+      
+      MOV R0, #0
+      MSR PRIMASK, R0  ; 将0写入PRIMASK使能所有中断
+      ```
+
+   2. FAULTMASK
+
+      ![](./00_pic/08_异常与中断/p42.png)
+
+      > FAULTMASK 和 PRIMASK很像，它更进一步，除了一般的中断外，把HardFault 都禁止了
+
+      ```assembly
+      CPSIE F  ; 清除FAULTMASK
+      CPSID F  ; 设置FAULTMASK
+      
+      或者：
+      MOV R0, #1
+      MSR  FAULTMASK R0  ; 将1写入FAULTMASK禁止中断
+      
+      MOV R0, #0
+      MSR FAULTMASK, R0  ; 将0写入FAULTMASK使能中断
+      ```
+
+   3. BASEPRI
+
+      ![](./00_pic/08_异常与中断/p43.png)
+
+      > BASEPRI 用来屏蔽这些中断：它们的优先级，其值大于或等于BASEPRI
+
+      ```assembly
+      MOVS R0, #0x60
+      MSR BASEPRI, R0   ; 禁止优先级在0x60~0xFF间的中断
+      
+      MRS R0, BASEPRI   ; 读取BASEPRI
+      
+      MOVS R0, #0
+      MSR BASEPRI, R0    ; 取消BASEPRI屏蔽
+      ```
+
+总结：
+
+![](./00_pic/08_异常与中断/p44.png)
+
+### 9.5.3 STM32MP157 的 GPIO 控制器
+
+### 9.5.3 IMX6ULL 的 GPIO 控制器
+
+### 9.6 中断实战
+
+1. AFIO
+
+   参考手册：`STM32F103参考手册.pdf - 3.3、9.4`
+
+   ![](./00_pic/08_异常与中断/p45.png)
+   ![](./00_pic/08_异常与中断/p46.png)
+
+2. EXTI
+
+   参考手册：`STM32F103参考手册.pdf - 3.3、10.3`
+
+   ![](./00_pic/08_异常与中断/p47.png)    
+
+   ![](./00_pic/08_异常与中断/p48.png) 
+
+3. NVIC
+
+   参考手册：`STM32F103编程手册.pdf - 4.1、4.3，ARM Cortex-M3与Cortex-M4权威指南.pdf - 7.8`
+
+   ![](./00_pic/08_异常与中断/p49.png)
+
+   ![](./00_pic/08_异常与中断/p50.png) 
+
+   ![](./00_pic/08_异常与中断/p52.png)
+   
+   ![](./00_pic/08_异常与中断/p51.png) 
+
+代码：
+
+```assembly
+PRESERVE8
+THUMB
+
+; Vector Table Mapped to Address 0 at Reset
+AREA    RESET, DATA, READONLY
+EXPORT  __Vectors
+IMPORT HardFault_Handler
+IMPORT UsageFault_Handler
+IMPORT SVC_Handler
+IMPORT SysTick_Handler
+IMPORT EXTI3_IRQHandler
+				
+__Vectors       
+DCD     (0x20000000+0x10000)                  
+DCD     Reset_Handler              	; Reset Handler
+DCD     0                			; NMI Handler
+DCD     HardFault_Handler          	; Hard Fault Handler
+DCD     0          					; MPU Fault Handler
+DCD     0           				; Bus Fault Handler
+DCD     UsageFault_Handler_asm      ; Usage Fault Handler
+DCD     0                          	; Reserved
+DCD     0                          	; Reserved
+DCD     0                          	; Reserved
+DCD     0                          	; Reserved
+DCD     SVC_Handler                	; SVCall Handler
+DCD     0           				; Debug Monitor Handler
+DCD     0                          	; Reserved
+DCD     0             				; PendSV Handler
+DCD     SysTick_Handler             ; SysTick Handler
+				
+; External Interrupts 从 0 开始
+DCD     0            				; 0 Window Watchdog
+DCD     0            	 			; 1 PVD through EXTI Line detect
+DCD     0          					; 2 Tamper
+DCD     0             			; 3 RTC
+DCD     0           				; 4 Flash
+DCD     0             			; 5 RCC
+DCD     0           				; 6 EXTI Line 0
+DCD     0           				; 7 EXTI Line 1
+DCD     0           				; 8 EXTI Line 2
+DCD     EXTI3_IRQHandler		; 9 EXTI Line 3
+				
+AREA    |.text|, CODE, READONLY
+
+; Reset handler
+Reset_Handler   PROC
+EXPORT  Reset_Handler             [WEAK]
+IMPORT  mymain
+IMPORT  SystemInit
+IMPORT  uart_init
+IMPORT	UsageFaultInit
+IMPORT 	SysTickInit
+				
+; 在向量表的第0项设置SP更好
+; 因为有可能还没执行到Reset_Handler就发生了异常
+; LDR SP, =(0x20000000+0x10000)
+				
+BL SystemInit
+BL uart_init
+BL UsageFaultInit
+				
+LDR R0, =0x00
+LDR R1, =0x01
+LDR R2, =0x02
+LDR R3, =0x03
+LDR R12, =0x04
+LDR LR, =0x05
+; PC
+; xPSR
+				
+DCD 0xFFFFFFFF	 ; 未定义指令异常
+SVC #1 					 ; SVC 异常
+BL	SysTickInit	 ; SysTick 异常
+				
+; 使能CPU中断
+CPSIE I 		; 清除 PRIMASK，使能中断
+				
+;BL mymain
+LDR R0, =mymain
+BLX R0
+				
+ENDP
+
+UsageFault_Handler_asm PROC
+MOV R0, SP		; 传入栈(指向保存的现场)
+B UsageFault_Handler
+ENDP
+
+END
+```
+
+```c
+#include "key.h"
+#include "string.h"
+#include "exti.h"
+#include "nvic.h"
+
+void KeyInit(void)
+{
+	AFIO_TypeDef *afio = (AFIO_TypeDef *)0x40010000;
+	unsigned int *pRcc;
+	unsigned int *pGpioe;
+	
+	pRcc = (unsigned int *)(0x40021000 + 0x18);		// APB2ENR
+	*pRcc |= (1 << 0);  // 使能 IO 复用时钟
+	*pRcc |= (1 << 6);	// 使能 GPIOE 时钟
+	
+	// 设置 GPIOE3 为输入引脚
+	pGpioe = (unsigned int *)(0x40011800 + 0x00);	// CPL
+	*pGpioe &= ~(0x0F << 12);	// mode3 = 0b00 cnf3 = 0b00
+	*pGpioe |= (2 << 14);		// cnf3 = 0b10
+	// 设置 GPIOE3 上拉
+	pGpioe = (unsigned int *)(0x40011800 + 0x10);	// BSRR
+	*pGpioe |= (1 << 3);
+	
+	/* 2. 设置为 EXTI3 */
+	afio->EXTICR[0] &= ~(0x0F << 12);	// EXTI3 = 0b0000
+	afio->EXTICR[0] |= (0x04 << 12);	// EXTI3 = 0b0100 - GPIOE
+}
+
+void EXTI3_IRQHandler(void)
+{
+	unsigned int *pGpioe = (unsigned int *)(0x40011800 + 0x08);  // IDR
+	
+	if ((*pGpioe & (1 << 3)) == 0)
+	{
+		puts("KEY pressed!\n\r");
+	}
+	else
+	{
+		puts("KEY released!\n\r");
+	}
+	
+	/* 清除中断 */
+	ExtiClear(3);
+	NvicClear(9);
+}
+```
+
+```c
+#include "exti.h"
+
+void ExtiInit(void)
+{
+	EXTI_TypeDef *exti = (EXTI_TypeDef *)0x40010400;
+	
+	exti->RTSR |= (1 << 3);		// line 3 rising
+	exti->FTSR |= (1 << 3);		// line 3 falling
+	
+	exti->IMR |= (1 << 3);		// line 3 not masked(屏蔽)
+}
+
+void ExtiClear(int bit)
+{
+	EXTI_TypeDef * exti = (EXTI_TypeDef *)0x40010400;
+	exti->PR |= (1 << bit);
+}
+
+```
+
+```c
+#include "nvic.h"
+
+void NvicInit(void)
+{
+	NVIC_Type * nvic = (NVIC_Type *)0xE000E100;
+	
+	/* 1. 使能 EXTI3 中断 */
+	nvic->ISER[0] |= (1 << 9);
+}
+
+void NvicClear(int bit)
+{
+	NVIC_Type * nvic = (NVIC_Type *)0xE000E100;
+	
+	if (bit <= 31)
+	{
+		nvic->ICPR[0] |= (1 << bit);
+	}
+}
+```
+
+  结果：
+
+![](./00_pic/08_异常与中断/p53.png) 
