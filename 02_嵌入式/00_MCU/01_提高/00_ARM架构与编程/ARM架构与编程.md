@@ -2445,7 +2445,7 @@ ARM对中断的使用过程：
 >   * cortex M3/M4 在向量表上放置函数地址
 >   * cortex A7 在向量表上放置跳转指令
 
-## 9.2 ARM 架构中异常与中断的处理
+## 9.2 ARM 架构异常与中断的处理
 
 ### 9.2.1 Cortex M3/M4
 
@@ -2582,7 +2582,72 @@ ARM对中断的使用过程：
   
   ==sp[6] 为处理异常前的PC，即处理完异常后的返回地址==![](./00_pic/08_异常与中断/p8.png)
 
-### 9.4.1 未定义指令异常
+### 9.4.1 硬件错误异常
+
+> - 若只设置了硬件错误异常，出现异常都跳转为硬件错误异常
+
+异常类型#3 - 硬件错误异常：
+
+```assembly
+PRESERVE8
+THUMB
+
+; Vector Table Mapped to Address 0 at Reset
+AREA    RESET, DATA, READONLY
+EXPORT  __Vectors
+IMPORT HardFault_Handler
+				
+__Vectors       
+DCD     0                  
+DCD     Reset_Handler       ; Reset Handler
+DCD     0                		; NMI Handler
+DCD     HardFault_Handler    ; Hard Fault Handler
+DCD     0          					; MPU Fault Handler
+DCD     0           				; Bus Fault Handler
+DCD     0									 ; Usage Fault Handler
+DCD     0                    ; Reserved
+DCD     0                    ; Reserved
+DCD     0                    ; Reserved
+DCD     0                    ; Reserved
+DCD     0                		 ; SVCall Handler
+DCD     0           				; Debug Monitor Handler
+DCD     0                    ; Reserved
+DCD     0             			; PendSV Handler
+DCD     0           		 		; SysTick Handler
+AREA    |.text|, CODE, READONLY
+
+; Reset handler
+Reset_Handler   PROC
+EXPORT  Reset_Handler             [WEAK]
+IMPORT  mymain
+IMPORT  SystemInit
+IMPORT  uart_init
+				
+LDR SP, =(0x20000000+0x10000)
+				
+BL SystemInit
+BL uart_init
+DCD 0xFFFFFFFF	; 异常指令
+BL mymain
+
+ENDP
+
+END
+```
+
+```c
+#include "uart.h"
+
+void HardFault_Handler(void)
+{
+	puts("HardFault_Handler\n\r");
+	while (1);
+}
+```
+
+结果：![](./00_pic/08_异常与中断/p10.png)
+
+### 9.4.2 未定义指令异常
 
 代码目录：`01_project\06_exception_irq\00_undefined`
 
@@ -2590,70 +2655,10 @@ ARM对中断的使用过程：
 DCD 0xFFFFFFFF
 ```
 
-> ==调用函数前，PC = 异常指令，异常处理后，继续执行异常指令==
+> - 若定义了该异常，执行未定义指令，优先触发未定义指令异常
+> - ==调用异常函数前，PC = 异常指令，异常处理后，继续重复执行异常指令==
 
-1. 异常类型#3 - 硬件错误异常：
-
-   ```assembly
-   PRESERVE8
-   THUMB
-   
-   ; Vector Table Mapped to Address 0 at Reset
-   AREA    RESET, DATA, READONLY
-   EXPORT  __Vectors
-   IMPORT HardFault_Handler
-   				
-   __Vectors       
-   DCD     0                  
-   DCD     Reset_Handler       ; Reset Handler
-   DCD     0                		; NMI Handler
-   DCD     HardFault_Handler    ; Hard Fault Handler
-   DCD     0          					; MPU Fault Handler
-   DCD     0           				; Bus Fault Handler
-   DCD     0									 ; Usage Fault Handler
-   DCD     0                    ; Reserved
-   DCD     0                    ; Reserved
-   DCD     0                    ; Reserved
-   DCD     0                    ; Reserved
-   DCD     0                		 ; SVCall Handler
-   DCD     0           				; Debug Monitor Handler
-   DCD     0                    ; Reserved
-   DCD     0             			; PendSV Handler
-   DCD     0           		 		; SysTick Handler
-   AREA    |.text|, CODE, READONLY
-   
-   ; Reset handler
-   Reset_Handler   PROC
-   EXPORT  Reset_Handler             [WEAK]
-   IMPORT  mymain
-   IMPORT  SystemInit
-   IMPORT  uart_init
-   				
-   LDR SP, =(0x20000000+0x10000)
-   				
-   BL SystemInit
-   BL uart_init
-   DCD 0xFFFFFFFF	; 异常指令
-   BL mymain
-   
-   ENDP
-   
-   END
-   ```
-
-   ```c
-   #include "uart.h"
-   
-   void HardFault_Handler(void)
-   {
-   	puts("HardFault_Handler\n\r");
-   	while (1);
-   }
-   ```
-
-   结果：![](./00_pic/08_异常与中断/p10.png)
-
-2. 异常类型#6 - 使用错误异常
+1. 异常类型#6 - 使用错误异常
 
    ```assembly
    PRESERVE8
@@ -2860,13 +2865,13 @@ DCD 0xFFFFFFFF
 
    解析：
 
-   1. 异常指令地址：0x08000068，与栈中保存的 PC 一致
+   1. ==异常指令地址：0x08000068，与栈中保存的 PC 一致==
 
-   2. **保存现场后，执行异常/中断函数前**，LR 被硬件设置为特殊值 0xFFFFFFF9
+   2. **保存现场后，执行异常/中断函数前**，LR 被硬件设置为 0xFFFFFFF9(EXC_RETURN)
 
    ![](./00_pic/08_异常与中断/p21.png)
 
-### 9.4.2 SVC 异常
+### 9.4.3 SVC 异常
 
 代码目录：`01_project\06_exception_irq\01_svc`
 
@@ -2874,10 +2879,10 @@ DCD 0xFFFFFFFF
 SVC #VAL
 ```
 
-> ==调用函数前，PC = 下一条指令，异常处理后，不影响后续程序运行==
+> - ==调用异常函数前，PC = 下一条指令，异常处理后，不影响后续程序运行==
 >
-> 在操作系统中，比如各类RTOS或者Linux，都会使用`SVC`指令故意触发异常，从而导致内核的异常处理函数被调用，进而去使用内核的服务。
-> Linux中，各类文件操作的函数`open`、`read`、`write`，它的实质都是`SVC`指令。
+> - 在操作系统中，比如各类 RTOS 或者 Linux，都会使用`SVC`指令故意触发异常，从而导致内核的异常处理函数被调用，进而去使用内核的服务。
+> - Linux中，各类文件操作的函数`open`、`read`、`write`，它的实质都是`SVC`指令。
 
 - 代码：
 
@@ -2999,7 +3004,7 @@ SVC #VAL
 
 - 解析：![](./00_pic/08_异常与中断/p23.png)PC = 0x0800006E，为 mymain 函数地址![](./00_pic/08_异常与中断/p24.png)
 
-### 9.4.3 SysTick 异常
+### 9.4.4 SysTick 异常
 
 代码目录：`01_project\06_exception_irq\02_systick`
 
