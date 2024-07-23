@@ -10,7 +10,7 @@
 	![700](./00_pic/00_裁剪官方例程/p1.png)![700](./00_pic/00_裁剪官方例程/p2.png)![700](./00_pic/00_裁剪官方例程/p3.png)![700](./00_pic/00_裁剪官方例程/p4.png)
 2. 去除无效代码
 	![700](./00_pic/00_裁剪官方例程/p5.png)
-3. 配置串口和输出
+1. 配置串口和输出
 ```C
 int fputc( int ch, FILE *f )
 {
@@ -284,19 +284,24 @@ vTaskDelayUntil(&pre, n);	// 相对时间，到时间后会更新 pre = pre + n
 
 ## 7.3 队列
 
-常规操作：
-![](./00_pic/07_同步与互斥/p3.png)
+创建队列需申请空间 `sizeof(Queue_t) + uxQueueLength * uxItemSize`
+### 7.3.1 操作
 
-详细操作：
-![](./00_pic/07_同步与互斥/p4.png)
+1. 常规操作
+	![LEFT](./00_pic/07_同步与互斥/p3.png)
+2. 详细操作
+	![LEFT](./00_pic/07_同步与互斥/p4.png)
 
+>[!NOTE] 读写及堵塞
 > 1. 写到尾部 或 头部
 > 2. 使用直接复制传输数据
 > 3. 读写任务链表用于唤醒对应的被队列堵塞的任务
 > 4. ==若多个任务被堵塞，唤醒的是最高优先级任务，且等待时间最长的任务==
 
-结构体
+### 7.3.2 原理
+
 ```C
+/* 队列控制块结构体 */
 typedef struct QueueDefinition
 {
 	/* 环形缓冲区 */
@@ -318,28 +323,131 @@ typedef struct QueuePointers
     int8_t * pcReadFrom;  // 指向上次读的位置
 } QueuePointers_t;
 ```
-创建：
-![](./00_pic/07_同步与互斥/p5.png)
->1.  `pcHead` 和 `pcWriteTo` 都指向队列头部
->2. `pcHead` 全程不变
->3. `pcReadFrom` 指向 `N-1`
+1. 创建：
+	![](./00_pic/07_同步与互斥/p5.png)
+	1. `pcHead` 和 `pcWriteTo` 都指向队列头部
+	2. `pcHead` 全程不变
+	3. `pcReadFrom` 指向 `N-1`
 
-写到队列尾部
-![](./00_pic/07_同步与互斥/p6.png)
-> 1. 将数据复制到空间0
-> 2. `pcWriteTo += itemSize`
-> 注意：若队列满，且设置了等待时间，将写队列的任务放入 `xTasksWaitingToSend`，当等待时间内有任务读队列，则唤醒对应队列
+2. 写到队列尾部
+	![](./00_pic/07_同步与互斥/p6.png)
+	1. 将数据复制到空间0
+	2. `pcWriteTo += itemSize`
+	- **注意：** 若队列满，且设置了等待时间，将写队列的任务放入 `xTasksWaitingToSend`，当等待时间内有任务读队列，则唤醒对应队列
 
-读队列头部
-![](./00_pic/07_同步与互斥/p7.png)
-> 1. `pcReadFrom += itemSize`，溢出则指向队列头部
-> 2. 读取`pcReadFrom`所指数据
-> 3. 读完后`pcReadFrom`保持不变
-> 注意：若队列空，且设置了等待时间，将写队列的任务放入 `xTasksWaitingToReceive`，当等待时间内有任务写队列，则唤醒对应队列
+3. 读队列头部
+	![](./00_pic/07_同步与互斥/p7.png)
+	1. `pcReadFrom += itemSize`，溢出则指向队列头部
+	2. 读取`pcReadFrom`所指数据
+	3. 读完后`pcReadFrom`保持不变
+	- **注意：** 若队列空，且设置了等待时间，将写队列的任务放入 `xTasksWaitingToReceive`，当等待时间内有任务写队列，则唤醒对应队列
 
-写队列头部
-![](./00_pic/07_同步与互斥/p8.png)
-> 1. 写之前：`pcWriteTo` 指向空间`2`，`pcReadFrom`指向空间`N-1`
-> 2. 写入时，将数据复制到空间`N-1`，`pcReadFrom -= itemSize`
-> 3. 再次读队列时，读到的是空间`N-1`的数据
+4. 写队列头部
+	![](./00_pic/07_同步与互斥/p8.png)
+1. 写之前：`pcWriteTo` 指向空间`2`，`pcReadFrom`指向空间`N-1`
+2. 写入时，将数据复制到空间`N-1`，`pcReadFrom -= itemSize`
+3. 再次读队列时，读到的是空间`N-1`的数据
+
+### 7.3.3 队列集和邮箱
+1. 邮箱
+	FreeRTOS的邮箱为长度为1的队列
+	- 写邮箱为覆盖数据
+	- 读邮箱为偷看数据
+2. 队列集
+	从多个队列中获取数据，例：输入子系统有鼠标、按键、触摸屏，则需要同时等待3个队列
+	1. 创建队列
+	2. 创建队列集
+	3. 将队列添加进队列集中
+	4. 写队列函数：写数据，同时将队列控制块写入到队列集
+	5. 读取队列集：返回队列控制块
+	6. 读取对应的队列
+
+> [!tip] 
+> 具体见官网手册
+
+```c
+static volatile int flagCalcEnd = 0;
+static volatile int flagUARTused = 0;
+static QueueHandle_t xQueueHandle1;
+static QueueHandle_t xQueueHandle2;
+static QueueSetHandle_t xQueueSet;
+
+void Task1Function(void * param)
+{
+	int i = 0;
+	while (1)
+	{
+		xQueueSend(xQueueHandle1, &i, portMAX_DELAY);
+		i++;
+		vTaskDelay(10);
+	}
+}
+
+void Task2Function(void * param)
+{
+	int i = -1;
+	while (1)
+	{
+		xQueueSend(xQueueHandle2, &i, portMAX_DELAY);
+		i--;
+		vTaskDelay(20);
+	}
+}
+
+void Task3Function(void * param)
+{
+	QueueSetMemberHandle_t handle;
+	int i;
+	while (1)
+	{
+		/* 1. read queue set: which queue has data */
+		handle = xQueueSelectFromSet(xQueueSet, portMAX_DELAY);
+
+		/* 2. read queue */
+		xQueueReceive(handle, &i, 0);
+
+		/* 3. print */
+		printf("get data : %d\r\n", i);
+	}
+}
+
+int main( void )
+{
+	/* 1. 创建queue */
+	xQueueHandle1 = xQueueCreate(2, sizeof(int));
+	if (xQueueHandle1 == NULL)
+	{
+		printf("can not create queue\r\n");
+	}
+	xQueueHandle2 = xQueueCreate(2, sizeof(int));
+	if (xQueueHandle2 == NULL)
+	{
+		printf("can not create queue\r\n");
+	}
+
+	/* 2. 创建queue set */
+	xQueueSet = xQueueCreateSet(3);
+	
+	/* 3. 把2个queue添加进queue set */
+	xQueueAddToSet(xQueueHandle1, xQueueSet);
+	xQueueAddToSet(xQueueHandle2, xQueueSet);
+	
+	/* 4. 创建3个任务 */
+	xTaskCreate(Task1Function, "Task1", 100, NULL, 1, NULL);
+	xTaskCreate(Task2Function, "Task2", 100, NULL, 1, NULL);
+	xTaskCreate(Task3Function, "Task3", 100, NULL, 1, NULL);
+
+	vTaskStartScheduler();
+	
+	return 0;
+}
+```
+
+## 7.4 信号量
+
+1. 信号量分为二值信号量和计数信号量
+2. 信号量和队列的区别：信号量只申请 `sizeof(Queue_t)` 大小的空间，无环形缓冲区 
+3. 信号量释放无需等待
+
+## 7.5 互斥量
 
