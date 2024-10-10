@@ -164,7 +164,7 @@ vTaskDelayUntil(&pre, n);	// 相对时间，到时间后会更新 pre = pre + n
 	1. 优先级为0
 	2. 只能处于就绪态和运行态，永不堵塞
 2. 作用：
-	1. 释放被删除的任务的内存（==删除自身的情况==），若用户任务永不堵塞，空闲任务将无法运行，也无法释放内存
+	1. 释放被删除的任务的内存==（当前任务删除自身）==，若用户任务永不堵塞，空闲任务将无法运行，也无法释放内存
 		![](./00_pic/04_任务/p4.png)
 	2. 调度器必须有一个可运行的函数
 
@@ -285,7 +285,7 @@ vTaskDelayUntil(&pre, n);	// 相对时间，到时间后会更新 pre = pre + n
 ## 7.3 队列
 
 创建队列需申请空间 `sizeof(Queue_t) + uxQueueLength * uxItemSize`
-### 7.3.1 操作
+### 7.3.1 理论
 
 1. 常规操作
 	![LEFT](./00_pic/07_同步与互斥/p3.png)
@@ -298,7 +298,7 @@ vTaskDelayUntil(&pre, n);	// 相对时间，到时间后会更新 pre = pre + n
 > 3. 读写任务链表用于唤醒对应的被队列堵塞的任务
 > 4. ==若多个任务被堵塞，唤醒的是最高优先级任务，且等待时间最长的任务==
 
-### 7.3.2 原理
+### 7.3.2 使用
 
 ```C
 /* 队列控制块结构体 */
@@ -425,8 +425,8 @@ int main( void )
 		printf("can not create queue\r\n");
 	}
 
-	/* 2. 创建queue set */
-	xQueueSet = xQueueCreateSet(3);
+	/* 2. 创建queue set，队列1和2宫4个消息 */
+	xQueueSet = xQueueCreateSet(4);
 	
 	/* 3. 把2个queue添加进queue set */
 	xQueueAddToSet(xQueueHandle1, xQueueSet);
@@ -451,3 +451,231 @@ int main( void )
 
 ## 7.5 互斥量
 
+### 7.5.1 理论
+
+> [!note] 与信号量的区别
+> 1. 上锁与解锁的任务必须一致（实际上需程序员控制）
+> 2. 解决部分优先级翻转问题
+> 3. 解决递归上锁/解锁问题
+
+1. 上锁与解锁一致
+	防止被其它任务解锁，导致资源被破坏
+2. 优先级翻转
+	高优先级任务等待低优先级任务互斥时，会将优先级继承给低优先级任务，防止因为等待低优先级任务的互斥量而被中优先级任务抢先执行
+	![](./00_pic/07_同步与互斥/p9.png)
+3. 递归上锁/解锁
+	常规互斥会导致死锁，递归互斥则可正常使用（同一个任务）
+	![](./00_pic/07_同步与互斥/p10.png)
+
+### 7.5.2 缺陷和递归锁
+
+互斥量：==当前任务未获取到互斥量也可解锁==；不可递归上锁
+递归互斥量：当前任务必须先获取到递归互斥量才能解锁；可递归上锁和解锁
+
+## 7.6 事件组
+
+### 7.6.1 理论
+
+事件组句柄结构体：
+``` C
+typedef struct EventGroupDef_t
+{
+    EventBits_t uxEventBits;  // 32位整数, 每一位代表一个事件
+    List_t xTasksWaitingForBits; // 等待事件的任务
+} EventGroup_t;
+```
+
+事件组函数：
+1. 创建：`xEventGroupCreate();`
+2. 设置位：`xEventGroupSetBits(event, (1<<1)|(1<<2));`
+3. 等待位：
+``` C
+EventBits_t xEventGroupWaitBits( 
+EventGroupHandle_t xEventGroup,		// 事件组
+const EventBits_t uxBitsToWaitFor,	// 等待的位
+const BaseType_t xClearOnExit,		// 返回前是否清除位
+const BaseType_t xWaitForAllBits,	// 与/或：是否等待所有位
+TickType_t xTicksToWait)			// 等待时间
+```
+4. 设置并等待：
+```C
+EventBits_t xEventGroupSync(
+EventGroupHandle_t xEventGroup,		// 事件组
+const EventBits_t uxBitsToSet,		// 设置位
+const EventBits_t uxBitsToWaitFor,	// 等待位
+TickType_t xTicksToWait)			// 等待时间
+```
+`xEventGroupSync`的场景-==多任务合作==：
+- 任务A实现事件1，等待事件1、2、3
+- 任务B实现事件2，等待事件1、2、3
+- 任务C实现事件3，等待事件1、2、3
+3个任务完成对应的事件后，可同时退出
+
+### 7.6.2 使用-等待
+
+工程路径：`01_project\04_event_group`
+``` C
+static int sum = 0;
+static int dec = 0;
+static volatile int flagCalcEnd = 0;
+static volatile int flagUARTused = 0;
+static QueueHandle_t xQueueCalcHandle;
+
+static EventGroupHandle_t xEventGroupCalc;
+
+void Task1Function(void * param)
+{
+	volatile int i = 0;
+	while (1)
+	{
+		for (i = 0; i < 100000; i++)
+			sum++;
+		xQueueSend(xQueueCalcHandle, &sum, 0);
+		xEventGroupSetBits(xEventGroupCalc, (1<<0));
+	}
+}
+
+void Task2Function(void * param)
+{
+	volatile int i = 0;
+	while (1)
+	{
+		for (i = 0; i < 100000; i++)
+			dec--;
+		xQueueSend(xQueueCalcHandle, &dec, 0);
+		xEventGroupSetBits(xEventGroupCalc, (1<<1));
+	}
+}
+
+void Task3Function(void * param)
+{
+	int val1, val2;
+	while (1)
+	{
+		xEventGroupWaitBits(xEventGroupCalc, (1<<0)|(1<<1), pdTRUE, pdTRUE, portMAX_DELAY);
+	
+		xQueueReceive(xQueueCalcHandle, &val1, 0);
+		xQueueReceive(xQueueCalcHandle, &val2, 0);
+		
+		printf("val1 = %d, val2 = %d\r\n", val1, val2);
+	}
+}
+
+int main( void )
+{
+	TaskHandle_t xHandleTask1;
+
+	prvSetupHardware();
+
+	printf("Hello, world!\r\n");
+
+	xEventGroupCalc = xEventGroupCreate();
+	xQueueCalcHandle = xQueueCreate(2, sizeof(int));
+	if (xQueueCalcHandle == NULL)
+	{
+		printf("can not create queue\r\n");
+	}
+
+
+	xTaskCreate(Task1Function, "Task1", 100, NULL, 1, &xHandleTask1);
+	xTaskCreate(Task2Function, "Task2", 100, NULL, 1, NULL);
+	xTaskCreate(Task3Function, "Task3", 100, NULL, 1, NULL);
+	vTaskStartScheduler();
+
+	return 0;
+}
+```
+结果：
+![LEFT](./00_pic/07_同步与互斥/p11.png)
+
+### 7.6.2 使用-同步点
+
+工程路径：`01_project\05_event_group_task_sync`
+``` C
+static void vCookingTask( void *pvParameters );
+static void vBuyingTask( void *pvParameters );
+static void vTableTask( void *pvParameters );
+
+EventGroupHandle_t xEventGroup;
+
+/* bit0: 洗菜
+ * bit1: 生火
+ * bit2: 炒菜
+ */
+#define TABLE    (1<<0)
+#define BUYING   (1<<1)
+#define COOKING  (1<<2)
+#define ALL      (TABLE | BUYING | COOKING)
+
+int main( void )
+{
+	prvSetupHardware();
+	
+    /* 创建递归锁 */
+    xEventGroup = xEventGroupCreate( );
+
+	if( xEventGroup != NULL )
+	{
+		/* 创建3个任务: 洗菜/生火/炒菜 */
+		xTaskCreate( vCookingTask, "task1", 1000, "A", 1, NULL );
+		xTaskCreate( vBuyingTask,  "task2", 1000, "B", 2, NULL );
+		xTaskCreate( vTableTask,   "task3", 1000, "C", 3, NULL );
+		vTaskStartScheduler();
+	}
+	else
+	{
+		/* 无法创建事件组 */
+	}
+
+	return 0;
+}
+
+static void vCookingTask( void *pvParameters )
+{
+	const TickType_t xTicksToWait = pdMS_TO_TICKS( 100UL );		
+	int i = 0;
+	for( ;; )
+	{
+		printf("%s is cooking %d time....\r\n", (char *)pvParameters, i);
+		/* 表示我做好了, 还要等别人都做好 */
+		xEventGroupSync(xEventGroup, COOKING, ALL, portMAX_DELAY);
+		/* 别人也做好了, 开饭 */
+		printf("%s is eating %d time....\r\n", (char *)pvParameters, i++);
+		vTaskDelay(xTicksToWait);
+	}
+}
+
+static void vBuyingTask( void *pvParameters )
+{
+	const TickType_t xTicksToWait = pdMS_TO_TICKS( 100UL );		
+	int i = 0;
+	for( ;; )
+	{
+		printf("%s is buying %d time....\r\n", (char *)pvParameters, i);
+		/* 表示我做好了, 还要等别人都做好 */
+		xEventGroupSync(xEventGroup, BUYING, ALL, portMAX_DELAY);
+		/* 别人也做好了, 开饭 */
+		printf("%s is eating %d time....\r\n", (char *)pvParameters, i++);
+		vTaskDelay(xTicksToWait);
+	}
+}
+
+static void vTableTask( void *pvParameters )
+{
+	const TickType_t xTicksToWait = pdMS_TO_TICKS( 100UL );		
+	int i = 0;
+	for( ;; )
+	{
+		printf("%s is do the table %d time....\r\n", (char *)pvParameters, i);
+		/* 表示我做好了, 还要等别人都做好 */
+		xEventGroupSync(xEventGroup, TABLE, ALL, portMAX_DELAY);
+		/* 别人也做好了, 开饭 */
+		printf("%s is eating %d time....\r\n", (char *)pvParameters, i++);
+		vTaskDelay(xTicksToWait);
+	}
+}
+```
+结果：
+![LEFT](./00_pic/07_同步与互斥/p12.png)
+
+## 7.7 任务通知
